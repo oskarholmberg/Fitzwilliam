@@ -81,7 +81,7 @@ public class Play extends GameState {
         FixtureDef fdef = new FixtureDef();
         fdef.shape=shape;
         fdef.filter.categoryBits = bodyCategory;
-        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET;
+        fdef.filter.maskBits = B2DVars.BIT_GROUND;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos / B2DVars.PPM, yPos / B2DVars.PPM);
         bdef.type= BodyDef.BodyType.DynamicBody;
@@ -114,9 +114,7 @@ public class Play extends GameState {
         shape.setAsBox(4 / B2DVars.PPM, 2 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
-        fdef.filter.categoryBits = B2DVars.BIT_BULLET;
-        if (harmFul)
-            fdef.filter.maskBits = B2DVars.BIT_PLAYER;
+        if (harmFul) fdef.filter.categoryBits = B2DVars.BIT_BULLET;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.KinematicBody;
