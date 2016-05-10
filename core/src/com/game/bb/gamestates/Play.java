@@ -7,18 +7,24 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.game.bb.handlers.*;
 import com.game.bb.main.Game;
 import com.game.bb.network.NetworkMonitor;
-import com.game.bb.sprites.PongBall;
-import com.game.bb.sprites.PongPaddle;
+import com.game.bb.entities.PongPaddle;
+
 
 /**
- * Created by erik on 06/05/16.
+ * TODO LIST --
+ * --Make bullets into a separate entity class
+ * --CLEAN UP CODE ( LOL XD )
+ * --Add textures to entities
+ * --Add background
+ * --Improve map?
+ * --Add music \o/
+ * --?
  */
 public class Play extends GameState {
 

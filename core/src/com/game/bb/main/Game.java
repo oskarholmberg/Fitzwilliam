@@ -9,7 +9,7 @@ import com.game.bb.handlers.BBInputProcessor;
 
 public class Game extends ApplicationAdapter {
     public final static String TITLE = "Block Bunny";
-    public final static int SCALE = 1;
+    public final static int SCALE = 2;
     public final static int WIDTH = 240*SCALE, HEIGHT = 160*SCALE;
 
     private SpriteBatch batch;

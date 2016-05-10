@@ -1,4 +1,4 @@
-package com.game.bb.sprites;
+package com.game.bb.entities;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.Body;
