@@ -38,6 +38,7 @@ public class NetworkMonitor {
 
     public synchronized void addOpponentAction(String action){
         opponentActions.add(action);
+        notifyAll();
     }
 
     public String getOpponentAction(){
