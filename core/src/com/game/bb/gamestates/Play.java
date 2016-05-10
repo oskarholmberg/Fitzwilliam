@@ -86,6 +86,7 @@ public class Play extends GameState {
         bdef.position.set(xPos / B2DVars.PPM, yPos / B2DVars.PPM);
         bdef.type= BodyDef.BodyType.DynamicBody;
         bodies[0] = world.createBody(bdef);
+        bodies[0].setAwake(true);
         bodies[0].createFixture(fdef).setUserData(name);
 
         //add foot
@@ -134,12 +135,14 @@ public class Play extends GameState {
     public void handlePongInput(float dt){
 
         if(PongInput.isPressed(PongInput.BUTTON_UP)) {
-            playerPaddle.movePaddle(150, 150);
-            mon.addAction(B2DVars.MY_ID + ":MOVE:150:150");
+            Vector2 temp = playerPaddle.getPosition();
+            playerPaddle.movePaddle(150, 150, temp.x, temp.y);
+            mon.addAction(B2DVars.MY_ID + ":MOVE:150:150:"+temp.x+":"+temp.y);
         }
         if(PongInput.isPressed(PongInput.BUTTON_DOWN)) {
-            playerPaddle.movePaddle(-150, 150);
-            mon.addAction(B2DVars.MY_ID + ":MOVE:-150:150");
+            Vector2 temp = playerPaddle.getPosition();
+            playerPaddle.movePaddle(-150, 150, temp.x, temp.y);
+            mon.addAction(B2DVars.MY_ID + ":MOVE:-150:150:"+temp.x+":"+temp.y);
         }
         if(PongInput.isPressed(PongInput.BUTTON_W)) {
             shoot();
@@ -151,7 +154,8 @@ public class Play extends GameState {
         String[] action = mon.getOpponentAction().split(":");
         if (validOpponentAction(action)) {
             if(action[1].equals("MOVE"))
-                opponentPaddle.movePaddle(Float.valueOf(action[2]), Float.valueOf(action[3]));
+                opponentPaddle.movePaddle(Float.valueOf(action[2]), Float.valueOf(action[3]),
+                        Float.valueOf(action[4]), Float.valueOf(action[5]));
             else if (action[1].equals("SHOOT"))
                 opponentShot(Float.valueOf(action[2]), Float.valueOf(action[3]), Float.valueOf(action[4]));
         }

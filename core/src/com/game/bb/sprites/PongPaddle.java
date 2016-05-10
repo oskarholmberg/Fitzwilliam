@@ -14,8 +14,9 @@ public class PongPaddle extends PongSprite {
 
     }
 
-    public void movePaddle(float x, float y){
-        body.applyForceToCenter(x, y, true);
+    public void movePaddle(float xForce, float yForce, float xPos, float yPos){
+        body.setTransform(xPos, yPos, 0);
+        body.applyForceToCenter(xForce, yForce, true);
     }
 
 
