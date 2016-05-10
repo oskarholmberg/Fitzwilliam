@@ -29,7 +29,7 @@ public class Game extends ApplicationAdapter {
         hudCam = new OrthographicCamera();
         hudCam.setToOrtho(false, WIDTH, HEIGHT);
 
-        gsm = new com.game.bb.handlers.GameStateManager(this);
+        gsm = new com.game.bb.handlers.GameStateManager(this, "192.168.1.163", 8080);
 	}
 
 
