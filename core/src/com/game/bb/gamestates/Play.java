@@ -86,16 +86,15 @@ public class Play extends GameState {
         bdef.position.set(xPos / B2DVars.PPM, yPos / B2DVars.PPM);
         bdef.type= BodyDef.BodyType.DynamicBody;
         bodies[0] = world.createBody(bdef);
-        bodies[0].setAwake(true);
         bodies[0].createFixture(fdef).setUserData(name);
 
         //add foot
-        //shape.setAsBox(2/B2DVars.PPM, 2/B2DVars.PPM, new Vector2(0, -5/B2DVars.PPM), 0);
-        //fdef.shape=shape;
-        //fdef.filter.categoryBits=B2DVars.BIT_PLAYER;
-        //fdef.filter.maskBits=B2DVars.BIT_GROUND | B2DVars.BIT_BALL;
-        //fdef.isSensor=true;
-        //body.createFixture(fdef).setUserData(name);
+        shape.setAsBox((width-2)/B2DVars.PPM, 2/B2DVars.PPM, new Vector2(0, -height/B2DVars.PPM), 0);
+        fdef.shape=shape;
+        fdef.filter.categoryBits=B2DVars.BIT_PLAYER;
+        fdef.filter.maskBits=B2DVars.BIT_GROUND;
+        fdef.isSensor=true;
+        bodies[0].createFixture(fdef).setUserData(name + "Foot");
 
         return bodies;
     }
@@ -134,15 +133,15 @@ public class Play extends GameState {
 
     public void handlePongInput(float dt){
 
-        if(PongInput.isPressed(PongInput.BUTTON_UP)) {
+        if(PongInput.isPressed(PongInput.BUTTON_UP) && cl.canJump()) {
             Vector2 temp = playerPaddle.getPosition();
-            playerPaddle.movePaddle(150, 150, temp.x, temp.y);
-            mon.addAction(B2DVars.MY_ID + ":MOVE:150:150:"+temp.x+":"+temp.y);
+            playerPaddle.movePaddle(50, 150, temp.x, temp.y);
+            mon.addAction(B2DVars.MY_ID + ":MOVE:50:150:"+temp.x+":"+temp.y);
         }
-        if(PongInput.isPressed(PongInput.BUTTON_DOWN)) {
+        if(PongInput.isPressed(PongInput.BUTTON_DOWN) && cl.canJump()) {
             Vector2 temp = playerPaddle.getPosition();
-            playerPaddle.movePaddle(-150, 150, temp.x, temp.y);
-            mon.addAction(B2DVars.MY_ID + ":MOVE:-150:150:"+temp.x+":"+temp.y);
+            playerPaddle.movePaddle(-50, 150, temp.x, temp.y);
+            mon.addAction(B2DVars.MY_ID + ":MOVE:-50:150:"+temp.x+":"+temp.y);
         }
         if(PongInput.isPressed(PongInput.BUTTON_W)) {
             shoot();

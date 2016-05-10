@@ -13,6 +13,7 @@ import com.game.bb.sprites.PongBall;
  */
 public class PongContactListener implements ContactListener {
     private NetworkMonitor mon;
+    private int footContact = 0, amntJumps = 0;
 
     public PongContactListener(NetworkMonitor mon){
         this.mon=mon;
@@ -23,12 +24,28 @@ public class PongContactListener implements ContactListener {
     public void beginContact(Contact contact) {
         Fixture fa = contact.getFixtureA();
         Fixture fb = contact.getFixtureB();
+
+        if (fa.getUserData().equals("PlayerFoot") || fb.getUserData().equals("PlayerFoot")) {
+            footContact++;
+            amntJumps = 0;
+        }
     }
 
     @Override
     public void endContact(Contact contact) {
         Fixture fa = contact.getFixtureA();
         Fixture fb = contact.getFixtureB();
+
+        if (fa.getUserData().equals("PlayerFoot") ||fb.getUserData().equals("PlayerFoot"))
+            footContact--;
+    }
+
+    public boolean canJump(){
+        if (footContact > 0 || amntJumps < 4){
+            amntJumps++;
+            return true;
+        }
+        return false;
     }
 
     @Override
