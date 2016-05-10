@@ -39,12 +39,9 @@ public class ServerReader extends Thread{
 
     @Override
     public void run() {
-        int i = 0;
         while(!socket.isClosed()){
             try {
                 mon.addOpponentAction(is.readUTF());
-                i++;
-                System.out.println("operation" + i);
             } catch (SocketException e){
                 try{
                     socket.close();

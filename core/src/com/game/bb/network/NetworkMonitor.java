@@ -42,8 +42,6 @@ public class NetworkMonitor {
 
     public String getOpponentAction(){
         if(!opponentActions.isEmpty()) {
-            System.out.println("operation" + i + ": " + opponentActions.get(0));
-            i++;
             return opponentActions.remove(0);
         } else {
             return "NO_ACTION";
