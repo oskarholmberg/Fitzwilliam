@@ -38,6 +38,17 @@ public class ServerWriter extends Thread {
                 try {
                     socket.close();
                     System.out.println("Server connection lost...");
+                    System.out.println("Trying to reconnect.");
+                    while(true){
+                        try {
+                            socket = new Socket("192.168.1.163", 8080);
+                            os = new DataOutputStream(socket.getOutputStream());
+                            os.writeUTF(B2DVars.MY_ID); //Sending temporary name
+                            os.flush();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }

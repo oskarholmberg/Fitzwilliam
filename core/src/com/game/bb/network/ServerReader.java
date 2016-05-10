@@ -19,6 +19,7 @@ public class ServerReader extends Thread{
             System.out.println("Trying to connect to 192.168.1.163");
             socket = new Socket("192.168.1.163", 8081);
             is = new DataInputStream(socket.getInputStream());
+            System.out.println("Success!");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,7 +44,14 @@ public class ServerReader extends Thread{
             } catch (EOFException e){
                 try {
                     socket.close();
-                    System.out.println("ServerConnection lost...");
+                    while(true){
+                        try {
+                            socket = new Socket("192.168.1.163", 8081);
+                            is = new DataInputStream(socket.getInputStream());
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
