@@ -6,7 +6,6 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.game.bb.network.NetworkMonitor;
-import com.game.bb.sprites.PongBall;
 
 /**
  * Created by erik on 08/05/16.
@@ -14,6 +13,7 @@ import com.game.bb.sprites.PongBall;
 public class PongContactListener implements ContactListener {
     private NetworkMonitor mon;
     private int footContact = 0, amntJumps = 0;
+    private boolean playerHit = false;
 
     public PongContactListener(NetworkMonitor mon){
         this.mon=mon;
@@ -29,6 +29,11 @@ public class PongContactListener implements ContactListener {
             footContact++;
             amntJumps = 0;
         }
+        if (fa.getUserData().equals("Player") && fb.getUserData().equals("Bullet")){
+            playerHit = true;
+        } else if (fa.getUserData().equals("Bullet") && fb.getUserData().equals("Player")){
+            playerHit = true;
+        }
     }
 
     @Override
@@ -38,6 +43,12 @@ public class PongContactListener implements ContactListener {
 
         if (fa.getUserData().equals("PlayerFoot") ||fb.getUserData().equals("PlayerFoot"))
             footContact--;
+    }
+
+    public void revive(){ playerHit = false; }
+
+    public boolean amIHit(){
+        return playerHit;
     }
 
     public boolean canJump(){

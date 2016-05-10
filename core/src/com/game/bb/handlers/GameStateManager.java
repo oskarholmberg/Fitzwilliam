@@ -20,9 +20,9 @@ public class GameStateManager {
         this.game=game;
         states = new Stack<GameState>();
         mon = new NetworkMonitor();
-        ServerWriter serverWriter = new ServerWriter(mon, "localhost", 8080);
+        ServerWriter serverWriter = new ServerWriter(mon, "192.168.1.163", 8080);
         if(serverWriter.isConnected()) serverWriter.start();
-        ServerReader serverReader = new ServerReader(mon, "localhost", 8081);
+        ServerReader serverReader = new ServerReader(mon, "192.168.1.163", 8081);
         if(serverReader.isConnected()) serverReader.start();
         pushState(PLAY);
     }

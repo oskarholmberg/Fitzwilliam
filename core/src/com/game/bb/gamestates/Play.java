@@ -33,22 +33,22 @@ public class Play extends GameState {
         super(gsm);
 
         mon = gsm.getMonitor();
-        world = new World(new Vector2(0, -9.81f), true);
+        world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new PongContactListener(mon));
         world.setVelocityThreshold(0.1f);
 
         b2dr = new Box2DDebugRenderer();
 
         // create boundaries
-        createBoundary(cam.viewportWidth/2, cam.viewportHeight, cam.viewportWidth/2, 5, false); //top
-        createBoundary(cam.viewportWidth/2, 0, cam.viewportWidth/2, 5, false); //bottom
-        createBoundary(0, cam.viewportHeight/2, 5, cam.viewportHeight/2, true); // left
-        createBoundary(cam.viewportWidth, cam.viewportHeight/2, 5, cam.viewportHeight/2, true); // right
+        createBoundary(cam.viewportWidth/2, cam.viewportHeight, cam.viewportWidth/2, 5); //top
+        createBoundary(cam.viewportWidth/2, 0, cam.viewportWidth/2, 5); //bottom
+        createBoundary(0, cam.viewportHeight/2, 5, cam.viewportHeight/2); // left
+        createBoundary(cam.viewportWidth, cam.viewportHeight/2, 5, cam.viewportHeight/2); // right
 
-        //Create falling player
+        //Players
 
-        playerPaddle = new PongPaddle(createPaddle("Player", 40, 120, 8, 8));
-        opponentPaddle = new PongPaddle(createPaddle("Opponent", cam.viewportWidth - 40, 120, 8, 8));
+        playerPaddle = new PongPaddle(createPaddle("Player", 40, 120, 8, 8, B2DVars.BIT_PLAYER));
+        opponentPaddle = new PongPaddle(createPaddle("Opponent", cam.viewportWidth - 40, 120, 8, 8, B2DVars.BIT_OPPONENT));
 
 
 
@@ -57,7 +57,7 @@ public class Play extends GameState {
         b2dCam.setToOrtho(false, Game.WIDTH/ B2DVars.PPM, Game.HEIGHT/ B2DVars.PPM);
     }
 
-    private void createBoundary(float xPos, float yPos, float width, float height, boolean sideWall){
+    private void createBoundary(float xPos, float yPos, float width, float height){
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos/ B2DVars.PPM, yPos/ B2DVars.PPM);
         bdef.type = BodyDef.BodyType.StaticBody;
@@ -70,18 +70,18 @@ public class Play extends GameState {
         // set bits to collide with
         fdef.filter.categoryBits = B2DVars.BIT_GROUND;
         fdef.friction = 1f;
-        fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BALL;
+        fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_OPPONENT;
         body.createFixture(fdef).setUserData("Ground");
     }
 
-    private Body[] createPaddle(String name, float xPos, float yPos, float width, float height){
+    private Body[] createPaddle(String name, float xPos, float yPos, float width, float height, short bodyCategory){
         Body[] bodies = new Body[2];
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width / B2DVars.PPM, height / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape=shape;
-        fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
-        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BALL | B2DVars.BIT_PLAYER;
+        fdef.filter.categoryBits = bodyCategory;
+        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos / B2DVars.PPM, yPos / B2DVars.PPM);
         bdef.type= BodyDef.BodyType.DynamicBody;
@@ -115,15 +115,17 @@ public class Play extends GameState {
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         fdef.filter.categoryBits = B2DVars.BIT_BULLET;
-        fdef.filter.maskBits = B2DVars.BIT_PLAYER;
+        if (harmFul)
+            fdef.filter.maskBits = B2DVars.BIT_PLAYER;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.KinematicBody;
         Body body = world.createBody(bdef);
-        body.createFixture(fdef).setUserData("gunShot");
+        body.createFixture(fdef).setUserData("Bullet");
         body.setLinearVelocity(100f * dir / B2DVars.PPM, 0);
-        if (!harmFul)
+        if (!harmFul) {
             mon.addAction(B2DVars.MY_ID + ":SHOOT:" + pos.x + ":" + pos.y + ":" + dir);
+        }
     }
 
     public void opponentShot(float xPos, float yPos, float dir){
@@ -165,10 +167,17 @@ public class Play extends GameState {
         return false;
     }
 
+    private void respawnPlayer(){
+        playerPaddle.movePaddle(0, 0, 100/B2DVars.PPM, 100/B2DVars.PPM);
+        cl.revive();
+    }
+
     @Override
     public void update(float dt) {
         handlePongInput(dt);
         opponentActions();
+        if (cl.amIHit())
+            respawnPlayer();
         world.step(dt, 6, 2);
     }
 

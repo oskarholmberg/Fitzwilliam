@@ -11,5 +11,5 @@ public class B2DVars {
     public static final String MY_ID = "Oskar" + System.currentTimeMillis();
 
     // collision bits
-    public static final short BIT_GROUND = 2, BIT_PLAYER = 4, BIT_BALL = 8, BIT_BULLET = 16;
+    public static final short BIT_GROUND = 2, BIT_PLAYER = 4, BIT_OPPONENT = 8, BIT_BULLET = 16;
 }
