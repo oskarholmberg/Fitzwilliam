@@ -64,12 +64,23 @@ public class GameStateManager {
         notifyAll();
     }
 
+    public synchronized String getAction(){
+        if(actions.isEmpty()){
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return actions.remove(0);
+    }
+
     public synchronized void addOpponentAction(String action){
         opponentActions.add(action);
         notifyAll();
     }
 
-    public String getOpponentAction() {
+    public synchronized String getOpponentAction() {
         if (!opponentActions.isEmpty()) {
             return opponentActions.remove(0);
         } else {
