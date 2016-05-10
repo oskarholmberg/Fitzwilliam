@@ -1,8 +1,12 @@
 package com.game.bb.network;
 
+import org.lwjgl.Sys;
+
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -13,12 +17,20 @@ public class ServerReader extends Thread{
     private NetworkMonitor mon;
     private Socket socket;
     private DataInputStream is;
-    public ServerReader(NetworkMonitor mon){
+    private String address;
+    private int port;
+
+    public ServerReader(NetworkMonitor mon, String address, int port){
         this.mon=mon;
+        this.address = address;
+        this.port = port;
         try {
-            System.out.println("Trying to connect to 192.168.1.163");
-            socket = new Socket("192.168.1.163", 8081);
+            System.out.println("Trying to connect to " + address);
+            socket = new Socket(address, port);
             is = new DataInputStream(socket.getInputStream());
+            System.out.println("Success!");
+        } catch (ConnectException e ){
+            System.out.println("Server @"+ address + ":" + port + " is offline. But you may still play offline.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,8 +55,21 @@ public class ServerReader extends Thread{
             } catch (EOFException e){
                 try {
                     socket.close();
-                    System.out.println("ServerConnection lost...");
+                    while(socket.isClosed()){
+                        sleep(5000);
+                        try {
+                            socket = new Socket(address, port);
+                            is = new DataInputStream(socket.getInputStream());
+                        } catch (ConnectException e1){
+
+                        }
+                        catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
                 } catch (IOException e1) {
+                    e1.printStackTrace();
+                } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
             } catch (IOException e) {
@@ -52,5 +77,9 @@ public class ServerReader extends Thread{
             }
 
         }
+    }
+
+    public boolean isConnected() {
+        return socket != null;
     }
 }
