@@ -33,7 +33,7 @@ public class Play extends GameState {
         super(gsm);
 
         mon = gsm.getMonitor();
-        world = new World(new Vector2(0, -9.81f), true);
+        world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new PongContactListener(mon));
         world.setVelocityThreshold(0.1f);
 
@@ -81,7 +81,7 @@ public class Play extends GameState {
         FixtureDef fdef = new FixtureDef();
         fdef.shape=shape;
         fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
-        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BALL | B2DVars.BIT_PLAYER;
+        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BALL;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos / B2DVars.PPM, yPos / B2DVars.PPM);
         bdef.type= BodyDef.BodyType.DynamicBody;

@@ -16,13 +16,13 @@ public class GameStateManager {
     private int PLAY = 123123;
     private NetworkMonitor mon;
 
-    public GameStateManager(Game game){
+    public GameStateManager(Game game, String address, int port){
         this.game=game;
         states = new Stack<GameState>();
         mon = new NetworkMonitor();
-        ServerWriter serverWriter = new ServerWriter(mon, "localhost", 8080);
+        ServerWriter serverWriter = new ServerWriter(mon, address, port);
         if(serverWriter.isConnected()) serverWriter.start();
-        ServerReader serverReader = new ServerReader(mon, "localhost", 8081);
+        ServerReader serverReader = new ServerReader(mon, address, port + 1);
         if(serverReader.isConnected()) serverReader.start();
         pushState(PLAY);
     }
