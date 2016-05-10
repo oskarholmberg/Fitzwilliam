@@ -47,8 +47,10 @@ public class Play extends GameState {
 
         //Players
 
-        playerPaddle = new PongPaddle(createPaddle("Player", 40, 120, 8, 8, B2DVars.BIT_PLAYER));
-        opponentPaddle = new PongPaddle(createPaddle("Opponent", cam.viewportWidth - 40, 120, 8, 8, B2DVars.BIT_OPPONENT));
+        playerPaddle = new PongPaddle(createPaddle("Player", cam.viewportWidth / 2, cam.viewportHeight / 2
+                , 8, 8, B2DVars.BIT_PLAYER));
+        opponentPaddle = new PongPaddle(createPaddle("Opponent", cam.viewportWidth / 2, cam.viewportHeight / 2
+                , 8, 8, B2DVars.BIT_OPPONENT));
 
 
 
@@ -81,7 +83,10 @@ public class Play extends GameState {
         FixtureDef fdef = new FixtureDef();
         fdef.shape=shape;
         fdef.filter.categoryBits = bodyCategory;
-        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET;
+        if (name.equals("Player"))
+            fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET;
+        else
+            fdef.filter.maskBits = B2DVars.BIT_GROUND;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos / B2DVars.PPM, yPos / B2DVars.PPM);
         bdef.type= BodyDef.BodyType.DynamicBody;
@@ -114,9 +119,10 @@ public class Play extends GameState {
         shape.setAsBox(4 / B2DVars.PPM, 2 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
-        fdef.filter.categoryBits = B2DVars.BIT_BULLET;
-        if (harmFul)
+        if (harmFul) {
+            fdef.filter.categoryBits = B2DVars.BIT_BULLET;
             fdef.filter.maskBits = B2DVars.BIT_PLAYER;
+        }
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.KinematicBody;
@@ -169,6 +175,7 @@ public class Play extends GameState {
 
     private void respawnPlayer(){
         playerPaddle.movePaddle(0, 0, 100/B2DVars.PPM, 100/B2DVars.PPM);
+        mon.addAction(B2DVars.MY_ID + ":MOVE:0:0:"+playerPaddle.getPosition().x+":"+playerPaddle.getPosition().y);
         cl.revive();
     }
 
