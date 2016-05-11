@@ -12,16 +12,18 @@ import com.game.bb.handlers.B2DVars;
  */
 public class SPBullet extends SPSprite {
 
-    public SPBullet(Body body, boolean harmful, float dir) {
+    private int offset = 0;
+
+    public SPBullet(Body body, boolean harmful) {
         super(body);
         Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/hit.wav"));
         sound.play();
         if (harmful) {
             // set enemy color texture
-            setTexture(new Texture("images/enemyBullet.png"));
+            setTexture(new Texture("images/redBullet.png"));
         } else {
             // set friendly color texture
-            setTexture(new Texture("images/friendlyBullet.png"));
+            setTexture(new Texture("images/blueBullet.png"));
         }
     }
 
@@ -33,8 +35,9 @@ public class SPBullet extends SPSprite {
     public void render(SpriteBatch sb){
         if(texture != null) {
             sb.begin();
-            sb.draw(texture, body.getPosition().x * B2DVars.PPM - width / 2,
-                    body.getPosition().y * B2DVars.PPM - height / 2, 16, 8);
+            float x =  body.getPosition().x * B2DVars.PPM - width / 2;
+            float y = body.getPosition().y * B2DVars.PPM - height / 2;
+            sb.draw(texture, x-offset, y-offset, 24, 7);
             sb.end();
         }
     }
