@@ -3,7 +3,9 @@ package com.game.bb.entities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.game.bb.handlers.B2DVars;
 
 /**
  * Created by erik on 11/05/16.
@@ -25,5 +27,15 @@ public class SPBullet extends SPSprite {
 
     public float getXPos(){
         return body.getPosition().x;
+    }
+
+    @Override
+    public void render(SpriteBatch sb){
+        if(texture != null) {
+            sb.begin();
+            sb.draw(texture, body.getPosition().x * B2DVars.PPM - width / 2,
+                    body.getPosition().y * B2DVars.PPM - height / 2, 16, 8);
+            sb.end();
+        }
     }
 }
