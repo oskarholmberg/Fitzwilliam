@@ -5,18 +5,17 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
-import com.game.bb.network.NetworkMonitor;
+import com.game.bb.gamestates.GameState;
 
 /**
  * Created by erik on 08/05/16.
  */
 public class PongContactListener implements ContactListener {
-    private NetworkMonitor mon;
     private int footContact = 0, amntJumps = 0;
     private boolean playerHit = false;
 
-    public PongContactListener(NetworkMonitor mon){
-        this.mon=mon;
+    public PongContactListener(){
+
     }
 
 
