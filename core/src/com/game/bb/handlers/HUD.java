@@ -16,7 +16,7 @@ public class HUD {
 
         Texture hudTex = new Texture("images/hud.png");
 
-        playerTexture = new Texture("images/bluePlayerStandRight.png");
+        playerTexture = new Texture("images/player/bluePlayerStandRight.png");
 
         font = new TextureRegion[11];
         for(int i = 0; i < 6; i++) {
