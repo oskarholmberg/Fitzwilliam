@@ -125,7 +125,6 @@ public class Play extends GameState {
             Vector2 pos = player.getPosition();
             bullet(pos.x, pos.y, lastJumpDirection, false);
             amntBullets--;
-            System.out.println(bullets.size);
         }
     }
 
@@ -145,7 +144,9 @@ public class Play extends GameState {
         Body body = world.createBody(bdef);
         body.createFixture(fdef).setUserData(B2DVars.ID_BULLET);
         body.setLinearVelocity(100f * dir / B2DVars.PPM, 0);
-        bullets.add(new SPBullet(body, harmFul, dir));
+        SPBullet bullet = new SPBullet(body, harmFul, dir);
+        body.setUserData(bullet);
+        bullets.add(bullet);
         if (!harmFul)
             gsm.addAction(B2DVars.MY_ID + ":SHOOT:" + pos.x + ":" + pos.y + ":" + dir);
     }
@@ -212,7 +213,7 @@ public class Play extends GameState {
             world.destroyBody(b);
         }
         for (SPBullet spb : bullets){
-            if (spb.getXPos() < 0  || spb.getXPos() > cam.viewportWidth) {
+            if (spb.getXPos() < 0  || spb.getXPos() > cam.viewportWidth / B2DVars.PPM) {
                 bullets.removeValue(spb, true);
                 world.destroyBody(spb.getBody());
             }

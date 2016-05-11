@@ -50,7 +50,6 @@ public class GameClient extends Thread {
                 e.printStackTrace();
             }
             String action = new String(packet.getData()).trim();
-            System.out.println("SERVER > " + action);
             gsm.addOpponentAction(action);
         }
     }
