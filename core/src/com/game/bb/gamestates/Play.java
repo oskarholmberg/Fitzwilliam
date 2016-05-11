@@ -132,7 +132,7 @@ public class Play extends GameState {
     public void bullet(float xPos, float yPos, float dir, boolean harmFul) {
         PolygonShape shape = new PolygonShape();
         Vector2 pos = player.getPosition();
-        shape.setAsBox(4 / B2DVars.PPM, 2 / B2DVars.PPM);
+        shape.setAsBox(8 / B2DVars.PPM, 4 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         if (harmFul) {
@@ -144,7 +144,7 @@ public class Play extends GameState {
         bdef.type = BodyDef.BodyType.KinematicBody;
         Body body = world.createBody(bdef);
         body.createFixture(fdef).setUserData(B2DVars.ID_BULLET);
-        body.setLinearVelocity(100f * dir / B2DVars.PPM, 0);
+        body.setLinearVelocity(200f * dir / B2DVars.PPM, 0);
         SPBullet bullet = new SPBullet(body, harmFul, dir);
         body.setUserData(bullet);
         bullets.add(bullet);
@@ -161,14 +161,14 @@ public class Play extends GameState {
 
         if(SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
-            player.jump(50, 150, temp.x, temp.y);
-            gsm.addAction(B2DVars.MY_ID + ":MOVE:50:150:"+temp.x+":"+temp.y);
+            player.jump(100, 300, temp.x, temp.y);
+            gsm.addAction(B2DVars.MY_ID + ":MOVE:100:300:"+temp.x+":"+temp.y);
             lastJumpDirection = 1;
         }
         if(SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
-            player.jump(-50, 150, temp.x, temp.y);
-            gsm.addAction(B2DVars.MY_ID + ":MOVE:-50:150:"+temp.x+":"+temp.y);
+            player.jump(-100, 300, temp.x, temp.y);
+            gsm.addAction(B2DVars.MY_ID + ":MOVE:-100:300:"+temp.x+":"+temp.y);
             lastJumpDirection = -1;
         }
         if(SPInput.isPressed(SPInput.BUTTON_W)) {
