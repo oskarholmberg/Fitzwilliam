@@ -1,0 +1,24 @@
+##Network##
+	Select host or join on start.
+
+##Code##
+	Remove dead bullet textures/bodies due to bullets list size.
+	Add start screen. Score screen. etc.
+	Add background image.
+	Change reload functionality to work as IRL.
+
+##Functionality##
+	Add score count.
+
+##Extra##
+	Add functionality for Tiled.map and level select.
+	Add spawn location list for different maps.
+
+	#Powerups#
+		Sabotage - Change enemy gravity scale
+		Clip - More shots available before reload.
+		Jetpack - Amount of jumps
+		Shield - +1 Armor
+		Armor Piercing - Extra fast bullets, +1 Dmg
+		Gravity swap - Reverse gravity 
+		Gravity Bullet - Magnetic bullets, pulling player towards it.
