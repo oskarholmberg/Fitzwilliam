@@ -194,7 +194,6 @@ public class Play extends GameState {
     }
 
     private void refreshBullets(float dt){
-        System.out.println(bulletRefresh);
         if (bulletRefresh > 5f){
             amntBullets = 5;
             bulletRefresh = 0;

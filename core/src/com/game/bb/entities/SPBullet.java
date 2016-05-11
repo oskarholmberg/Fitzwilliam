@@ -12,9 +12,10 @@ public class SPBullet extends SPSprite {
         super(body);
         if (harmful) {
             // set enemy color texture
-            //setTexture(new Texture("TEXTURENAME"));
+            setTexture(new Texture("images/enemyBulletRight.png"));
         } else {
             // set friendly color texture
+            setTexture(new Texture("images/enemyBulletRight.png"));
         }
     }
 }
