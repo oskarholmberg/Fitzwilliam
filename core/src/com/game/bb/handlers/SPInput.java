@@ -3,7 +3,7 @@ package com.game.bb.handlers;
 /**
  * Created by erik on 08/05/16.
  */
-public class PongInput {
+public class SPInput {
 
     public static boolean[] keys;
     public static boolean[] pkeys;

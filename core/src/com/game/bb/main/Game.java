@@ -4,13 +4,12 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.game.bb.handlers.PongInput;
-import com.game.bb.handlers.BBInputProcessor;
+import com.game.bb.handlers.B2DVars;
+import com.game.bb.handlers.SPInput;
+import com.game.bb.handlers.SPInputProcessor;
 
 public class Game extends ApplicationAdapter {
     public final static String TITLE = "Space Pirates";
-    public final static int SCALE = 2;
-    public final static int WIDTH = 240*SCALE, HEIGHT = 160*SCALE;
 
     private SpriteBatch batch;
     private OrthographicCamera cam;
@@ -21,13 +20,13 @@ public class Game extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-        Gdx.input.setInputProcessor(new BBInputProcessor());
+        Gdx.input.setInputProcessor(new SPInputProcessor());
 
 		batch = new SpriteBatch();
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, WIDTH, HEIGHT);
+        cam.setToOrtho(false, B2DVars.CAM_WIDTH, B2DVars.CAM_HEIGHT);
         hudCam = new OrthographicCamera();
-        hudCam.setToOrtho(false, WIDTH, HEIGHT);
+        hudCam.setToOrtho(false, B2DVars.CAM_WIDTH, B2DVars.CAM_HEIGHT);
 
         gsm = new com.game.bb.handlers.GameStateManager(this, "192.168.1.163", 8080);
 	}
@@ -38,7 +37,7 @@ public class Game extends ApplicationAdapter {
 	public void render () {
             gsm.update(Gdx.graphics.getDeltaTime());
             gsm.render();
-            PongInput.update();
+            SPInput.update();
 	}
 
 	public void dispose(){
