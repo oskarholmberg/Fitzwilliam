@@ -3,6 +3,7 @@ package com.game.bb.gamestates;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -39,6 +40,7 @@ public class Play extends GameState {
     private float bulletRefresh, lastJumpDirection = 1;
     private Array<SPBullet> bullets;
     private HUD hud;
+    private Texture backGround = new Texture("images/spaceBackground.png");
 
     public Play(GameStateManager gsm){
         super(gsm);
@@ -240,6 +242,9 @@ public class Play extends GameState {
     public void render() {
         //Clear screen
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        sb.begin();
+        sb.draw(backGround, 0, 0);
+        sb.end();
         b2dr.render(world, b2dCam.combined);
         for (SPBullet b : bullets){
             b.render(sb);

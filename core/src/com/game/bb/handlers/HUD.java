@@ -10,10 +10,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class HUD {
     private TextureRegion[] font;
     private String playerDeaths = "0", opponentDeaths = "0";
+    private Texture playerTexture;
 
     public HUD(){
 
         Texture hudTex = new Texture("images/hud.png");
+
+        playerTexture = new Texture("images/bluePlayerStandRight.png");
 
         font = new TextureRegion[11];
         for(int i = 0; i < 6; i++) {
@@ -32,7 +35,8 @@ public class HUD {
     public void render(SpriteBatch sb){
         sb.begin();
         for (int i = 0; i < playerDeaths.length(); i++){
-            sb.draw(font[Integer.valueOf(playerDeaths.substring(i, i+1))], 50 + i*50, B2DVars.CAM_HEIGHT - 50, 40, 40);
+            sb.draw(playerTexture, 50, B2DVars.CAM_HEIGHT - 70, 45, 40);
+            sb.draw(font[Integer.valueOf(playerDeaths.substring(i, i+1))], 100 + i*50, B2DVars.CAM_HEIGHT - 70, 40, 40);
         }
         sb.end();
     }
