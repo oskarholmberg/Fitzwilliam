@@ -61,8 +61,7 @@ public class SPPlayer extends SPSprite {
                 }
                 onGround=true;
             }
-
-            sb.draw(texture, x-offset, y);
+            sb.draw(texture, x-offset, y, 54, 48);
             sb.end();
         }
     }
