@@ -58,7 +58,7 @@ public class SPPlayer extends SPSprite {
             sb.begin();
             float x = body.getPosition().x * B2DVars.PPM - B2DVars.PLAYER_WIDTH;
             float y = body.getPosition().y * B2DVars.PPM - B2DVars.PLAYER_HEIGHT;
-            sb.draw(texture, x, y);
+            sb.draw(texture, x, y, 54, 48);
             sb.end();
         }
     }
