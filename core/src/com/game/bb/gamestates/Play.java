@@ -20,7 +20,8 @@ import java.util.ArrayList;
 
 /**
  * TODO LIST --
- * --Make bullets into a separate entity class
+ * --Remove dead bullet textures/bodies (check how big the bullets list gets)
+ * --Add different game screens with options to host or join
  * --CLEAN UP CODE ( LOL XD )
  * --Add textures to entities
  * --Add background
