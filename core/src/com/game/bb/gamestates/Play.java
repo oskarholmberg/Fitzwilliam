@@ -10,9 +10,12 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.game.bb.entities.SPBullet;
 import com.game.bb.handlers.*;
 import com.game.bb.main.Game;
 import com.game.bb.entities.SPPlayer;
+
+import java.util.ArrayList;
 
 
 /**
@@ -34,6 +37,7 @@ public class Play extends GameState {
     private SPPlayer playerPaddle, opponentPaddle;
     private int amntBullets = 0;
     private float bulletRefresh, lastJumpDirection = 1;
+    private ArrayList<SPBullet> bullets;
 
     public Play(GameStateManager gsm){
         super(gsm);
@@ -43,6 +47,7 @@ public class Play extends GameState {
 
         b2dr = new Box2DDebugRenderer();
 
+        bullets = new ArrayList<SPBullet>();
         // create boundaries
         createBoundary(cam.viewportWidth/2, cam.viewportHeight, cam.viewportWidth/2, 5); //top
         createBoundary(cam.viewportWidth/2, 0, cam.viewportWidth/2, 5); //bottom
@@ -136,9 +141,9 @@ public class Play extends GameState {
         Body body = world.createBody(bdef);
         body.createFixture(fdef).setUserData("Bullet");
         body.setLinearVelocity(100f * dir / B2DVars.PPM, 0);
-        if (!harmFul) {
+        bullets.add(new SPBullet(body, harmFul));
+        if (!harmFul)
             gsm.addAction(B2DVars.MY_ID + ":SHOOT:" + pos.x + ":" + pos.y + ":" + dir);
-        }
     }
 
     public void opponentShot(float xPos, float yPos, float dir){
@@ -214,6 +219,9 @@ public class Play extends GameState {
         //Clear screen
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
         b2dr.render(world, b2dCam.combined);
+        for (int i = 0; i < bullets.size(); i++) {
+            bullets.get(i).render(sb);
+        }
         sb.setProjectionMatrix(cam.combined);
     }
 
