@@ -165,14 +165,14 @@ public class Play extends GameState {
 
         if(SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
-            player.jump(70, 200, temp.x, temp.y);
-            gsm.addAction(B2DVars.MY_ID + ":MOVE:70:200:"+temp.x+":"+temp.y);
+            player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, temp.x, temp.y);
+            gsm.addAction(B2DVars.MY_ID + ":MOVE:" + B2DVars.PH_JUMPX + ":"+B2DVars.PH_JUMPY+":"+ temp.x +":"+temp.y);
             lastJumpDirection = 1;
         }
         if(SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
-            player.jump(-70, 200, temp.x, temp.y);
-            gsm.addAction(B2DVars.MY_ID + ":MOVE:-70:200:"+temp.x+":"+temp.y);
+            player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, temp.x, temp.y);
+            gsm.addAction(B2DVars.MY_ID + ":MOVE:" + -B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":"+temp.x+":"+temp.y);
             lastJumpDirection = -1;
         }
         if(SPInput.isPressed(SPInput.BUTTON_W)) {

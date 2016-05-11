@@ -12,6 +12,8 @@ public class B2DVars {
     public static final int SCALE = 1;
     public final static int CAM_WIDTH = 960*SCALE, CAM_HEIGHT = 640*SCALE;
 
+    public final static float PH_JUMPX = 70, PH_JUMPY = 200;
+
     public static final String MY_ID = Long.toString(System.currentTimeMillis()) + Math.random();
 
     // collision bits
