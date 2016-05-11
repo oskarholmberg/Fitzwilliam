@@ -13,7 +13,6 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.game.bb.handlers.*;
 import com.game.bb.main.Game;
-import com.game.bb.network.NetworkMonitor;
 import com.game.bb.entities.PongPaddle;
 
 
@@ -33,15 +32,13 @@ public class Play extends GameState {
     private Box2DDebugRenderer b2dr;
     private OrthographicCamera b2dCam;
     private PongContactListener cl;
-    private NetworkMonitor mon;
     private PongPaddle playerPaddle, opponentPaddle;
 
     public Play(GameStateManager gsm){
         super(gsm);
 
-        mon = gsm.getMonitor();
         world = new World(new Vector2(0, -7.81f), true);
-        world.setContactListener(cl = new PongContactListener(mon));
+        world.setContactListener(cl = new PongContactListener());
         world.setVelocityThreshold(0.1f);
 
         b2dr = new Box2DDebugRenderer();
@@ -137,7 +134,7 @@ public class Play extends GameState {
         body.createFixture(fdef).setUserData("Bullet");
         body.setLinearVelocity(100f * dir / B2DVars.PPM, 0);
         if (!harmFul) {
-            mon.addAction(B2DVars.MY_ID + ":SHOOT:" + pos.x + ":" + pos.y + ":" + dir);
+            gsm.addAction(B2DVars.MY_ID + ":SHOOT:" + pos.x + ":" + pos.y + ":" + dir);
         }
     }
 
@@ -151,12 +148,12 @@ public class Play extends GameState {
         if(PongInput.isPressed(PongInput.BUTTON_UP) && cl.canJump()) {
             Vector2 temp = playerPaddle.getPosition();
             playerPaddle.movePaddle(50, 150, temp.x, temp.y);
-            mon.addAction(B2DVars.MY_ID + ":MOVE:50:150:"+temp.x+":"+temp.y);
+            gsm.addAction(B2DVars.MY_ID + ":MOVE:50:150:"+temp.x+":"+temp.y);
         }
         if(PongInput.isPressed(PongInput.BUTTON_DOWN) && cl.canJump()) {
             Vector2 temp = playerPaddle.getPosition();
             playerPaddle.movePaddle(-50, 150, temp.x, temp.y);
-            mon.addAction(B2DVars.MY_ID + ":MOVE:-50:150:"+temp.x+":"+temp.y);
+            gsm.addAction(B2DVars.MY_ID + ":MOVE:-50:150:"+temp.x+":"+temp.y);
         }
         if(PongInput.isPressed(PongInput.BUTTON_W)) {
             shoot();
@@ -165,7 +162,7 @@ public class Play extends GameState {
     }
 
     private void opponentActions(){
-        String[] action = mon.getOpponentAction().split(":");
+        String[] action = gsm.getOpponentAction().split(":");
         if (validOpponentAction(action)) {
             if(action[1].equals("MOVE"))
                 opponentPaddle.movePaddle(Float.valueOf(action[2]), Float.valueOf(action[3]),
@@ -182,7 +179,7 @@ public class Play extends GameState {
 
     private void respawnPlayer(){
         playerPaddle.movePaddle(0, 0, 100/B2DVars.PPM, 100/B2DVars.PPM);
-        mon.addAction(B2DVars.MY_ID + ":MOVE:0:0:"+playerPaddle.getPosition().x+":"+playerPaddle.getPosition().y);
+        gsm.addAction(B2DVars.MY_ID + ":MOVE:0:0:"+playerPaddle.getPosition().x+":"+playerPaddle.getPosition().y);
         cl.revive();
     }
 
