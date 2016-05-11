@@ -18,20 +18,20 @@ public class GameServer extends Thread {
     private int port;
     private ArrayList<String> connectedClients;
 
-    public GameServer(int port){
-        this.port=port;
+    public GameServer(int port) {
+        this.port = port;
         connectedClients = new ArrayList<String>();
         try {
             System.out.println("Trying to start server on port: " + port);
-            this.socket=new DatagramSocket(port);
+            this.socket = new DatagramSocket(port);
             System.out.println("Success! Server listening on port: " + port);
         } catch (SocketException e) {
             e.printStackTrace();
         }
     }
 
-    public void run(){
-        while(!socket.isClosed()){
+    public void run() {
+        while (!socket.isClosed()) {
             byte[] data = new byte[1024];
             DatagramPacket packet = new DatagramPacket(data, data.length);
             try {
@@ -39,12 +39,19 @@ public class GameServer extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String ipAddress = packet.getAddress().getHostAddress()+":"+packet.getPort();
-            if(!connectedClients.contains(ipAddress)){
+            String ipAddress = packet.getAddress().getHostAddress() + ":" + packet.getPort();
+            if (!connectedClients.contains(ipAddress)) {
                 connectedClients.add(ipAddress);
+                System.out.println("CLIENT[" + ipAddress + "] connected.");
             }
-            System.out.println("CLIENT["+ ipAddress + "] > " + new String(packet.getData()).trim());
-            sendData(packet.getData());
+            String content = new String(packet.getData()).trim();
+            if (content.equals("disconnect")) {
+                connectedClients.remove(ipAddress);
+                System.out.println("CLIENT[" + ipAddress + "] disconnected.");
+            } else {
+                System.out.println("CLIENT[" + ipAddress + "] > " + content);
+                sendData(packet.getData());
+            }
         }
     }
 
@@ -63,11 +70,12 @@ public class GameServer extends Thread {
                 }
             } catch (UnknownHostException e) {
                 connectedClients.remove(s);
+                System.out.println("CLIENT[" + s + "] disconnected.");
             }
         }
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         new GameServer(8080).start();
     }
 }

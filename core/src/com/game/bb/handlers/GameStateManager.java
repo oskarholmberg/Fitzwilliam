@@ -14,7 +14,6 @@ public class GameStateManager {
     private Game game;
     private Stack<GameState> states;
     private int PLAY = 123123;
-    private ArrayList<String> actions;
     private ArrayList<String> opponentActions;
     private GameClient client;
 
@@ -22,10 +21,10 @@ public class GameStateManager {
     public GameStateManager(Game game, String ipAddress, int port) {
         this.game = game;
         states = new Stack<GameState>();
-        actions = new ArrayList<String>();
         opponentActions = new ArrayList<String>();
         client = new GameClient(this, ipAddress, port);
         client.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(client.getDisconnecter()));
         pushState(PLAY);
     }
 
