@@ -45,7 +45,7 @@ public class Play extends GameState {
     public Play(GameStateManager gsm){
         super(gsm);
 
-        world = new World(new Vector2(0, -5.81f), true);
+        world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
 
         b2dr = new Box2DDebugRenderer();
@@ -59,8 +59,10 @@ public class Play extends GameState {
         createBoundary(0, cam.viewportHeight/2, 5, cam.viewportHeight/2); // left
         createBoundary(cam.viewportWidth, cam.viewportHeight/2, 5, cam.viewportHeight/2); // right
 
-        //Players
+        //build random platforms
 
+
+        //Players
         player = new SPPlayer(createPlayer(B2DVars.ID_PLAYER, cam.viewportWidth / 2, cam.viewportHeight / 2
                 , B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT, B2DVars.BIT_PLAYER));
         opponentPaddle = new SPPlayer(createPlayer(B2DVars.ID_OPPONENT, cam.viewportWidth / 2, cam.viewportHeight / 2
@@ -163,14 +165,14 @@ public class Play extends GameState {
 
         if(SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
-            player.jump(100, 300, temp.x, temp.y);
-            gsm.addAction(B2DVars.MY_ID + ":MOVE:100:300:"+temp.x+":"+temp.y);
+            player.jump(70, 200, temp.x, temp.y);
+            gsm.addAction(B2DVars.MY_ID + ":MOVE:70:200:"+temp.x+":"+temp.y);
             lastJumpDirection = 1;
         }
         if(SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
-            player.jump(-100, 300, temp.x, temp.y);
-            gsm.addAction(B2DVars.MY_ID + ":MOVE:-100:300:"+temp.x+":"+temp.y);
+            player.jump(-70, 200, temp.x, temp.y);
+            gsm.addAction(B2DVars.MY_ID + ":MOVE:-70:200:"+temp.x+":"+temp.y);
             lastJumpDirection = -1;
         }
         if(SPInput.isPressed(SPInput.BUTTON_W)) {
@@ -245,7 +247,7 @@ public class Play extends GameState {
         sb.begin();
         sb.draw(backGround, 0, 0);
         sb.end();
-        b2dr.render(world, b2dCam.combined);
+        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         for (SPBullet b : bullets){
             b.render(sb);
         }
