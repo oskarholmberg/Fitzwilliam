@@ -19,16 +19,26 @@ public class SPPlayer extends SPSprite {
     private float textureTimer = 0;
     private int offset = 2;
 
-    public SPPlayer(Body body)
+    public SPPlayer(Body body, String color)
     {
         super(body);
         sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jump.wav"));
-        onGroundRight = new Texture("images/player/bluePlayerStandRight.png");
-        inAirRight = new Texture("images/player/bluePlayerJumpRight.png");
-        onGroundLeft = new Texture("images/player/bluePlayerStandLeft.png");
-        inAirLeft = new Texture("images/player/bluePlayerJumpLeft.png");
-        deadRight = new Texture("images/player/bluePlayerDeadRight.png");
-        deadLeft = new Texture("images/player/bluePlayerDeadLeft.png");
+        if(color.equals("blue")){
+            onGroundRight = new Texture("images/player/bluePlayerStandRight.png");
+            inAirRight = new Texture("images/player/bluePlayerJumpRight.png");
+            onGroundLeft = new Texture("images/player/bluePlayerStandLeft.png");
+            inAirLeft = new Texture("images/player/bluePlayerJumpLeft.png");
+            deadRight = new Texture("images/player/bluePlayerDeadRight.png");
+            deadLeft = new Texture("images/player/bluePlayerDeadLeft.png");
+        }
+        else {
+            onGroundRight = new Texture("images/player/redPlayerStandRight.png");
+            inAirRight = new Texture("images/player/redPlayerJumpRight.png");
+            onGroundLeft = new Texture("images/player/redPlayerStandLeft.png");
+            inAirLeft = new Texture("images/player/redPlayerJumpLeft.png");
+            deadRight = new Texture("images/player/redPlayerDeadRight.png");
+            deadLeft = new Texture("images/player/redPlayerDeadLeft.png");
+        }
         setTexture(onGroundRight);
     }
 

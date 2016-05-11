@@ -14,7 +14,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.handlers.*;
-import com.game.bb.main.Game;
 import com.game.bb.entities.SPPlayer;
 
 
@@ -35,7 +34,7 @@ public class Play extends GameState {
     private Box2DDebugRenderer b2dr;
     private OrthographicCamera b2dCam;
     private SPContactListener cl;
-    private SPPlayer player, opponentPaddle;
+    private SPPlayer player, opponentPlayer;
     private int amntBullets = 5;
     private float bulletRefresh, lastJumpDirection = 1;
     private Array<SPBullet> bullets;
@@ -64,9 +63,9 @@ public class Play extends GameState {
 
         //Players
         player = new SPPlayer(createPlayer(B2DVars.ID_PLAYER, cam.viewportWidth / 2, cam.viewportHeight / 2
-                , B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT, B2DVars.BIT_PLAYER));
-        opponentPaddle = new SPPlayer(createPlayer(B2DVars.ID_OPPONENT, cam.viewportWidth / 2, cam.viewportHeight / 2
-                , B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT, B2DVars.BIT_OPPONENT));
+                , B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT, B2DVars.BIT_PLAYER), "blue");
+        opponentPlayer = new SPPlayer(createPlayer(B2DVars.ID_OPPONENT, cam.viewportWidth / 2, cam.viewportHeight / 2
+                , B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT, B2DVars.BIT_OPPONENT), "red");
 
 
 
@@ -185,7 +184,7 @@ public class Play extends GameState {
         String[] action = gsm.getOpponentAction().split(":");
         if (validOpponentAction(action)) {
             if(action[1].equals("MOVE"))
-                opponentPaddle.jump(Float.valueOf(action[2]), Float.valueOf(action[3]),
+                opponentPlayer.jump(Float.valueOf(action[2]), Float.valueOf(action[3]),
                         Float.valueOf(action[4]), Float.valueOf(action[5]));
             else if (action[1].equals("SHOOT"))
                 opponentShot(Float.valueOf(action[2]), Float.valueOf(action[3]), Float.valueOf(action[4]));
@@ -247,10 +246,11 @@ public class Play extends GameState {
         sb.begin();
         sb.draw(backGround, 0, 0);
         sb.end();
-        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+        //b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         for (SPBullet b : bullets){
             b.render(sb);
         }
+        opponentPlayer.render(sb);
         player.render(sb);
         hud.render(sb);
 
