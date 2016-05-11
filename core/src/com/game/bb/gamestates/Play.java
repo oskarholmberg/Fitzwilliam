@@ -229,8 +229,10 @@ public class Play extends GameState {
         player.update(dt);
         opponentActions();
         refreshBullets(dt);
-        if (cl.amIHit())
+        if (cl.amIHit()) {
+            hud.addPlayerDeath();
             respawnPlayer();
+        }
         removeDeadBodes();
     }
 
@@ -243,7 +245,7 @@ public class Play extends GameState {
             b.render(sb);
         }
         player.render(sb);
-        hud.render(sb, "1", "1");
+        hud.render(sb);
 
         //Do this last in render
         sb.setProjectionMatrix(cam.combined);
