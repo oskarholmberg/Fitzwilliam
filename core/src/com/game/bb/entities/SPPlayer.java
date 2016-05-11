@@ -17,7 +17,7 @@ public class SPPlayer extends SPSprite {
     private Texture onGroundRight, inAirRight, onGroundLeft, inAirLeft;
     private boolean onGround = true;
     private float textureTimer = 0;
-    private int offset = 4;
+    private int offset = 2;
 
     public SPPlayer(Body body)
     {
@@ -53,11 +53,11 @@ public class SPPlayer extends SPSprite {
             if(textureTimer>=0.5f && !onGround){
                 if(texture.equals(inAirLeft)){
                     setTexture(onGroundLeft);
-                    offset = 6;
+                    offset = 7;
                 }
                 else{
                     setTexture(onGroundRight);
-                    offset = 3;
+                    offset = 2;
                 }
                 onGround=true;
             }
