@@ -9,6 +9,7 @@
 	Add start screen. Score screen. etc.
 	Add background image.
 	Change reload functionality to work as IRL.
+	Change ArrayLists to libgdx Array
 
 ##Functionality##
 	Add score count.
