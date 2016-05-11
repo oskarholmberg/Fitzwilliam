@@ -35,12 +35,10 @@ public class SPContactListener implements ContactListener {
         }
         if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BULLET)){
             playerHit = true;
-            System.out.println("bullet and player!");
             bodiesToRemove.add(fb.getBody());
         } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_PLAYER)){
             playerHit = true;
             bodiesToRemove.add(fa.getBody());
-            System.out.println("Bullet and player!");
         }
     }
 

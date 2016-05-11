@@ -9,6 +9,9 @@ public class B2DVars {
     // PPM ratio
     public static final float PPM = 100;
 
+    public static final int SCALE = 2;
+    public final static int CAM_WIDTH = 240*SCALE, CAM_HEIGHT = 160*SCALE;
+
     public static final String MY_ID = Long.toString(System.currentTimeMillis() + (int) Math.random()*100);
 
     // collision bits

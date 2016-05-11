@@ -40,6 +40,7 @@ public class Play extends GameState {
     private int amntBullets = 5;
     private float bulletRefresh, lastJumpDirection = 1;
     private Array<SPBullet> bullets;
+    private HUD hud;
 
     public Play(GameStateManager gsm){
         super(gsm);
@@ -48,6 +49,8 @@ public class Play extends GameState {
         world.setContactListener(cl = new SPContactListener());
 
         b2dr = new Box2DDebugRenderer();
+
+        hud = new HUD();
 
         bullets = new Array<SPBullet>();
         // create boundaries
@@ -67,7 +70,7 @@ public class Play extends GameState {
 
         // set up box2d cam
         b2dCam = new OrthographicCamera();
-        b2dCam.setToOrtho(false, Game.WIDTH/ B2DVars.PPM, Game.HEIGHT/ B2DVars.PPM);
+        b2dCam.setToOrtho(false, B2DVars.CAM_WIDTH/ B2DVars.PPM, B2DVars.CAM_HEIGHT/ B2DVars.PPM);
     }
 
     private void createBoundary(float xPos, float yPos, float width, float height){
@@ -242,6 +245,9 @@ public class Play extends GameState {
             b.render(sb);
         }
         player.render(sb);
+        hud.render(sb, "1", "1");
+
+        //Do this last in render
         sb.setProjectionMatrix(cam.combined);
     }
 
