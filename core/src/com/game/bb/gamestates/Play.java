@@ -16,8 +16,6 @@ import com.game.bb.handlers.*;
 import com.game.bb.main.Game;
 import com.game.bb.entities.SPPlayer;
 
-import java.util.ArrayList;
-
 
 /**
  * TODO LIST --
@@ -62,9 +60,9 @@ public class Play extends GameState {
         //Players
 
         player = new SPPlayer(createPlayer(B2DVars.ID_PLAYER, cam.viewportWidth / 2, cam.viewportHeight / 2
-                , 8, 8, B2DVars.BIT_PLAYER));
+                , B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT, B2DVars.BIT_PLAYER));
         opponentPaddle = new SPPlayer(createPlayer(B2DVars.ID_OPPONENT, cam.viewportWidth / 2, cam.viewportHeight / 2
-                , 8, 8, B2DVars.BIT_OPPONENT));
+                , B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT, B2DVars.BIT_OPPONENT));
 
 
 
@@ -89,8 +87,8 @@ public class Play extends GameState {
         body.createFixture(fdef).setUserData(B2DVars.ID_GROUND);
     }
 
-    private Body[] createPlayer(String name, float xPos, float yPos, float width, float height, short bodyCategory){
-        Body[] bodies = new Body[2];
+    private Body createPlayer(String name, float xPos, float yPos, float width, float height, short bodyCategory){
+        Body body;
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width / B2DVars.PPM, height / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
@@ -103,8 +101,8 @@ public class Play extends GameState {
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos / B2DVars.PPM, yPos / B2DVars.PPM);
         bdef.type= BodyDef.BodyType.DynamicBody;
-        bodies[0] = world.createBody(bdef);
-        bodies[0].createFixture(fdef).setUserData(name);
+        body = world.createBody(bdef);
+        body.createFixture(fdef).setUserData(name);
 
         //add foot
         if (name.equals(B2DVars.ID_PLAYER)) {
@@ -113,10 +111,10 @@ public class Play extends GameState {
             fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
             fdef.filter.maskBits = B2DVars.BIT_GROUND;
             fdef.isSensor = true;
-            bodies[0].createFixture(fdef).setUserData(B2DVars.ID_FOOT);
+            body.createFixture(fdef).setUserData(B2DVars.ID_FOOT);
         }
 
-        return bodies;
+        return body;
     }
 
     @Override
@@ -163,13 +161,13 @@ public class Play extends GameState {
 
         if(SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
-            player.movePaddle(50, 150, temp.x, temp.y);
+            player.jump(50, 150, temp.x, temp.y);
             gsm.addAction(B2DVars.MY_ID + ":MOVE:50:150:"+temp.x+":"+temp.y);
             lastJumpDirection = 1;
         }
         if(SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
-            player.movePaddle(-50, 150, temp.x, temp.y);
+            player.jump(-50, 150, temp.x, temp.y);
             gsm.addAction(B2DVars.MY_ID + ":MOVE:-50:150:"+temp.x+":"+temp.y);
             lastJumpDirection = -1;
         }
@@ -183,7 +181,7 @@ public class Play extends GameState {
         String[] action = gsm.getOpponentAction().split(":");
         if (validOpponentAction(action)) {
             if(action[1].equals("MOVE"))
-                opponentPaddle.movePaddle(Float.valueOf(action[2]), Float.valueOf(action[3]),
+                opponentPaddle.jump(Float.valueOf(action[2]), Float.valueOf(action[3]),
                         Float.valueOf(action[4]), Float.valueOf(action[5]));
             else if (action[1].equals("SHOOT"))
                 opponentShot(Float.valueOf(action[2]), Float.valueOf(action[3]), Float.valueOf(action[4]));
@@ -196,7 +194,7 @@ public class Play extends GameState {
     }
 
     private void respawnPlayer(){
-        player.movePaddle(0, 0, 100/B2DVars.PPM, 100/B2DVars.PPM);
+        player.jump(0, 0, 100/B2DVars.PPM, 100/B2DVars.PPM);
         gsm.addAction(B2DVars.MY_ID + ":MOVE:0:0:"+ player.getPosition().x+":"+ player.getPosition().y);
         cl.revive();
     }
@@ -228,7 +226,7 @@ public class Play extends GameState {
     public void update(float dt) {
         handlePongInput(dt);
         world.step(dt, 6, 2);
-
+        player.update(dt);
         opponentActions();
         refreshBullets(dt);
         if (cl.amIHit())
