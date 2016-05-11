@@ -3,6 +3,7 @@ package com.game.bb.gamestates;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -198,7 +199,7 @@ public class Play extends GameState {
     public void render() {
         //Clear screen
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+        playerPaddle.render(sb);
         b2dr.render(world, b2dCam.combined);
         sb.setProjectionMatrix(cam.combined);
     }
