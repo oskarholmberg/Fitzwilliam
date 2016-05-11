@@ -34,8 +34,8 @@ public class Play extends GameState {
     private Box2DDebugRenderer b2dr;
     private OrthographicCamera b2dCam;
     private PongContactListener cl;
-    private SPPlayer playerPaddle, opponentPaddle;
-    private int amntBullets = 0;
+    private SPPlayer player, opponentPaddle;
+    private int amntBullets = 5;
     private float bulletRefresh, lastJumpDirection = 1;
     private ArrayList<SPBullet> bullets;
 
@@ -56,7 +56,7 @@ public class Play extends GameState {
 
         //Players
 
-        playerPaddle = new SPPlayer(createPlayer("Player", cam.viewportWidth / 2, cam.viewportHeight / 2
+        player = new SPPlayer(createPlayer("Player", cam.viewportWidth / 2, cam.viewportHeight / 2
                 , 8, 8, B2DVars.BIT_PLAYER));
         opponentPaddle = new SPPlayer(createPlayer("Opponent", cam.viewportWidth / 2, cam.viewportHeight / 2
                 , 8, 8, B2DVars.BIT_OPPONENT));
@@ -119,7 +119,7 @@ public class Play extends GameState {
 
     public void shoot(){
         if (amntBullets > 0) {
-            Vector2 pos = playerPaddle.getPosition();
+            Vector2 pos = player.getPosition();
             bullet(pos.x, pos.y, lastJumpDirection, false);
             amntBullets--;
         }
@@ -127,7 +127,7 @@ public class Play extends GameState {
 
     public void bullet(float xPos, float yPos, float dir, boolean harmFul) {
         PolygonShape shape = new PolygonShape();
-        Vector2 pos = playerPaddle.getPosition();
+        Vector2 pos = player.getPosition();
         shape.setAsBox(4 / B2DVars.PPM, 2 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
@@ -154,14 +154,14 @@ public class Play extends GameState {
     public void handlePongInput(float dt){
 
         if(PongInput.isPressed(PongInput.BUTTON_RIGHT) && cl.canJump()) {
-            Vector2 temp = playerPaddle.getPosition();
-            playerPaddle.movePaddle(50, 150, temp.x, temp.y);
+            Vector2 temp = player.getPosition();
+            player.movePaddle(50, 150, temp.x, temp.y);
             gsm.addAction(B2DVars.MY_ID + ":MOVE:50:150:"+temp.x+":"+temp.y);
             lastJumpDirection = 1;
         }
         if(PongInput.isPressed(PongInput.BUTTON_LEFT) && cl.canJump()) {
-            Vector2 temp = playerPaddle.getPosition();
-            playerPaddle.movePaddle(-50, 150, temp.x, temp.y);
+            Vector2 temp = player.getPosition();
+            player.movePaddle(-50, 150, temp.x, temp.y);
             gsm.addAction(B2DVars.MY_ID + ":MOVE:-50:150:"+temp.x+":"+temp.y);
             lastJumpDirection = -1;
         }
@@ -188,8 +188,8 @@ public class Play extends GameState {
     }
 
     private void respawnPlayer(){
-        playerPaddle.movePaddle(0, 0, 100/B2DVars.PPM, 100/B2DVars.PPM);
-        gsm.addAction(B2DVars.MY_ID + ":MOVE:0:0:"+playerPaddle.getPosition().x+":"+playerPaddle.getPosition().y);
+        player.movePaddle(0, 0, 100/B2DVars.PPM, 100/B2DVars.PPM);
+        gsm.addAction(B2DVars.MY_ID + ":MOVE:0:0:"+ player.getPosition().x+":"+ player.getPosition().y);
         cl.revive();
     }
 
@@ -221,6 +221,7 @@ public class Play extends GameState {
         for (int i = 0; i < bullets.size(); i++) {
             bullets.get(i).render(sb);
         }
+        player.render(sb);
         sb.setProjectionMatrix(cam.combined);
     }
 
