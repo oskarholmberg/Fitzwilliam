@@ -20,6 +20,7 @@
 ##Extra##
 	Add functionality for Tiled.map and level select.
 	Add spawn location list for different maps.
+	Add grenades.
 
 	#Powerups#
 		Sabotage - Change enemy gravity scale

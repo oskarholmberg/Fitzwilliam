@@ -188,6 +188,9 @@ public class Play extends GameState {
                         Float.valueOf(action[4]), Float.valueOf(action[5]));
             else if (action[1].equals("SHOOT"))
                 opponentShot(Float.valueOf(action[2]), Float.valueOf(action[3]), Float.valueOf(action[4]));
+            else if(action[1].equals("DEATH")){
+                hud.addOpponentDeath(action[0]);
+            }
         }
     }
     private boolean validOpponentAction(String[] split){
@@ -235,6 +238,7 @@ public class Play extends GameState {
         refreshBullets(dt);
         if (cl.amIHit()) {
             hud.addPlayerDeath();
+            gsm.addAction(B2DVars.MY_ID + ":DEATH:0:0:"+ player.getPosition().x+":"+ player.getPosition().y);
             respawnPlayer();
         }
         removeDeadBodes();
