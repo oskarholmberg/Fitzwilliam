@@ -8,7 +8,7 @@ import com.badlogic.gdx.physics.box2d.Body;
  */
 public class SPBullet extends SPSprite {
 
-    public SPBullet(Body body, boolean harmful) {
+    public SPBullet(Body body, boolean harmful, float dir) {
         super(body);
         if (harmful) {
             // set enemy color texture

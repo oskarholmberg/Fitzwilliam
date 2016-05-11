@@ -141,7 +141,7 @@ public class Play extends GameState {
         Body body = world.createBody(bdef);
         body.createFixture(fdef).setUserData("Bullet");
         body.setLinearVelocity(100f * dir / B2DVars.PPM, 0);
-        bullets.add(new SPBullet(body, harmFul));
+        bullets.add(new SPBullet(body, harmFul, dir));
         if (!harmFul)
             gsm.addAction(B2DVars.MY_ID + ":SHOOT:" + pos.x + ":" + pos.y + ":" + dir);
     }
@@ -194,7 +194,6 @@ public class Play extends GameState {
     }
 
     private void refreshBullets(float dt){
-        System.out.println(bulletRefresh);
         if (bulletRefresh > 5f){
             amntBullets = 5;
             bulletRefresh = 0;

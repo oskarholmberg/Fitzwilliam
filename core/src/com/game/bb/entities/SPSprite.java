@@ -31,9 +31,11 @@ public class SPSprite {
     }
 
     public void render(SpriteBatch sb){
-        sb.begin();
-        sb.draw(texture, body.getPosition().x* B2DVars.PPM - width / 2, body.getPosition().y * B2DVars.PPM - height/2);
-        sb.end();
+        if (texture != null) {
+            sb.begin();
+            sb.draw(texture, body.getPosition().x * B2DVars.PPM - width / 2, body.getPosition().y * B2DVars.PPM - height / 2);
+            sb.end();
+        }
     }
 
     public Body getBody(){
