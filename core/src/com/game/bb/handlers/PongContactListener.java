@@ -44,7 +44,10 @@ public class PongContactListener implements ContactListener {
             footContact--;
     }
 
-    public void revive(){ playerHit = false; }
+    public void revive(){
+        playerHit = false;
+        amntJumps=0;
+    }
 
     public boolean amIHit(){
         return playerHit;

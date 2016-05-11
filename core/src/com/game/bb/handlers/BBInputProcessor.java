@@ -14,10 +14,10 @@ public class BBInputProcessor extends InputAdapter{
             PongInput.setKey(PongInput.BUTTON_W, true);
         if (k == Input.Keys.S)
             PongInput.setKey(PongInput.BUTTON_S, true);
-        if (k == Input.Keys.UP)
-            PongInput.setKey(PongInput.BUTTON_UP, true);
-        if (k == Input.Keys.DOWN)
-            PongInput.setKey(PongInput.BUTTON_DOWN, true);
+        if (k == Input.Keys.RIGHT)
+            PongInput.setKey(PongInput.BUTTON_RIGHT, true);
+        if (k == Input.Keys.LEFT)
+            PongInput.setKey(PongInput.BUTTON_LEFT, true);
         return true;
     }
 
@@ -26,10 +26,10 @@ public class BBInputProcessor extends InputAdapter{
             PongInput.setKey(PongInput.BUTTON_W, false);
         if (k == Input.Keys.S)
             PongInput.setKey(PongInput.BUTTON_S, false);
-        if (k == Input.Keys.UP)
-            PongInput.setKey(PongInput.BUTTON_UP, false);
-        if (k == Input.Keys.DOWN)
-            PongInput.setKey(PongInput.BUTTON_DOWN, false);
+        if (k == Input.Keys.RIGHT)
+            PongInput.setKey(PongInput.BUTTON_RIGHT, false);
+        if (k == Input.Keys.LEFT)
+            PongInput.setKey(PongInput.BUTTON_LEFT, false);
         return true;
     }
 

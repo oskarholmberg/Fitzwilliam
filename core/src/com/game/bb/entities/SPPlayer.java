@@ -1,17 +1,14 @@
 package com.game.bb.entities;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.Body;
 
 /**
  * Created by erik on 09/05/16.
  */
-public class PongPaddle extends PongSprite {
+public class SPPlayer extends SPSprite {
 
-    public PongPaddle(Body[] bodies) {
+    public SPPlayer(Body[] bodies) {
         super(bodies[0]);
-        setTexture(new Texture("playerShip.png"));
-
     }
 
     public void movePaddle(float xForce, float yForce, float xPos, float yPos){

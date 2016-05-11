@@ -3,7 +3,6 @@ package com.game.bb.gamestates;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -13,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.game.bb.handlers.*;
 import com.game.bb.main.Game;
-import com.game.bb.entities.PongPaddle;
+import com.game.bb.entities.SPPlayer;
 
 
 /**
@@ -32,14 +31,15 @@ public class Play extends GameState {
     private Box2DDebugRenderer b2dr;
     private OrthographicCamera b2dCam;
     private PongContactListener cl;
-    private PongPaddle playerPaddle, opponentPaddle;
+    private SPPlayer playerPaddle, opponentPaddle;
+    private int amntBullets = 0;
+    private float bulletRefresh, lastJumpDirection = 1;
 
     public Play(GameStateManager gsm){
         super(gsm);
 
-        world = new World(new Vector2(0, -7.81f), true);
+        world = new World(new Vector2(0, -5.81f), true);
         world.setContactListener(cl = new PongContactListener());
-        world.setVelocityThreshold(0.1f);
 
         b2dr = new Box2DDebugRenderer();
 
@@ -51,9 +51,9 @@ public class Play extends GameState {
 
         //Players
 
-        playerPaddle = new PongPaddle(createPaddle("Player", cam.viewportWidth / 2, cam.viewportHeight / 2
+        playerPaddle = new SPPlayer(createPlayer("Player", cam.viewportWidth / 2, cam.viewportHeight / 2
                 , 8, 8, B2DVars.BIT_PLAYER));
-        opponentPaddle = new PongPaddle(createPaddle("Opponent", cam.viewportWidth / 2, cam.viewportHeight / 2
+        opponentPaddle = new SPPlayer(createPlayer("Opponent", cam.viewportWidth / 2, cam.viewportHeight / 2
                 , 8, 8, B2DVars.BIT_OPPONENT));
 
 
@@ -80,7 +80,7 @@ public class Play extends GameState {
         body.createFixture(fdef).setUserData("Ground");
     }
 
-    private Body[] createPaddle(String name, float xPos, float yPos, float width, float height, short bodyCategory){
+    private Body[] createPlayer(String name, float xPos, float yPos, float width, float height, short bodyCategory){
         Body[] bodies = new Body[2];
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width / B2DVars.PPM, height / B2DVars.PPM);
@@ -113,8 +113,11 @@ public class Play extends GameState {
     }
 
     public void shoot(){
-        Vector2 pos = playerPaddle.getPosition();
-        bullet(pos.x, pos.y, 1, false);
+        if (amntBullets > 0) {
+            Vector2 pos = playerPaddle.getPosition();
+            bullet(pos.x, pos.y, lastJumpDirection, false);
+            amntBullets--;
+        }
     }
 
     public void bullet(float xPos, float yPos, float dir, boolean harmFul) {
@@ -145,15 +148,17 @@ public class Play extends GameState {
 
     public void handlePongInput(float dt){
 
-        if(PongInput.isPressed(PongInput.BUTTON_UP) && cl.canJump()) {
+        if(PongInput.isPressed(PongInput.BUTTON_RIGHT) && cl.canJump()) {
             Vector2 temp = playerPaddle.getPosition();
             playerPaddle.movePaddle(50, 150, temp.x, temp.y);
             gsm.addAction(B2DVars.MY_ID + ":MOVE:50:150:"+temp.x+":"+temp.y);
+            lastJumpDirection = 1;
         }
-        if(PongInput.isPressed(PongInput.BUTTON_DOWN) && cl.canJump()) {
+        if(PongInput.isPressed(PongInput.BUTTON_LEFT) && cl.canJump()) {
             Vector2 temp = playerPaddle.getPosition();
             playerPaddle.movePaddle(-50, 150, temp.x, temp.y);
             gsm.addAction(B2DVars.MY_ID + ":MOVE:-50:150:"+temp.x+":"+temp.y);
+            lastJumpDirection = -1;
         }
         if(PongInput.isPressed(PongInput.BUTTON_W)) {
             shoot();
@@ -183,10 +188,22 @@ public class Play extends GameState {
         cl.revive();
     }
 
+    private void refreshBullets(float dt){
+        System.out.println(bulletRefresh);
+        if (bulletRefresh > 5f){
+            amntBullets = 5;
+            bulletRefresh = 0;
+        } else {
+            bulletRefresh+=dt;
+        }
+    }
+
+
     @Override
     public void update(float dt) {
         handlePongInput(dt);
         opponentActions();
+        refreshBullets(dt);
         if (cl.amIHit())
             respawnPlayer();
         world.step(dt, 6, 2);
@@ -196,7 +213,6 @@ public class Play extends GameState {
     public void render() {
         //Clear screen
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        playerPaddle.render(sb);
         b2dr.render(world, b2dCam.combined);
         sb.setProjectionMatrix(cam.combined);
     }

@@ -8,7 +8,7 @@ public class PongInput {
     public static boolean[] keys;
     public static boolean[] pkeys;
 
-    public static final int NUM_KEYS = 5, BUTTON_W = 0, BUTTON_S = 1, BUTTON_UP = 2, BUTTON_DOWN = 3, BUTTON_E = 4;
+    public static final int NUM_KEYS = 5, BUTTON_W = 0, BUTTON_S = 1, BUTTON_RIGHT = 2, BUTTON_LEFT = 3, BUTTON_E = 4;
 
     static{
         keys = new boolean[NUM_KEYS];

@@ -9,14 +9,14 @@ import com.game.bb.handlers.B2DVars;
 /**
  * Created by erik on 09/05/16.
  */
-public class PongSprite {
+public class SPSprite {
     protected Body body;
     protected float height, width;
     protected Texture texture;
     // maybe add animation, check the tutorial
     // protected Animation animation;
 
-    public PongSprite(Body body){
+    public SPSprite(Body body){
         this.body=body;
     }
 

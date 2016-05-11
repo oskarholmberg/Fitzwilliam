@@ -7,8 +7,8 @@ import com.game.bb.handlers.B2DVars;
 /**
  * Created by erik on 10/05/16.
  */
-public class PongBall extends PongSprite {
-    public PongBall(Body body) {
+public class SPBall extends SPSprite {
+    public SPBall(Body body) {
         super(body);
     }
 
