@@ -1,5 +1,8 @@
 ##Network##
 	Select host or join on start.
+	Send relevant information when connecting.
+		- Server answer with number of connected clients and their 			  location.
+		- Server settings (map, nbr of players) 
 
 ##Code##
 	Remove dead bullet textures/bodies due to bullets list size.
