@@ -45,9 +45,9 @@ public class GameClient extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String action = new String(packet.getData());
+            String action = new String(packet.getData()).trim();
             System.out.println("SERVER > " + action);
-            gsm.addAction(action);
+            gsm.addOpponentAction(action);
         }
     }
 

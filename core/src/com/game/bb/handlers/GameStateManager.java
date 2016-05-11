@@ -16,6 +16,7 @@ public class GameStateManager {
     private int PLAY = 123123;
     private ArrayList<String> actions;
     private ArrayList<String> opponentActions;
+    private GameClient client;
 
 
     public GameStateManager(Game game, String ipAddress, int port) {
@@ -23,7 +24,8 @@ public class GameStateManager {
         states = new Stack<GameState>();
         actions = new ArrayList<String>();
         opponentActions = new ArrayList<String>();
-        new GameClient(this, ipAddress, port).start();
+        client = new GameClient(this, ipAddress, port);
+        client.start();
         pushState(PLAY);
     }
 
@@ -60,8 +62,7 @@ public class GameStateManager {
 
 
     public synchronized void addAction(String action) {
-        actions.add(action);
-        notifyAll();
+        client.sendData(action.getBytes());
     }
 
     public synchronized String getAction(){
