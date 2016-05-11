@@ -17,6 +17,7 @@ public class SPPlayer extends SPSprite {
     private Texture onGroundRight, inAirRight, onGroundLeft, inAirLeft;
     private boolean onGround = true;
     private float textureTimer = 0;
+    private int offset = 4;
 
     public SPPlayer(Body body)
     {
@@ -46,19 +47,21 @@ public class SPPlayer extends SPSprite {
     @Override
     public void render(SpriteBatch sb){
         if(texture != null) {
-            if(textureTimer>=0.5f && !onGround){
-                if(texture.equals(inAirLeft)){
-                    setTexture(onGroundLeft);
-                }
-                else{
-                    setTexture(onGroundRight);
-                }
-                onGround=true;
-            }
             sb.begin();
             float x = body.getPosition().x * B2DVars.PPM - B2DVars.PLAYER_WIDTH;
             float y = body.getPosition().y * B2DVars.PPM - B2DVars.PLAYER_HEIGHT;
-            sb.draw(texture, x, y, 54, 48);
+            if(textureTimer>=0.5f && !onGround){
+                if(texture.equals(inAirLeft)){
+                    setTexture(onGroundLeft);
+                    offset = 6;
+                }
+                else{
+                    setTexture(onGroundRight);
+                    offset = 3;
+                }
+                onGround=true;
+            }
+            sb.draw(texture, x-offset, y, 54, 48);
             sb.end();
         }
     }
