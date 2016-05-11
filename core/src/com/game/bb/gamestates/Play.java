@@ -3,6 +3,7 @@ package com.game.bb.gamestates;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -39,11 +40,12 @@ public class Play extends GameState {
     private float bulletRefresh, lastJumpDirection = 1;
     private Array<SPBullet> bullets;
     private HUD hud;
+    private Texture backGround = new Texture("images/spaceBackground.png");
 
     public Play(GameStateManager gsm){
         super(gsm);
 
-        world = new World(new Vector2(0, -5.81f), true);
+        world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
 
         b2dr = new Box2DDebugRenderer();
@@ -57,8 +59,10 @@ public class Play extends GameState {
         createBoundary(0, cam.viewportHeight/2, 5, cam.viewportHeight/2); // left
         createBoundary(cam.viewportWidth, cam.viewportHeight/2, 5, cam.viewportHeight/2); // right
 
-        //Players
+        //build random platforms
 
+
+        //Players
         player = new SPPlayer(createPlayer(B2DVars.ID_PLAYER, cam.viewportWidth / 2, cam.viewportHeight / 2
                 , B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT, B2DVars.BIT_PLAYER));
         opponentPaddle = new SPPlayer(createPlayer(B2DVars.ID_OPPONENT, cam.viewportWidth / 2, cam.viewportHeight / 2
@@ -161,14 +165,14 @@ public class Play extends GameState {
 
         if(SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
-            player.jump(100, 300, temp.x, temp.y);
-            gsm.addAction(B2DVars.MY_ID + ":MOVE:100:300:"+temp.x+":"+temp.y);
+            player.jump(70, 200, temp.x, temp.y);
+            gsm.addAction(B2DVars.MY_ID + ":MOVE:70:200:"+temp.x+":"+temp.y);
             lastJumpDirection = 1;
         }
         if(SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
-            player.jump(-100, 300, temp.x, temp.y);
-            gsm.addAction(B2DVars.MY_ID + ":MOVE:-100:300:"+temp.x+":"+temp.y);
+            player.jump(-70, 200, temp.x, temp.y);
+            gsm.addAction(B2DVars.MY_ID + ":MOVE:-70:200:"+temp.x+":"+temp.y);
             lastJumpDirection = -1;
         }
         if(SPInput.isPressed(SPInput.BUTTON_W)) {
@@ -229,8 +233,10 @@ public class Play extends GameState {
         player.update(dt);
         opponentActions();
         refreshBullets(dt);
-        if (cl.amIHit())
+        if (cl.amIHit()) {
+            hud.addPlayerDeath();
             respawnPlayer();
+        }
         removeDeadBodes();
     }
 
@@ -238,12 +244,15 @@ public class Play extends GameState {
     public void render() {
         //Clear screen
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        b2dr.render(world, b2dCam.combined);
+        sb.begin();
+        sb.draw(backGround, 0, 0);
+        sb.end();
+        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         for (SPBullet b : bullets){
             b.render(sb);
         }
         player.render(sb);
-        hud.render(sb, "1", "1");
+        hud.render(sb);
 
         //Do this last in render
         sb.setProjectionMatrix(cam.combined);
