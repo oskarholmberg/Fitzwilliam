@@ -53,7 +53,7 @@ public class SPPlayer extends SPSprite {
             if(textureTimer>=0.5f && !onGround){
                 if(texture.equals(inAirLeft)){
                     setTexture(onGroundLeft);
-                    offset = 7;
+                    offset = 12;
                 }
                 else{
                     setTexture(onGroundRight);
