@@ -145,7 +145,7 @@ public class Play extends GameState {
         Body body = world.createBody(bdef);
         body.createFixture(fdef).setUserData(B2DVars.ID_BULLET);
         body.setLinearVelocity(200f * dir / B2DVars.PPM, 0);
-        SPBullet bullet = new SPBullet(body, harmFul, dir);
+        SPBullet bullet = new SPBullet(body, harmFul);
         body.setUserData(bullet);
         bullets.add(bullet);
         if (!harmFul)

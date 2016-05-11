@@ -14,7 +14,7 @@ import com.game.bb.handlers.B2DVars;
 public class SPPlayer extends SPSprite {
 
     private Sound sound;
-    private Texture onGroundRight, inAirRight, onGroundLeft, inAirLeft;
+    private Texture onGroundRight, inAirRight, onGroundLeft, inAirLeft, deadRight, deadLeft;
     private boolean onGround = true;
     private float textureTimer = 0;
     private int offset = 2;
@@ -23,10 +23,12 @@ public class SPPlayer extends SPSprite {
     {
         super(body);
         sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jump.wav"));
-        onGroundRight = new Texture("images/bluePlayerStandRight.png");
-        inAirRight = new Texture("images/bluePlayerJumpRight.png");
-        onGroundLeft = new Texture("images/bluePlayerStandLeft.png");
-        inAirLeft = new Texture("images/bluePlayerJumpLeft.png");
+        onGroundRight = new Texture("images/player/bluePlayerStandRight.png");
+        inAirRight = new Texture("images/player/bluePlayerJumpRight.png");
+        onGroundLeft = new Texture("images/player/bluePlayerStandLeft.png");
+        inAirLeft = new Texture("images/player/bluePlayerJumpLeft.png");
+        deadRight = new Texture("images/player/bluePlayerDeadRight.png");
+        deadLeft = new Texture("images/player/bluePlayerDeadLeft.png");
         setTexture(onGroundRight);
     }
 
