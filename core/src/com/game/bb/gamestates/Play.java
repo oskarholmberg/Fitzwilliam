@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.handlers.*;
 import com.game.bb.main.Game;
@@ -34,21 +35,21 @@ public class Play extends GameState {
     private World world;
     private Box2DDebugRenderer b2dr;
     private OrthographicCamera b2dCam;
-    private PongContactListener cl;
+    private SPContactListener cl;
     private SPPlayer player, opponentPaddle;
     private int amntBullets = 5;
     private float bulletRefresh, lastJumpDirection = 1;
-    private ArrayList<SPBullet> bullets;
+    private Array<SPBullet> bullets;
 
     public Play(GameStateManager gsm){
         super(gsm);
 
         world = new World(new Vector2(0, -5.81f), true);
-        world.setContactListener(cl = new PongContactListener());
+        world.setContactListener(cl = new SPContactListener());
 
         b2dr = new Box2DDebugRenderer();
 
-        bullets = new ArrayList<SPBullet>();
+        bullets = new Array<SPBullet>();
         // create boundaries
         createBoundary(cam.viewportWidth/2, cam.viewportHeight, cam.viewportWidth/2, 5); //top
         createBoundary(cam.viewportWidth/2, 0, cam.viewportWidth/2, 5); //bottom
@@ -57,9 +58,9 @@ public class Play extends GameState {
 
         //Players
 
-        player = new SPPlayer(createPlayer("Player", cam.viewportWidth / 2, cam.viewportHeight / 2
+        player = new SPPlayer(createPlayer(B2DVars.ID_PLAYER, cam.viewportWidth / 2, cam.viewportHeight / 2
                 , 8, 8, B2DVars.BIT_PLAYER));
-        opponentPaddle = new SPPlayer(createPlayer("Opponent", cam.viewportWidth / 2, cam.viewportHeight / 2
+        opponentPaddle = new SPPlayer(createPlayer(B2DVars.ID_OPPONENT, cam.viewportWidth / 2, cam.viewportHeight / 2
                 , 8, 8, B2DVars.BIT_OPPONENT));
 
 
@@ -81,9 +82,8 @@ public class Play extends GameState {
         fdef.shape=shape;
         // set bits to collide with
         fdef.filter.categoryBits = B2DVars.BIT_GROUND;
-        fdef.friction = 1f;
         fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_OPPONENT;
-        body.createFixture(fdef).setUserData("Ground");
+        body.createFixture(fdef).setUserData(B2DVars.ID_GROUND);
     }
 
     private Body[] createPlayer(String name, float xPos, float yPos, float width, float height, short bodyCategory){
@@ -93,7 +93,7 @@ public class Play extends GameState {
         FixtureDef fdef = new FixtureDef();
         fdef.shape=shape;
         fdef.filter.categoryBits = bodyCategory;
-        if (name.equals("Player"))
+        if (name.equals(B2DVars.ID_PLAYER))
             fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET;
         else
             fdef.filter.maskBits = B2DVars.BIT_GROUND;
@@ -104,12 +104,14 @@ public class Play extends GameState {
         bodies[0].createFixture(fdef).setUserData(name);
 
         //add foot
-        shape.setAsBox((width-2)/B2DVars.PPM, 2/B2DVars.PPM, new Vector2(0, -height/B2DVars.PPM), 0);
-        fdef.shape=shape;
-        fdef.filter.categoryBits=B2DVars.BIT_PLAYER;
-        fdef.filter.maskBits=B2DVars.BIT_GROUND;
-        fdef.isSensor=true;
-        bodies[0].createFixture(fdef).setUserData(name + "Foot");
+        if (name.equals(B2DVars.ID_PLAYER)) {
+            shape.setAsBox((width - 2) / B2DVars.PPM, 2 / B2DVars.PPM, new Vector2(0, -height / B2DVars.PPM), 0);
+            fdef.shape = shape;
+            fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
+            fdef.filter.maskBits = B2DVars.BIT_GROUND;
+            fdef.isSensor = true;
+            bodies[0].createFixture(fdef).setUserData(B2DVars.ID_FOOT);
+        }
 
         return bodies;
     }
@@ -123,6 +125,7 @@ public class Play extends GameState {
             Vector2 pos = player.getPosition();
             bullet(pos.x, pos.y, lastJumpDirection, false);
             amntBullets--;
+            System.out.println(bullets.size);
         }
     }
 
@@ -134,13 +137,13 @@ public class Play extends GameState {
         fdef.shape = shape;
         if (harmFul) {
             fdef.filter.categoryBits = B2DVars.BIT_BULLET;
-            fdef.filter.maskBits = B2DVars.BIT_PLAYER;
+            fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND;
         }
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.KinematicBody;
         Body body = world.createBody(bdef);
-        body.createFixture(fdef).setUserData("Bullet");
+        body.createFixture(fdef).setUserData(B2DVars.ID_BULLET);
         body.setLinearVelocity(100f * dir / B2DVars.PPM, 0);
         bullets.add(new SPBullet(body, harmFul, dir));
         if (!harmFul)
@@ -154,19 +157,19 @@ public class Play extends GameState {
 
     public void handlePongInput(float dt){
 
-        if(PongInput.isPressed(PongInput.BUTTON_RIGHT) && cl.canJump()) {
+        if(SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
             player.movePaddle(50, 150, temp.x, temp.y);
             gsm.addAction(B2DVars.MY_ID + ":MOVE:50:150:"+temp.x+":"+temp.y);
             lastJumpDirection = 1;
         }
-        if(PongInput.isPressed(PongInput.BUTTON_LEFT) && cl.canJump()) {
+        if(SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
             player.movePaddle(-50, 150, temp.x, temp.y);
             gsm.addAction(B2DVars.MY_ID + ":MOVE:-50:150:"+temp.x+":"+temp.y);
             lastJumpDirection = -1;
         }
-        if(PongInput.isPressed(PongInput.BUTTON_W)) {
+        if(SPInput.isPressed(SPInput.BUTTON_W)) {
             shoot();
         }
 
@@ -203,15 +206,30 @@ public class Play extends GameState {
         }
     }
 
+    public void removeDeadBodes(){
+        for (Body b : cl.getBodiesToRemove()){
+            bullets.removeValue((SPBullet) b.getUserData(), true);
+            world.destroyBody(b);
+        }
+        for (SPBullet spb : bullets){
+            if (spb.getXPos() < 0  || spb.getXPos() > cam.viewportWidth) {
+                bullets.removeValue(spb, true);
+                world.destroyBody(spb.getBody());
+            }
+        }
+    }
+
 
     @Override
     public void update(float dt) {
         handlePongInput(dt);
+        world.step(dt, 6, 2);
+
         opponentActions();
         refreshBullets(dt);
         if (cl.amIHit())
             respawnPlayer();
-        world.step(dt, 6, 2);
+        removeDeadBodes();
     }
 
     @Override
@@ -219,8 +237,8 @@ public class Play extends GameState {
         //Clear screen
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
         b2dr.render(world, b2dCam.combined);
-        for (int i = 0; i < bullets.size(); i++) {
-            bullets.get(i).render(sb);
+        for (SPBullet b : bullets){
+            b.render(sb);
         }
         player.render(sb);
         sb.setProjectionMatrix(cam.combined);

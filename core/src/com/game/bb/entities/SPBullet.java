@@ -22,4 +22,8 @@ public class SPBullet extends SPSprite {
             setTexture(new Texture("images/friendlyBullet.png"));
         }
     }
+
+    public float getXPos(){
+        return body.getPosition().x;
+    }
 }

@@ -4,8 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.game.bb.handlers.PongInput;
-import com.game.bb.handlers.BBInputProcessor;
+import com.game.bb.handlers.SPInput;
+import com.game.bb.handlers.SPInputProcessor;
 
 public class Game extends ApplicationAdapter {
     public final static String TITLE = "Block Bunny";
@@ -21,7 +21,7 @@ public class Game extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-        Gdx.input.setInputProcessor(new BBInputProcessor());
+        Gdx.input.setInputProcessor(new SPInputProcessor());
 
 		batch = new SpriteBatch();
         cam = new OrthographicCamera();
@@ -38,7 +38,7 @@ public class Game extends ApplicationAdapter {
 	public void render () {
             gsm.update(Gdx.graphics.getDeltaTime());
             gsm.render();
-            PongInput.update();
+            SPInput.update();
 	}
 
 	public void dispose(){

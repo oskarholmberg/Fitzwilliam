@@ -12,4 +12,7 @@ public class B2DVars {
 
     // collision bits
     public static final short BIT_GROUND = 2, BIT_PLAYER = 4, BIT_OPPONENT = 8, BIT_BULLET = 16;
+
+    public static final String ID_FOOT = "foot", ID_PLAYER = "player", ID_OPPONENT = "opponent",
+    ID_GROUND = "ground", ID_BULLET = "bullet";
 }
