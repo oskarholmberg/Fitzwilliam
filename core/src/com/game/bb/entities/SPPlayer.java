@@ -15,7 +15,7 @@ public class SPPlayer extends SPSprite {
 
     private Sound sound;
     private Texture onGroundRight, inAirRight, onGroundLeft, inAirLeft, deadRight, deadLeft;
-    private boolean onGround = true;
+    private boolean onGround = true, isDead = false;
     private float textureTimer = 0;
     private int offset = 2;
 
@@ -43,17 +43,29 @@ public class SPPlayer extends SPSprite {
     }
 
     public void jump(float xForce, float yForce, float xPos, float yPos){
-        body.setTransform(xPos, yPos, 0);
-        body.setLinearVelocity(0, 0);
-        body.applyForceToCenter(xForce, yForce, true);
-        textureTimer = 0;
-        onGround = false;
-        if(xForce<0){
-            setTexture(inAirLeft);
-        }else {
-            setTexture(inAirRight);
+        if(!isDead) {
+            body.setTransform(xPos, yPos, 0);
+            body.setLinearVelocity(0, 0);
+            body.applyForceToCenter(xForce, yForce, true);
+            textureTimer = 0;
+            onGround = false;
+            if (xForce < 0) {
+                setTexture(inAirLeft);
+            } else {
+                setTexture(inAirRight);
+            }
+            sound.play();
         }
-        sound.play();
+    }
+
+    public void kill(){
+        isDead = true;
+        setTexture(deadRight);
+    }
+
+    public void revive(){
+        isDead = false;
+        setTexture(onGroundRight);
     }
 
     @Override

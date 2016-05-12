@@ -1,5 +1,6 @@
 package com.game.bb.net;
 
+import com.badlogic.gdx.utils.Array;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -7,7 +8,6 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by oskar on 5/11/16.
@@ -16,11 +16,11 @@ public class GameServer extends Thread {
 
     private DatagramSocket socket;
     private int port;
-    private ArrayList<String> connectedClients;
+    private Array<String> connectedClients;
 
     public GameServer(int port) {
         this.port = port;
-        connectedClients = new ArrayList<String>();
+        connectedClients = new Array<String>();
         try {
             System.out.println("Trying to start server on port: " + port);
             this.socket = new DatagramSocket(port);
@@ -40,15 +40,20 @@ public class GameServer extends Thread {
                 e.printStackTrace();
             }
             String ipAddress = packet.getAddress().getHostAddress() + ":" + packet.getPort();
-            if (!connectedClients.contains(ipAddress)) {
+            if (!connectedClients.contains(ipAddress, false)) {
                 connectedClients.add(ipAddress);
                 System.out.println("CLIENT[" + ipAddress + "] connected.");
+                byte[] setupData = ("SETUP&"+ (connectedClients.size-1)).getBytes();
+                sendData(setupData);
             }
             String content = new String(packet.getData()).trim();
-            if (content.equals("disconnect")) {
-                connectedClients.remove(ipAddress);
+            if (content.equals("DISCONNECT")) {
+                connectedClients.removeValue(ipAddress, false);
                 System.out.println("CLIENT[" + ipAddress + "] disconnected.");
-            } else {
+            } else if(content.equals("SETUP")){
+                System.out.println("CLIENT[" + ipAddress + "] > " + content);
+            }
+            else {
                 System.out.println("CLIENT[" + ipAddress + "] > " + content);
                 sendData(packet.getData());
             }
@@ -69,7 +74,7 @@ public class GameServer extends Thread {
                     e.printStackTrace();
                 }
             } catch (UnknownHostException e) {
-                connectedClients.remove(s);
+                connectedClients.removeValue(s, false);
                 System.out.println("CLIENT[" + s + "] disconnected.");
             }
         }

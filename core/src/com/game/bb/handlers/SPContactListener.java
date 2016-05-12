@@ -18,6 +18,7 @@ public class SPContactListener implements ContactListener {
     private int footContact = 0, amntJumps = 0;
     private boolean playerHit = false;
     private Array<Body> bodiesToRemove;
+    private Fixture killingBullet;
 
     public SPContactListener(){
         bodiesToRemove = new Array<Body>();
@@ -35,9 +36,11 @@ public class SPContactListener implements ContactListener {
         }
         if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BULLET)){
             playerHit = true;
+            killingBullet = fb;
             bodiesToRemove.add(fb.getBody());
         } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_PLAYER)){
             playerHit = true;
+            killingBullet = fa;
             bodiesToRemove.add(fa.getBody());
         }
     }
@@ -66,6 +69,10 @@ public class SPContactListener implements ContactListener {
 
     public boolean amIHit(){
         return playerHit;
+    }
+
+    public Fixture getKillingBullet(){
+        return killingBullet;
     }
 
     public boolean canJump(){

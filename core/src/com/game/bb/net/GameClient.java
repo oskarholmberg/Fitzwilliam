@@ -24,13 +24,13 @@ public class GameClient extends Thread {
     private int port;
     private Disconnecter disconnecter;
 
-    public GameClient(GameStateManager gsm, String ipAddress, int port){
-        this.gsm=gsm;
-        this.port=port;
+    public GameClient(GameStateManager gsm, String ipAddress, int port) {
+        this.gsm = gsm;
+        this.port = port;
         disconnecter = new Disconnecter(this);
         try {
             System.out.println("Connecting to " + ipAddress + ":" + port);
-            this.socket=new DatagramSocket();
+            this.socket = new DatagramSocket();
             this.ipAddress = InetAddress.getByName(ipAddress);
             System.out.println("Connection successful!");
         } catch (SocketException e) {
@@ -40,8 +40,8 @@ public class GameClient extends Thread {
         }
     }
 
-    public void run(){
-        while(!socket.isClosed()){
+    public void run() {
+        while (!socket.isClosed()) {
             byte[] data = new byte[1024];
             DatagramPacket packet = new DatagramPacket(data, data.length);
             try {
@@ -49,12 +49,20 @@ public class GameClient extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String action = new String(packet.getData()).trim();
-            gsm.addOpponentAction(action);
+            String content = new String(packet.getData()).trim();
+            System.out.println("SERVER > " + content);
+            if (content.split("&")[0].equals("SETUP")) {
+                String[] players = content.split("&");
+                for (int i = 0; i < players.length; i++) {
+
+                }
+            } else {
+                gsm.addOpponentAction(content);
+            }
         }
     }
 
-    public void sendData(byte[] data){
+    public void sendData(byte[] data) {
         DatagramPacket packet = new DatagramPacket(data, data.length, ipAddress, port);
         try {
             socket.send(packet);
@@ -63,22 +71,23 @@ public class GameClient extends Thread {
         }
     }
 
-    protected void disconnect(){
-        byte[] disconnect = "disconnect".getBytes();
+    protected void disconnect() {
+        byte[] disconnect = "DISCONNECT".getBytes();
         sendData(disconnect);
     }
 
-    public Runnable getDisconnecter(){
+    public Runnable getDisconnecter() {
         return disconnecter;
     }
 
-    private static class Disconnecter implements Runnable{
+    private static class Disconnecter implements Runnable {
 
         private GameClient client;
 
-        private Disconnecter(GameClient client){
+        private Disconnecter(GameClient client) {
             this.client = client;
         }
+
         @Override
         public void run() {
             client.disconnect();

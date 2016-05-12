@@ -38,6 +38,7 @@ public class Play extends GameState {
     private int amntBullets = 5;
     private float bulletRefresh, lastJumpDirection = 1;
     private Array<SPBullet> bullets;
+    private float respawnTimer = 0;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
 
@@ -188,6 +189,9 @@ public class Play extends GameState {
                         Float.valueOf(action[4]), Float.valueOf(action[5]));
             else if (action[1].equals("SHOOT"))
                 opponentShot(Float.valueOf(action[2]), Float.valueOf(action[3]), Float.valueOf(action[4]));
+            else if(action[1].equals("DEATH")){
+                hud.setOpponentDeath(action[2]);
+            }
         }
     }
     private boolean validOpponentAction(String[] split){
@@ -197,6 +201,8 @@ public class Play extends GameState {
     }
 
     private void respawnPlayer(){
+        respawnTimer=0;
+        player.revive();
         player.jump(0, 0, 100/B2DVars.PPM, 100/B2DVars.PPM);
         gsm.addAction(B2DVars.MY_ID + ":MOVE:0:0:"+ player.getPosition().x+":"+ player.getPosition().y);
         cl.revive();
@@ -234,8 +240,16 @@ public class Play extends GameState {
         opponentActions();
         refreshBullets(dt);
         if (cl.amIHit()) {
+            if(cl.getKillingBullet() != null){
+                cl.getKillingBullet().getBody().setTransform(cam.viewportWidth*2, cam.viewportHeight*2, 0);
+            }
+            player.kill();
             hud.addPlayerDeath();
-            respawnPlayer();
+            gsm.addAction(B2DVars.MY_ID + ":DEATH:" + hud.getDeathCount() + ":0:"+ player.getPosition().x+":"+ player.getPosition().y);
+            respawnTimer+=dt;
+            if(respawnTimer >= B2DVars.RESPAWN_TIME){
+                respawnPlayer();
+            }
         }
         removeDeadBodes();
     }
