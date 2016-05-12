@@ -34,7 +34,7 @@ public class SPSprite {
         if(texture != null) {
             sb.begin();
             sb.draw(texture, body.getPosition().x * B2DVars.PPM - width / 2,
-                    body.getPosition().y * B2DVars.PPM - height / 2, 4, 4);
+                    body.getPosition().y * B2DVars.PPM - height / 2);
             sb.end();
         }
     }
