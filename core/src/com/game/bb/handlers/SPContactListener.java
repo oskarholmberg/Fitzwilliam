@@ -29,6 +29,7 @@ public class SPContactListener implements ContactListener {
     public void beginContact(Contact contact) {
         Fixture fa = contact.getFixtureA();
         Fixture fb = contact.getFixtureB();
+        System.out.println("fa: " +fa.getUserData() + "fb: "+ fb.getUserData());
 
         if (fa.getUserData().equals(B2DVars.ID_FOOT) || fb.getUserData().equals(B2DVars.ID_FOOT)) {
             footContact++;

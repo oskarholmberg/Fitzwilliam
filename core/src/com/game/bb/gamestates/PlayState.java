@@ -4,11 +4,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -45,6 +50,9 @@ public class PlayState extends GameState {
     private Texture backGround = new Texture("images/spaceBackground.png");
     private float[] touchNbrs = { (B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH*4/5};
 
+    private TiledMap tiledMap;
+    private OrthogonalTiledMapRenderer tmr;
+
     public PlayState(GameStateManager gsm) {
         super(gsm);
 
@@ -65,6 +73,7 @@ public class PlayState extends GameState {
         createBoundary(cam.viewportWidth, cam.viewportHeight / 2, 5, cam.viewportHeight / 2); // right
 
         //Vectors for handling android touch input
+        buildMap();
 
         //Players
         player = new SPPlayer(world, B2DVars.MY_ID, cam.viewportWidth / 2, cam.viewportHeight / 2, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
@@ -73,6 +82,42 @@ public class PlayState extends GameState {
         // set up box2d cam
         b2dCam = new OrthographicCamera();
         b2dCam.setToOrtho(false, B2DVars.CAM_WIDTH / B2DVars.PPM, B2DVars.CAM_HEIGHT / B2DVars.PPM);
+    }
+
+    private void buildMap(){
+        tiledMap = new TmxMapLoader().load("maps/testMap.tmx");
+        tmr = new OrthogonalTiledMapRenderer(tiledMap);
+        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("blue");
+
+        float ts = layer.getTileWidth();
+        for(int row = 0; row < layer.getHeight(); row++) {
+            for(int col = 0; col < layer.getWidth(); col++) {
+                // get cell
+                TiledMapTileLayer.Cell cell = layer.getCell(col, row);
+
+                // check that there is a cell
+                if(cell == null) continue;
+                if(cell.getTile() == null) continue;
+
+                // create body from cell
+                BodyDef bdef = new BodyDef();
+                bdef.type = BodyDef.BodyType.StaticBody;
+                bdef.position.set((col + 0.5f) * ts / B2DVars.PPM, (row + 0.5f) * ts / B2DVars.PPM);
+                ChainShape cs = new ChainShape();
+                Vector2[] v = new Vector2[3];
+                v[0] = new Vector2(-ts / 2 / B2DVars.PPM, -ts / 2 / B2DVars.PPM);
+                v[1] = new Vector2(-ts / 2 / B2DVars.PPM, ts / 2 / B2DVars.PPM);
+                v[2] = new Vector2(ts / 2 / B2DVars.PPM, ts / 2 / B2DVars.PPM);
+                cs.createChain(v);
+                FixtureDef fd = new FixtureDef();
+                fd.shape = cs;
+                fd.filter.categoryBits = B2DVars.BIT_GROUND;
+                fd.filter.maskBits = B2DVars.BIT_PLAYER;
+                world.createBody(bdef).createFixture(fd).setUserData(B2DVars.ID_GROUND);
+                cs.dispose();
+
+            }
+        }
     }
 
     private void createBoundary(float xPos, float yPos, float width, float height) {
@@ -245,7 +290,8 @@ public class PlayState extends GameState {
         sb.begin();
         sb.draw(backGround, 0, 0);
         sb.end();
-        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+        tmr.setView(cam);
+        tmr.render();
         for (SPBullet b : bullets) {
             b.render(sb);
         }
@@ -256,6 +302,7 @@ public class PlayState extends GameState {
         hud.render(sb);
 
         //Do this last in render
+        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         sb.setProjectionMatrix(cam.combined);
     }
 
