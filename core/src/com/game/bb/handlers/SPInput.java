@@ -24,7 +24,9 @@ public class SPInput {
     }
 
     public static boolean isDown() { return down; }
-    public static boolean isPressed() { return down && !pdown; }
+    public static boolean isPressed() {
+        return down;
+    }
     public static boolean isReleased() { return !down && pdown; }
 
     public static void setKey(int i, boolean b){ keys[i] = b;  }

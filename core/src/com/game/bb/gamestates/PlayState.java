@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -42,6 +43,7 @@ public class PlayState extends GameState {
     private float respawnTimer = 0;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
+    private float[] touchNbrs = { (B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH*4/5};
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -52,6 +54,7 @@ public class PlayState extends GameState {
         b2dr = new Box2DDebugRenderer();
 
         hud = new HUD();
+        System.out.println("touchnbrs0 " + touchNbrs[0] + " touchnbrs1 " + touchNbrs[1]);
 
         bullets = new Array<SPBullet>();
         opponents = new Array<SPPlayer>();
@@ -61,8 +64,7 @@ public class PlayState extends GameState {
         createBoundary(0, cam.viewportHeight / 2, 5, cam.viewportHeight / 2); // left
         createBoundary(cam.viewportWidth, cam.viewportHeight / 2, 5, cam.viewportHeight / 2); // right
 
-        //build random platforms
-
+        //Vectors for handling android touch input
 
         //Players
         player = new SPPlayer(world, B2DVars.MY_ID, cam.viewportWidth / 2, cam.viewportHeight / 2, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
@@ -107,19 +109,25 @@ public class PlayState extends GameState {
 
     public void handleInput() {
 
-        if (SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump()) {
+        if (SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump() ||
+                SPInput.isPressed() && SPInput.x > touchNbrs[1] && cl.canJump()) {
             Vector2 temp = player.getPosition();
+            SPInput.down=false;
             player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, temp.x, temp.y);
             gsm.addAction(B2DVars.MY_ID + ":MOVE:" + B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + temp.x + ":" + temp.y);
             lastJumpDirection = 1;
         }
-        if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump()) {
+        if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
+                SPInput.isPressed() && SPInput.x < touchNbrs[0] && cl.canJump()) {
             Vector2 temp = player.getPosition();
+            SPInput.down=false;
             player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, temp.x, temp.y);
             gsm.addAction(B2DVars.MY_ID + ":MOVE:" + -B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + temp.x + ":" + temp.y);
             lastJumpDirection = -1;
         }
-        if (SPInput.isPressed(SPInput.BUTTON_W)) {
+        if (SPInput.isPressed(SPInput.BUTTON_W) ||
+                SPInput.isPressed() && SPInput.x > touchNbrs[0] && SPInput.x < touchNbrs[1]) {
+            SPInput.down=false;
             shoot();
         }
 
@@ -198,6 +206,15 @@ public class PlayState extends GameState {
         }
     }
 
+    private void playerHit(){
+        if (cl.getKillingBullet() != null) {
+            cl.getKillingBullet().getBody().setTransform(cam.viewportWidth * 2, cam.viewportHeight * 2, 0);
+        }
+        player.kill();
+        hud.addPlayerDeath();
+        gsm.addAction(B2DVars.MY_ID + ":DEATH:" + hud.getDeathCount() + ":0:" + player.getPosition().x + ":" + player.getPosition().y);
+    }
+
 
     @Override
     public void update(float dt) {
@@ -209,14 +226,9 @@ public class PlayState extends GameState {
         }
         opponentActions();
         refreshBullets(dt);
-        if (cl.amIHit()) {
-            if (cl.getKillingBullet() != null) {
-                cl.getKillingBullet().getBody().setTransform(cam.viewportWidth * 2, cam.viewportHeight * 2, 0);
-            }
-            player.kill();
-            hud.addPlayerDeath();
-            gsm.addAction(B2DVars.MY_ID + ":DEATH:" + hud.getDeathCount() + ":0:" + player.getPosition().x + ":" + player.getPosition().y);
-        }
+        if (cl.amIHit())
+            playerHit();
+
         if (player.isDead()) {
             respawnTimer += dt;
             if (respawnTimer >= B2DVars.RESPAWN_TIME) {
