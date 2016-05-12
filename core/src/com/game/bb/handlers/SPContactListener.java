@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Array;
+import com.game.bb.entities.SPPlayer;
 import com.game.bb.gamestates.GameState;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
  */
 public class SPContactListener implements ContactListener {
     private int footContact = 0, amntJumps = 0;
-    private boolean playerHit = false;
+    private boolean playerDead = false;
     private Array<Body> bodiesToRemove;
     private Fixture killingBullet;
 
@@ -36,13 +37,18 @@ public class SPContactListener implements ContactListener {
             amntJumps = 0;
         }
         if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
-            playerHit = true;
-            killingBullet = fb;
-            bodiesToRemove.add(fb.getBody());
+            //Unless player is dead, mark him as dead.
+            if (!playerDead) {
+                playerDead = true;
+                killingBullet = fb;
+                bodiesToRemove.add(fb.getBody());
+            }
         } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_PLAYER)) {
-            playerHit = true;
-            killingBullet = fa;
-            bodiesToRemove.add(fa.getBody());
+            if (!playerDead) {
+                playerDead = true;
+                killingBullet = fa;
+                bodiesToRemove.add(fa.getBody());
+            }
         }
     }
 
@@ -63,16 +69,15 @@ public class SPContactListener implements ContactListener {
         return temp;
     }
 
-    public void revive() {
-        amntJumps = 0;
+    public boolean isPlayerDead() {
+        return playerDead;
     }
 
-    public boolean amIHit() {
-        return playerHit;
+    public void revivePlayer(){
+        playerDead = false;
     }
 
     public Fixture getKillingBullet() {
-        playerHit = false;
         return killingBullet;
     }
 
@@ -92,5 +97,9 @@ public class SPContactListener implements ContactListener {
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
 
+    }
+
+    public void resetJumps() {
+        amntJumps=0;
     }
 }
