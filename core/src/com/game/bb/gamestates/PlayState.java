@@ -43,7 +43,7 @@ public class PlayState extends GameState {
     private float respawnTimer = 0;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
-    private float[] touchNbrs = { (B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH*4/5};
+    private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -112,7 +112,7 @@ public class PlayState extends GameState {
         if (SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x > touchNbrs[1] && cl.canJump()) {
             Vector2 temp = player.getPosition();
-            SPInput.down=false;
+            SPInput.down = false;
             player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, temp.x, temp.y);
             gsm.addAction(B2DVars.MY_ID + ":MOVE:" + B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + temp.x + ":" + temp.y);
             lastJumpDirection = 1;
@@ -120,14 +120,14 @@ public class PlayState extends GameState {
         if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x < touchNbrs[0] && cl.canJump()) {
             Vector2 temp = player.getPosition();
-            SPInput.down=false;
+            SPInput.down = false;
             player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, temp.x, temp.y);
             gsm.addAction(B2DVars.MY_ID + ":MOVE:" + -B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + temp.x + ":" + temp.y);
             lastJumpDirection = -1;
         }
         if (SPInput.isPressed(SPInput.BUTTON_W) ||
                 SPInput.isPressed() && SPInput.x > touchNbrs[0] && SPInput.x < touchNbrs[1]) {
-            SPInput.down=false;
+            SPInput.down = false;
             shoot();
         }
 
@@ -150,7 +150,7 @@ public class PlayState extends GameState {
                 opponent.jump(Float.valueOf(action[2]), Float.valueOf(action[3]),
                         Float.valueOf(action[4]), Float.valueOf(action[5]));
             } else if (action[1].equals("CONNECT")) {
-                if (getOpponent(action[0])==null) {
+                if (getOpponent(action[0]) == null) {
                     opponents.add(new SPPlayer(world, action[0], Float.valueOf(action[4]), Float.valueOf(action[5]), Short.valueOf(action[6]), action[7], action[8]));
                 }
             } else if (action[1].equals("DISCONNECT")) {
@@ -179,9 +179,10 @@ public class PlayState extends GameState {
     private void respawnPlayer() {
         respawnTimer = 0;
         player.revive();
-        player.jump(0, 0, 100 / B2DVars.PPM, 100 / B2DVars.PPM);
+        player.jump(0, 0, B2DVars.CAM_WIDTH / (B2DVars.PPM*2), B2DVars.CAM_HEIGHT / (B2DVars.PPM*2));
         gsm.addAction(B2DVars.MY_ID + ":RESPAWN:0:0:" + player.getPosition().x + ":" + player.getPosition().y);
-        cl.revive();
+        cl.resetJumps();
+        cl.revivePlayer();
     }
 
     private void refreshBullets(float dt) {
@@ -206,13 +207,15 @@ public class PlayState extends GameState {
         }
     }
 
-    private void playerHit(){
-        if (cl.getKillingBullet() != null) {
-            cl.getKillingBullet().getBody().setTransform(cam.viewportWidth * 2, cam.viewportHeight * 2, 0);
+    private void playerHit() {
+        if (!player.isDead()) {
+            if (cl.getKillingBullet() != null) {
+                cl.getKillingBullet().getBody().setTransform(cam.viewportWidth * 2, cam.viewportHeight * 2, 0);
+            }
+            player.kill();
+            hud.addPlayerDeath();
+            gsm.addAction(B2DVars.MY_ID + ":DEATH:" + hud.getDeathCount() + ":0:" + player.getPosition().x + ":" + player.getPosition().y);
         }
-        player.kill();
-        hud.addPlayerDeath();
-        gsm.addAction(B2DVars.MY_ID + ":DEATH:" + hud.getDeathCount() + ":0:" + player.getPosition().x + ":" + player.getPosition().y);
     }
 
 
@@ -226,9 +229,9 @@ public class PlayState extends GameState {
         }
         opponentActions();
         refreshBullets(dt);
-        if (cl.amIHit())
+        if (cl.isPlayerDead()) {
             playerHit();
-
+        }
         if (player.isDead()) {
             respawnTimer += dt;
             if (respawnTimer >= B2DVars.RESPAWN_TIME) {
@@ -245,7 +248,7 @@ public class PlayState extends GameState {
         sb.begin();
         sb.draw(backGround, 0, 0);
         sb.end();
-        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+        //b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         for (SPBullet b : bullets) {
             b.render(sb);
         }
