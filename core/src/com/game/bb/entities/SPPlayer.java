@@ -25,7 +25,7 @@ public class SPPlayer extends SPSprite {
     private String id;
     private int xOffset = 23, yOffset=25;
 
-    public SPPlayer(World world, float xPos, float yPos, short bodyBIT, String bodyType, String id, String color) {
+    public SPPlayer(World world, String id, float xPos, float yPos, short bodyBIT, String bodyType, String color) {
         super(world);
         createPlayer(xPos, yPos, bodyBIT, bodyType);
         this.id=id;

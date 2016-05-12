@@ -30,7 +30,6 @@ public class GameStateManager {
         this.port = port;
         states = new Stack<GameState>();
         opponentActions = new ArrayList<String>();
-        init();
         pushState(START_SCREEN);
         //pushState(PLAY); //remove this later
     }
@@ -44,7 +43,7 @@ public class GameStateManager {
         client = new GameClient(this, ipAddress, port);
         client.start();
         Runtime.getRuntime().addShutdownHook(new Thread(client.getDisconnecter()));
-        byte[] clientInfo = (B2DVars.MY_ID + ":CONNECT:" + B2DVars.CAM_WIDTH/2+":"+B2DVars.CAM_HEIGHT/2+":"+B2DVars.BIT_OPPONENT+":"+B2DVars.ID_OPPONENT+":"+B2DVars.MY_ID+":red").getBytes();
+        byte[] clientInfo = (B2DVars.MY_ID + ":CONNECT:0:0:" + B2DVars.CAM_WIDTH/2+":"+B2DVars.CAM_HEIGHT/2+":"+B2DVars.BIT_OPPONENT+":"+B2DVars.ID_OPPONENT+":red").getBytes();
         client.sendData(clientInfo);
     }
 
@@ -69,6 +68,9 @@ public class GameStateManager {
     }
 
     public void setState(int state) {
+        if(state == PLAY){
+            init();
+        }
         popState();
         pushState(state);
     }

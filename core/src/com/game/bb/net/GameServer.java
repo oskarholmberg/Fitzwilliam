@@ -1,6 +1,7 @@
 package com.game.bb.net;
 
 import com.badlogic.gdx.utils.Array;
+import com.game.bb.handlers.B2DVars;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -17,12 +18,10 @@ import java.util.HashMap;
 public class GameServer extends Thread {
 
     private DatagramSocket socket;
-    private int port;
     private HashMap<String, String> connectedClients;
 
     public GameServer(int port) {
-        this.port = port;
-        // First String is ID, second is last known position.
+        // First String is ipAddress, second is last known action.
         connectedClients = new HashMap<String, String>();
         try {
             System.out.println("Trying to start server on port: " + port);
@@ -45,15 +44,17 @@ public class GameServer extends Thread {
             String ipAddress = packet.getAddress().getHostAddress() + ":" + packet.getPort();
             String content = new String(packet.getData()).trim();
             String[] segments = content.split(":");
-            if (connectedClients.get(segments[0]) == null) {
+            if (connectedClients.get(ipAddress) == null) {
                 //New client has connected
+                connectedClients.put(ipAddress, content);
                 for (String id : connectedClients.keySet()) {
-                    String lastKnownPosition=connectedClients.get(id);
-                    sendData((segments[0]+":"+"CONNECT:"+lastKnownPosition).getBytes());
+                    String[] info=connectedClients.get(id).split(":");
+                    sendData((info[0]+":CONNECT:0:0:"+info[4]+":"+info[5]+":"+ B2DVars.BIT_OPPONENT+":"+B2DVars.ID_OPPONENT+":red").getBytes());
                 }
-                connectedClients.put(segments[0], segments[2]+":"+segments[3]);
-
                 System.out.println("CLIENT[" + ipAddress + "] connected.");
+            }
+            if(segments[1].equals("MOVE")){
+                connectedClients.put(ipAddress, content);
             }
             if (segments[1].equals("DISCONNECT")) {
                 //Client has disconnected
@@ -68,9 +69,10 @@ public class GameServer extends Thread {
 
     public void sendData(byte[] data) {
         for (String s : connectedClients.keySet()) {
+            String[] address = s.split(":");
             try {
-                InetAddress ip = InetAddress.getByName(s);
-                int port = Integer.valueOf(s);
+                InetAddress ip = InetAddress.getByName(address[0]);
+                int port = Integer.valueOf(address[1]);
                 DatagramPacket packet = new DatagramPacket(data, data.length, ip, port);
                 try {
                     socket.send(packet);

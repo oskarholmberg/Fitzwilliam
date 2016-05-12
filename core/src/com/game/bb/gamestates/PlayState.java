@@ -43,9 +43,9 @@ public class PlayState extends GameState {
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
 
-    public PlayState(GameStateManager gsm){
+    public PlayState(GameStateManager gsm) {
         super(gsm);
-        
+
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
 
@@ -65,7 +65,7 @@ public class PlayState extends GameState {
 
 
         //Players
-        player = new SPPlayer(world, cam.viewportWidth / 2, cam.viewportHeight / 2, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, B2DVars.MY_ID, "blue");
+        player = new SPPlayer(world, B2DVars.MY_ID, cam.viewportWidth / 2, cam.viewportHeight / 2, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
 
 
         // set up box2d cam
@@ -94,7 +94,7 @@ public class PlayState extends GameState {
             Vector2 pos = player.getPosition();
             SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false);
             bullets.add(bullet);
-            gsm.addAction(B2DVars.MY_ID + ":SHOOT:" + pos.x + ":" + pos.y + ":" + lastJumpDirection);
+            gsm.addAction(B2DVars.MY_ID + ":SHOOT:0:0:" + pos.x + ":" + pos.y + ":" + lastJumpDirection);
             amntBullets--;
         }
     }
@@ -135,15 +135,17 @@ public class PlayState extends GameState {
             else if (action[1].equals("SHOOT") && opponent != null)
                 opponentShot(Float.valueOf(action[2]), Float.valueOf(action[3]), Float.valueOf(action[4]));
             else if (action[1].equals("DEATH") && opponent != null) {
-                hud.setOpponentDeath(action[1],action[2]);
+                hud.setOpponentDeath(action[1], action[2]);
                 opponent.kill();
             } else if (action[1].equals("RESPAWN") && opponent != null) {
                 opponent.revive();
                 opponent.jump(Float.valueOf(action[2]), Float.valueOf(action[3]),
                         Float.valueOf(action[4]), Float.valueOf(action[5]));
-            } else if(action[1].equals("CONNECT")){
-                opponents.add(new SPPlayer(world, Float.valueOf(action[2]), Float.valueOf(action[3]), Short.valueOf(action[4]), action[5], action[0], action[7]));
-            } else if(action[1].equals("DISCONNECT")){
+            } else if (action[1].equals("CONNECT")) {
+                if (getOpponent(action[0])==null) {
+                    opponents.add(new SPPlayer(world, action[0], Float.valueOf(action[4]), Float.valueOf(action[5]), Short.valueOf(action[6]), action[7], action[8]));
+                }
+            } else if (action[1].equals("DISCONNECT")) {
                 opponent = getOpponent(action[0]);
                 opponents.removeValue(opponent, false);
                 world.destroyBody(opponent.getBody());
