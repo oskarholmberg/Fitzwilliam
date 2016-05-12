@@ -20,7 +20,7 @@ public class SPContactListener implements ContactListener {
     private Array<Body> bodiesToRemove;
     private Fixture killingBullet;
 
-    public SPContactListener(){
+    public SPContactListener() {
         bodiesToRemove = new Array<Body>();
     }
 
@@ -34,11 +34,11 @@ public class SPContactListener implements ContactListener {
             footContact++;
             amntJumps = 0;
         }
-        if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BULLET)){
+        if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
             playerHit = true;
             killingBullet = fb;
             bodiesToRemove.add(fb.getBody());
-        } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_PLAYER)){
+        } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_PLAYER)) {
             playerHit = true;
             killingBullet = fa;
             bodiesToRemove.add(fa.getBody());
@@ -50,31 +50,31 @@ public class SPContactListener implements ContactListener {
         Fixture fa = contact.getFixtureA();
         Fixture fb = contact.getFixtureB();
 
-        if (fa.getUserData().equals(B2DVars.ID_FOOT) ||fb.getUserData().equals(B2DVars.ID_FOOT))
+        if (fa.getUserData().equals(B2DVars.ID_FOOT) || fb.getUserData().equals(B2DVars.ID_FOOT))
             footContact--;
     }
 
-    public Array<Body> getBodiesToRemove(){
+    public Array<Body> getBodiesToRemove() {
         Array<Body> temp = bodiesToRemove;
         bodiesToRemove.clear();
         return temp;
     }
 
-    public void revive(){
-        playerHit = false;
-        amntJumps=0;
+    public void revive() {
+        amntJumps = 0;
     }
 
-    public boolean amIHit(){
+    public boolean amIHit() {
         return playerHit;
     }
 
-    public Fixture getKillingBullet(){
+    public Fixture getKillingBullet() {
+        playerHit = false;
         return killingBullet;
     }
 
-    public boolean canJump(){
-        if (footContact > 0 || amntJumps < 4){
+    public boolean canJump() {
+        if (footContact > 0 || amntJumps < 4) {
             amntJumps++;
             return true;
         }
