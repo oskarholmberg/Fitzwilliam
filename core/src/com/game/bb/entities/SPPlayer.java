@@ -23,22 +23,7 @@ public class SPPlayer extends SPSprite {
     {
         super(body);
         sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jump.wav"));
-        if(color.equals("blue")){
-            onGroundRight = new Texture("images/player/bluePlayerStandRight.png");
-            inAirRight = new Texture("images/player/bluePlayerJumpRight.png");
-            onGroundLeft = new Texture("images/player/bluePlayerStandLeft.png");
-            inAirLeft = new Texture("images/player/bluePlayerJumpLeft.png");
-            deadRight = new Texture("images/player/bluePlayerDeadRight.png");
-            deadLeft = new Texture("images/player/bluePlayerDeadLeft.png");
-        }
-        else {
-            onGroundRight = new Texture("images/player/redPlayerStandRight.png");
-            inAirRight = new Texture("images/player/redPlayerJumpRight.png");
-            onGroundLeft = new Texture("images/player/redPlayerStandLeft.png");
-            inAirLeft = new Texture("images/player/redPlayerJumpLeft.png");
-            deadRight = new Texture("images/player/redPlayerDeadRight.png");
-            deadLeft = new Texture("images/player/redPlayerDeadLeft.png");
-        }
+        loadTexture(color);
         setTexture(onGroundRight);
     }
 
@@ -97,5 +82,24 @@ public class SPPlayer extends SPSprite {
 
     public boolean isDead() {
         return isDead;
+    }
+
+    private void loadTexture(String color){
+        if(color.equals("blue")){
+            onGroundRight = new Texture("images/player/bluePlayerStandRight.png");
+            inAirRight = new Texture("images/player/bluePlayerJumpRight.png");
+            onGroundLeft = new Texture("images/player/bluePlayerStandLeft.png");
+            inAirLeft = new Texture("images/player/bluePlayerJumpLeft.png");
+            deadRight = new Texture("images/player/bluePlayerDeadRight.png");
+            deadLeft = new Texture("images/player/bluePlayerDeadLeft.png");
+        }
+        else {
+            onGroundRight = new Texture("images/player/redPlayerStandRight.png");
+            inAirRight = new Texture("images/player/redPlayerJumpRight.png");
+            onGroundLeft = new Texture("images/player/redPlayerStandLeft.png");
+            inAirLeft = new Texture("images/player/redPlayerJumpLeft.png");
+            deadRight = new Texture("images/player/redPlayerDeadRight.png");
+            deadLeft = new Texture("images/player/redPlayerDeadLeft.png");
+        }
     }
 }
