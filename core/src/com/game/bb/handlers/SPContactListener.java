@@ -53,6 +53,8 @@ public class SPContactListener implements ContactListener {
 
     public Array<Body> getBodiesToRemove(){
         Array<Body> temp = bodiesToRemove;
+        if (bodiesToRemove.size > 1)
+            System.out.println("Size of bodiesToRemove: " + bodiesToRemove.size);
         bodiesToRemove.clear();
         return temp;
     }

@@ -230,6 +230,7 @@ public class Play extends GameState {
         handlePongInput(dt);
         world.step(dt, 6, 2);
         player.update(dt);
+        opponentPlayer.update(dt);
         opponentActions();
         refreshBullets(dt);
         if (cl.amIHit()) {
