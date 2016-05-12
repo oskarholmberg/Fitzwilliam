@@ -28,7 +28,7 @@ import com.game.bb.entities.SPPlayer;
  * --Add music \o/
  * --?
  */
-public class Play extends GameState {
+public class PlayState extends GameState {
 
     private World world;
     private Box2DDebugRenderer b2dr;
@@ -42,9 +42,10 @@ public class Play extends GameState {
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
 
-    public Play(GameStateManager gsm){
+    public PlayState(GameStateManager gsm){
         super(gsm);
-
+        System.out.println("Hello playstate!");
+        
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
 
@@ -242,6 +243,7 @@ public class Play extends GameState {
         if (cl.amIHit()) {
             if(cl.getKillingBullet() != null){
                 cl.getKillingBullet().getBody().setTransform(cam.viewportWidth*2, cam.viewportHeight*2, 0);
+                world.destroyBody(cl.getKillingBullet().getBody());
             }
             player.kill();
             hud.addPlayerDeath();

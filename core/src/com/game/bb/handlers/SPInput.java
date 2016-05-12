@@ -7,6 +7,8 @@ public class SPInput {
 
     public static boolean[] keys;
     public static boolean[] pkeys;
+    public static int x, y;
+    public static boolean pdown, down;
 
     public static final int NUM_KEYS = 5, BUTTON_W = 0, BUTTON_S = 1, BUTTON_RIGHT = 2, BUTTON_LEFT = 3, BUTTON_E = 4;
 
@@ -20,6 +22,10 @@ public class SPInput {
             pkeys[i] = keys[i];
         }
     }
+
+    public static boolean isDown() { return down; }
+    public static boolean isPressed() { return down && !pdown; }
+    public static boolean isReleased() { return !down && pdown; }
 
     public static void setKey(int i, boolean b){ keys[i] = b;  }
 

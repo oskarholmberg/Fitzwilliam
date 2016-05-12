@@ -20,13 +20,14 @@ public class Game extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-        Gdx.input.setInputProcessor(new SPInputProcessor());
 
 		batch = new SpriteBatch();
         cam = new OrthographicCamera();
         cam.setToOrtho(false, B2DVars.CAM_WIDTH, B2DVars.CAM_HEIGHT);
         hudCam = new OrthographicCamera();
         hudCam.setToOrtho(false, B2DVars.CAM_WIDTH, B2DVars.CAM_HEIGHT);
+
+        Gdx.input.setInputProcessor(new SPInputProcessor());
 
         gsm = new com.game.bb.handlers.GameStateManager(this, "localhost", 8080);
 	}

@@ -8,6 +8,20 @@ import com.badlogic.gdx.InputAdapter;
  */
 public class SPInputProcessor extends InputAdapter{
 
+    public boolean touchDown(int x, int y, int pointer, int button) {
+        SPInput.x = x;
+        SPInput.y = y;
+        SPInput.down = true;
+        return true;
+    }
+
+    public boolean touchUp(int x, int y, int pointer, int button) {
+        SPInput.x = x;
+        SPInput.y = y;
+        SPInput.down = false;
+        return true;
+    }
+
 
     public boolean keyDown(int k){
         if (k == Input.Keys.W)

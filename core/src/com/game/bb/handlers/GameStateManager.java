@@ -1,5 +1,7 @@
 package com.game.bb.handlers;
 
+import com.game.bb.gamestates.MenuState;
+import com.game.bb.gamestates.PlayState;
 import com.game.bb.main.Game;
 import com.game.bb.gamestates.GameState;
 import com.game.bb.net.GameClient;
@@ -14,7 +16,7 @@ import java.util.Stack;
 public class GameStateManager {
     private Game game;
     private Stack<GameState> states;
-    private int PLAY = 123123;
+    private static final int PLAY = 1, START_SCREEN = 2;
     private ArrayList<String> opponentActions;
     private GameClient client;
     private String ipAddress;
@@ -29,7 +31,8 @@ public class GameStateManager {
         states = new Stack<GameState>();
         opponentActions = new ArrayList<String>();
         init();
-        pushState(PLAY);
+        pushState(START_SCREEN);
+        //pushState(PLAY); //remove this later
     }
 
     private void init(){
@@ -59,7 +62,9 @@ public class GameStateManager {
 
     private GameState getState(int state) {
         if (state == PLAY)
-            return new com.game.bb.gamestates.Play(this);
+            return new PlayState(this);
+        else if (state == START_SCREEN)
+            return new MenuState(this);
         return null;
     }
 
