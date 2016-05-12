@@ -45,7 +45,6 @@ public class PlayState extends GameState {
 
     public PlayState(GameStateManager gsm){
         super(gsm);
-        System.out.println("Hello playstate!");
         
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
