@@ -1,6 +1,7 @@
 package com.game.bb.net;
 
 import com.badlogic.gdx.utils.Array;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -43,20 +44,15 @@ public class GameServer extends Thread {
             if (!connectedClients.contains(ipAddress, false)) {
                 connectedClients.add(ipAddress);
                 System.out.println("CLIENT[" + ipAddress + "] connected.");
-                byte[] setupData = ("SETUP&"+ (connectedClients.size-1)).getBytes();
-                sendData(setupData);
             }
             String content = new String(packet.getData()).trim();
             if (content.equals("DISCONNECT")) {
                 connectedClients.removeValue(ipAddress, false);
                 System.out.println("CLIENT[" + ipAddress + "] disconnected.");
-            } else if(content.equals("SETUP")){
-                System.out.println("CLIENT[" + ipAddress + "] > " + content);
             }
-            else {
-                System.out.println("CLIENT[" + ipAddress + "] > " + content);
-                sendData(packet.getData());
-            }
+            System.out.println("CLIENT[" + ipAddress + "] > " + content);
+            sendData(packet.getData());
+
         }
     }
 

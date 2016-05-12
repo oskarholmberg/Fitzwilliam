@@ -41,7 +41,7 @@ public class GameStateManager {
         client = new GameClient(this, ipAddress, port);
         client.start();
         Runtime.getRuntime().addShutdownHook(new Thread(client.getDisconnecter()));
-        byte[] clientInfo = "SETUP".getBytes();
+        byte[] clientInfo = (B2DVars.MY_ID + ":CONNECT:" + B2DVars.CAM_WIDTH/2+":"+B2DVars.CAM_HEIGHT/2+":"+B2DVars.BIT_OPPONENT+":"+B2DVars.ID_OPPONENT+":"+B2DVars.MY_ID+":red").getBytes();
         client.sendData(clientInfo);
     }
 
