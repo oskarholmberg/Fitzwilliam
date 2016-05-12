@@ -67,11 +67,10 @@ public class GameServer extends Thread {
     }
 
     public void sendData(byte[] data) {
-        for (String s : connectedClients) {
-            String[] client = s.split(":");
+        for (String s : connectedClients.keySet()) {
             try {
-                InetAddress ip = InetAddress.getByName(client[0]);
-                int port = Integer.valueOf(client[1]);
+                InetAddress ip = InetAddress.getByName(s);
+                int port = Integer.valueOf(s);
                 DatagramPacket packet = new DatagramPacket(data, data.length, ip, port);
                 try {
                     socket.send(packet);
@@ -79,7 +78,7 @@ public class GameServer extends Thread {
                     e.printStackTrace();
                 }
             } catch (UnknownHostException e) {
-                connectedClients.removeValue(s, false);
+                connectedClients.remove(s);
                 System.out.println("CLIENT[" + s + "] disconnected.");
             }
         }
