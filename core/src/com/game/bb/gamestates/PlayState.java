@@ -141,7 +141,7 @@ public class PlayState extends GameState {
                 opponent.jump(Float.valueOf(action[2]), Float.valueOf(action[3]),
                         Float.valueOf(action[4]), Float.valueOf(action[5]));
             else if (action[1].equals("SHOOT") && opponent != null)
-                opponentShot(Float.valueOf(action[2]), Float.valueOf(action[3]), Float.valueOf(action[4]));
+                opponentShot(Float.valueOf(action[4]), Float.valueOf(action[5]), Float.valueOf(action[6]));
             else if (action[1].equals("DEATH") && opponent != null) {
                 hud.setOpponentDeath(action[1], action[2]);
                 opponent.kill();
