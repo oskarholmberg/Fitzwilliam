@@ -34,7 +34,8 @@ public class PlayState extends GameState {
     private Box2DDebugRenderer b2dr;
     private OrthographicCamera b2dCam;
     private SPContactListener cl;
-    private SPPlayer player, opponentPlayer;
+    private SPPlayer player;
+    private Array<SPPlayer> opponents;
     private int amntBullets = 5;
     private float bulletRefresh, lastJumpDirection = 1;
     private Array<SPBullet> bullets;
@@ -54,6 +55,7 @@ public class PlayState extends GameState {
         hud = new HUD();
 
         bullets = new Array<SPBullet>();
+        opponents = new Array<SPPlayer>();
         // create boundaries
         createBoundary(cam.viewportWidth / 2, cam.viewportHeight, cam.viewportWidth / 2, 5); //top
         createBoundary(cam.viewportWidth / 2, 0, cam.viewportWidth / 2, 5); //bottom
@@ -64,10 +66,7 @@ public class PlayState extends GameState {
 
 
         //Players
-        player = new SPPlayer(createPlayer(B2DVars.ID_PLAYER, cam.viewportWidth / 2, cam.viewportHeight / 2
-                , B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT, B2DVars.BIT_PLAYER), "blue");
-        opponentPlayer = new SPPlayer(createPlayer(B2DVars.ID_OPPONENT, cam.viewportWidth / 2, cam.viewportHeight / 2
-                , B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT, B2DVars.BIT_OPPONENT), "red");
+        player = new SPPlayer(world, cam.viewportWidth / 2, cam.viewportHeight / 2, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, B2DVars.MY_ID, "blue");
 
 
         // set up box2d cam
@@ -91,77 +90,23 @@ public class PlayState extends GameState {
         body.createFixture(fdef).setUserData(B2DVars.ID_GROUND);
     }
 
-    private Body createPlayer(String name, float xPos, float yPos, float width, float height, short bodyCategory) {
-        Body body;
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(width / B2DVars.PPM, height / B2DVars.PPM);
-        FixtureDef fdef = new FixtureDef();
-        fdef.shape = shape;
-        fdef.filter.categoryBits = bodyCategory;
-        if (name.equals(B2DVars.ID_PLAYER))
-            fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET;
-        else
-            fdef.filter.maskBits = B2DVars.BIT_GROUND;
-        BodyDef bdef = new BodyDef();
-        bdef.position.set(xPos / B2DVars.PPM, yPos / B2DVars.PPM);
-        bdef.type = BodyDef.BodyType.DynamicBody;
-        body = world.createBody(bdef);
-        body.createFixture(fdef).setUserData(name);
-
-        //add foot
-        if (name.equals(B2DVars.ID_PLAYER)) {
-            shape.setAsBox((width - 2) / B2DVars.PPM, 2 / B2DVars.PPM, new Vector2(0, -height / B2DVars.PPM), 0);
-            fdef.shape = shape;
-            fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
-            fdef.filter.maskBits = B2DVars.BIT_GROUND;
-            fdef.isSensor = true;
-            body.createFixture(fdef).setUserData(B2DVars.ID_FOOT);
-        }
-
-        return body;
-    }
-
-    @Override
-    public void handleInput() {
-    }
-
     public void shoot() {
         if (amntBullets > 0) {
             Vector2 pos = player.getPosition();
-            bullet(pos.x, pos.y, lastJumpDirection, false);
+            SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false);
+            bullets.add(bullet);
+            gsm.addAction(B2DVars.MY_ID + ":SHOOT:" + pos.x + ":" + pos.y + ":" + lastJumpDirection);
             amntBullets--;
         }
     }
 
-    public void bullet(float xPos, float yPos, float dir, boolean harmFul) {
-        PolygonShape shape = new PolygonShape();
-        Vector2 pos = player.getPosition();
-        shape.setAsBox(8 / B2DVars.PPM, 4 / B2DVars.PPM);
-        FixtureDef fdef = new FixtureDef();
-        fdef.shape = shape;
-        if (harmFul) {
-            fdef.filter.categoryBits = B2DVars.BIT_BULLET;
-            fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND;
-        }
-        BodyDef bdef = new BodyDef();
-        bdef.position.set(xPos, yPos);
-        bdef.type = BodyDef.BodyType.KinematicBody;
-        Body body = world.createBody(bdef);
-        body.createFixture(fdef).setUserData(B2DVars.ID_BULLET);
-        body.setLinearVelocity(200f * dir / B2DVars.PPM, 0);
-        SPBullet bullet = new SPBullet(body, harmFul);
-        body.setUserData(bullet);
-        bullets.add(bullet);
-        if (!harmFul)
-            gsm.addAction(B2DVars.MY_ID + ":SHOOT:" + pos.x + ":" + pos.y + ":" + dir);
-    }
-
     public void opponentShot(float xPos, float yPos, float dir) {
-        bullet(xPos, yPos, dir, true);
+        SPBullet bullet = new SPBullet(world, xPos, yPos, dir, true);
+        bullets.add(bullet);
     }
 
 
-    public void handlePongInput(float dt) {
+    public void handleInput() {
 
         if (SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump()) {
             Vector2 temp = player.getPosition();
@@ -183,28 +128,43 @@ public class PlayState extends GameState {
 
     private void opponentActions() {
         String[] action = gsm.getOpponentAction().split(":");
+        SPPlayer opponent = getOpponent(action[0]);
         if (validOpponentAction(action)) {
-            if (action[1].equals("MOVE"))
-                opponentPlayer.jump(Float.valueOf(action[2]), Float.valueOf(action[3]),
+            if (action[1].equals("MOVE") && opponent != null)
+                opponent.jump(Float.valueOf(action[2]), Float.valueOf(action[3]),
                         Float.valueOf(action[4]), Float.valueOf(action[5]));
-            else if (action[1].equals("SHOOT"))
+            else if (action[1].equals("SHOOT") && opponent != null)
                 opponentShot(Float.valueOf(action[2]), Float.valueOf(action[3]), Float.valueOf(action[4]));
-            else if (action[1].equals("DEATH")) {
-                hud.setOpponentDeath(action[2]);
-                opponentPlayer.kill();
-            }
-            else if (action[1].equals("RESPAWN")){
-                opponentPlayer.revive();
-                opponentPlayer.jump(Float.valueOf(action[2]), Float.valueOf(action[3]),
+            else if (action[1].equals("DEATH") && opponent != null) {
+                hud.setOpponentDeath(action[1],action[2]);
+                opponent.kill();
+            } else if (action[1].equals("RESPAWN") && opponent != null) {
+                opponent.revive();
+                opponent.jump(Float.valueOf(action[2]), Float.valueOf(action[3]),
                         Float.valueOf(action[4]), Float.valueOf(action[5]));
+            } else if(action[1].equals("CONNECT")){
+                opponents.add(new SPPlayer(world, Float.valueOf(action[2]), Float.valueOf(action[3]), Short.valueOf(action[4]), action[5], action[0], action[7]));
+            } else if(action[1].equals("DISCONNECT")){
+                opponent = getOpponent(action[0]);
+                opponents.removeValue(opponent, false);
+                world.destroyBody(opponent.getBody());
             }
         }
     }
 
     private boolean validOpponentAction(String[] split) {
-        if (split.length >= 4 && !split[0].equals(B2DVars.MY_ID))
+        if (split.length >= 2 && !split[0].equals(B2DVars.MY_ID))
             return true;
         return false;
+    }
+
+    private SPPlayer getOpponent(String id) {
+        for (SPPlayer player : opponents) {
+            if (player.getId().equals(id)) {
+                return player;
+            }
+        }
+        return null;
     }
 
     private void respawnPlayer() {
@@ -240,10 +200,12 @@ public class PlayState extends GameState {
 
     @Override
     public void update(float dt) {
-        handlePongInput(dt);
+        handleInput();
         world.step(dt, 6, 2);
         player.update(dt);
-        opponentPlayer.update(dt);
+        for (SPPlayer player : opponents) {
+            player.update(dt);
+        }
         opponentActions();
         refreshBullets(dt);
         if (cl.amIHit()) {
@@ -270,11 +232,13 @@ public class PlayState extends GameState {
         sb.begin();
         sb.draw(backGround, 0, 0);
         sb.end();
-        //b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         for (SPBullet b : bullets) {
             b.render(sb);
         }
-        opponentPlayer.render(sb);
+        for (SPPlayer opponent : opponents) {
+            opponent.render(sb);
+        }
         player.render(sb);
         hud.render(sb);
 

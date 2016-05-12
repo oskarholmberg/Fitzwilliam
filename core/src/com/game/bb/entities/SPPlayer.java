@@ -5,7 +5,12 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.game.bb.handlers.B2DVars;
 
 /**
@@ -17,11 +22,13 @@ public class SPPlayer extends SPSprite {
     private Texture onGroundRight, inAirRight, onGroundLeft, inAirLeft, deadRight, deadLeft;
     private boolean onGround = true, isDead = false;
     private float textureTimer = 0;
-    private int offset = 2;
+    private String id;
+    private int xOffset = 23, yOffset=25;
 
-    public SPPlayer(Body body, String color)
-    {
-        super(body);
+    public SPPlayer(World world, float xPos, float yPos, short bodyBIT, String bodyType, String id, String color) {
+        super(world);
+        createPlayer(xPos, yPos, bodyBIT, bodyType);
+        this.id=id;
         sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jump.wav"));
         loadTexture(color);
         setTexture(onGroundRight);
@@ -53,6 +60,10 @@ public class SPPlayer extends SPSprite {
         setTexture(onGroundRight);
     }
 
+    public String getId(){
+        return id;
+    }
+
     @Override
     public void render(SpriteBatch sb){
         if(texture != null) {
@@ -62,15 +73,15 @@ public class SPPlayer extends SPSprite {
             if(textureTimer>=0.5f && !onGround){
                 if(texture.equals(inAirLeft)){
                     setTexture(onGroundLeft);
-                    offset = 12;
+                    xOffset = 30;
                 }
                 else{
                     setTexture(onGroundRight);
-                    offset = 2;
+                    xOffset = 23;
                 }
                 onGround=true;
             }
-            sb.draw(texture, x-offset, y, 54, 48);
+            sb.draw(texture, x-xOffset, y-yOffset, 54, 48);
             sb.end();
         }
     }
@@ -82,6 +93,33 @@ public class SPPlayer extends SPSprite {
 
     public boolean isDead() {
         return isDead;
+    }
+
+    private void createPlayer(float xPos, float yPos, short bodyCategory, String bodyID){
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT);
+        FixtureDef fdef = new FixtureDef();
+        fdef.shape = shape;
+        fdef.filter.categoryBits = bodyCategory;
+        if (bodyID.equals(B2DVars.ID_PLAYER))
+            fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET;
+        else
+            fdef.filter.maskBits = B2DVars.BIT_GROUND;
+        BodyDef bdef = new BodyDef();
+        bdef.position.set(xPos / B2DVars.PPM, yPos / B2DVars.PPM);
+        bdef.type = BodyDef.BodyType.DynamicBody;
+        body = world.createBody(bdef);
+        body.createFixture(fdef).setUserData(bodyID);
+
+        //add foot
+        if (bodyID.equals(B2DVars.ID_PLAYER)) {
+            shape.setAsBox(B2DVars.PLAYER_WIDTH - 2/B2DVars.PPM, 4 / B2DVars.PPM, new Vector2(0, -B2DVars.PLAYER_HEIGHT), 0);
+            fdef.shape = shape;
+            fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
+            fdef.filter.maskBits = B2DVars.BIT_GROUND;
+            fdef.isSensor = true;
+            body.createFixture(fdef).setUserData(B2DVars.ID_FOOT);
+        }
     }
 
     private void loadTexture(String color){

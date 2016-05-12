@@ -1,5 +1,6 @@
 package com.game.bb.net;
 
+import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
 import com.game.bb.main.Game;
 import com.sun.org.apache.xpath.internal.SourceTree;
@@ -72,7 +73,7 @@ public class GameClient extends Thread {
     }
 
     protected void disconnect() {
-        byte[] disconnect = "DISCONNECT".getBytes();
+        byte[] disconnect = (B2DVars.MY_ID+":DISCONNECT").getBytes();
         sendData(disconnect);
     }
 
