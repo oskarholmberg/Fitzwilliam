@@ -94,4 +94,8 @@ public class SPPlayer extends SPSprite {
     public void update(float dt){
         textureTimer+=dt;
     }
+
+    public boolean isDead() {
+        return isDead;
+    }
 }
