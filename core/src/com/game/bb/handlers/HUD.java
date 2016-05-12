@@ -36,9 +36,8 @@ public class HUD {
         playerDeaths = Integer.toString(temp);
     }
 
-    public void addOpponentDeath(String id) {
-        int temp = Integer.valueOf(opponentDeaths) + 1;
-        opponentDeaths = Integer.toString(temp);
+    public void setOpponentDeath(String deaths) {
+        opponentDeaths = deaths;
     }
 
     public void render(SpriteBatch sb) {
@@ -53,5 +52,9 @@ public class HUD {
 
         }
         sb.end();
+    }
+
+    public String getDeathCount() {
+        return playerDeaths;
     }
 }

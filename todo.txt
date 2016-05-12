@@ -14,7 +14,6 @@
 ##Functionality##
 	Add score count.
 	Balance; jumping, laser overheat
-	Update opponent score (will require network sending death event)
 	Set respawn delay and killed sprite.
 
 ##Extra##
