@@ -34,7 +34,7 @@ public class SPPlayer extends SPSprite {
 
     public void jump(float xForce, float yForce, float xPos, float yPos){
         if(!isDead) {
-            body.setTransform(xPos , yPos, 0);
+            body.setTransform(xPos, yPos, 0);
             body.setLinearVelocity(0, 0);
             body.applyForceToCenter(xForce, yForce, true);
             textureTimer = 0;
@@ -105,7 +105,7 @@ public class SPPlayer extends SPSprite {
         fdef.filter.categoryBits = bodyCategory;
         fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET;
         BodyDef bdef = new BodyDef();
-        bdef.position.set(xPos / B2DVars.PPM, yPos / B2DVars.PPM);
+        bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bdef);
         body.createFixture(fdef).setUserData(bodyID);

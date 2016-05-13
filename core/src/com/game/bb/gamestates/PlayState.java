@@ -76,7 +76,7 @@ public class PlayState extends GameState {
         buildMap();
 
         //Players
-        player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2, B2DVars.CAM_HEIGHT, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
+        player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM, B2DVars.CAM_HEIGHT/B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
 
 
         // set up box2d cam
@@ -225,7 +225,7 @@ public class PlayState extends GameState {
     private void respawnPlayer() {
         respawnTimer = 0;
         player.revive();
-        player.jump(0, 0, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM , B2DVars.CAM_HEIGHT / B2DVars.PPM);
+        player.jump(0, 0, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM, B2DVars.CAM_HEIGHT/B2DVars.PPM);
         gsm.addAction(B2DVars.MY_ID + ":RESPAWN:0:0:" + player.getPosition().x + ":" + player.getPosition().y);
         cl.resetJumps();
         cl.revivePlayer();
