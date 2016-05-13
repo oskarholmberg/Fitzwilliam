@@ -48,6 +48,7 @@ public class PlayState extends GameState {
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
+    private int debugShoot = 0, debugRemoveBullet = 0; // remove these variables
 
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer tmr;
@@ -140,8 +141,10 @@ public class PlayState extends GameState {
             Vector2 pos = player.getPosition();
             SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false);
             bullets.add(bullet);
+            
             gsm.addAction(B2DVars.MY_ID + ":SHOOT:0:0:" + pos.x + ":" + pos.y + ":" + lastJumpDirection);
             amntBullets--;
+            debugShoot++;
         }
     }
 
@@ -239,6 +242,8 @@ public class PlayState extends GameState {
 
     public void removeDeadBodies() {
         for (Body b : cl.getBodiesToRemove()) {
+            debugRemoveBullet++;
+            System.out.println("I removed a bullet! Good job me. Bullets shot: " + debugShoot + " Bullets removed: " + debugRemoveBullet);
             bullets.removeValue((SPBullet) b.getUserData(), true);
             world.destroyBody(b);
         }
@@ -260,7 +265,7 @@ public class PlayState extends GameState {
     public void update(float dt) {
         handleInput();
         world.step(dt, 6, 2);
-        //removeDeadBodies();
+        removeDeadBodies();
         player.update(dt);
         for (SPPlayer player : opponents) {
             player.update(dt);
