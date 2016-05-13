@@ -22,7 +22,7 @@ public class SPBullet extends SPSprite {
     public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful) {
         super(world);
         createBullet(xPos, yPos, dir, harmful);
-        Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/hit.wav"));
+        Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
         sound.play();
         if (harmful) {
             // set enemy color texture
@@ -53,15 +53,18 @@ public class SPBullet extends SPSprite {
         shape.setAsBox(8 / B2DVars.PPM, 4 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
+        fdef.filter.categoryBits = B2DVars.BIT_BULLET;
         if (harmful) {
-            fdef.filter.categoryBits = B2DVars.BIT_BULLET;
             fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND;
         }
+        fdef.filter.maskBits = B2DVars.BIT_GROUND;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
-        bdef.type = BodyDef.BodyType.KinematicBody;
+        bdef.type = BodyDef.BodyType.DynamicBody; // Should be dynamic
         body = world.createBody(bdef);
+        body.setGravityScale(0f);
         body.createFixture(fdef).setUserData(B2DVars.ID_BULLET);
         body.setLinearVelocity(200f * dir / B2DVars.PPM, 0);
+        body.setUserData(this);
     }
 }

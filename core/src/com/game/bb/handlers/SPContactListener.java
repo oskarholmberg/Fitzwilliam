@@ -50,6 +50,13 @@ public class SPContactListener implements ContactListener {
                 bodiesToRemove.add(fa.getBody());
             }
         }
+        if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_GROUND)) {
+            bodiesToRemove.add(fa.getBody());
+            System.out.println("ContactListener: " +fa.getBody());
+        }else if (fa.getUserData().equals(B2DVars.ID_GROUND) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
+            bodiesToRemove.add(fb.getBody());
+            System.out.println("ContactListener: " + fb.getBody().getUserData());
+        }
     }
 
     @Override
@@ -62,11 +69,7 @@ public class SPContactListener implements ContactListener {
     }
 
     public Array<Body> getBodiesToRemove() {
-        Array<Body> temp = bodiesToRemove;
-        if (bodiesToRemove.size > 1)
-            System.out.println("Size of bodiesToRemove: " + bodiesToRemove.size);
-        bodiesToRemove.clear();
-        return temp;
+        return bodiesToRemove;
     }
 
     public boolean isPlayerDead() {
@@ -101,5 +104,10 @@ public class SPContactListener implements ContactListener {
 
     public void resetJumps() {
         amntJumps=0;
+    }
+
+    public void clearBulletArray() {
+        if (bodiesToRemove.size > 0)
+            bodiesToRemove.clear();
     }
 }

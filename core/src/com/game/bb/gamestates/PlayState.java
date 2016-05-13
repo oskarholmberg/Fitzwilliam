@@ -112,7 +112,7 @@ public class PlayState extends GameState {
                 FixtureDef fd = new FixtureDef();
                 fd.shape = cs;
                 fd.filter.categoryBits = B2DVars.BIT_GROUND;
-                fd.filter.maskBits = B2DVars.BIT_PLAYER;
+                fd.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BULLET;
                 world.createBody(bdef).createFixture(fd).setUserData(B2DVars.ID_GROUND);
                 cs.dispose();
 
@@ -132,7 +132,7 @@ public class PlayState extends GameState {
         fdef.shape = shape;
         // set bits to collide with
         fdef.filter.categoryBits = B2DVars.BIT_GROUND;
-        fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_OPPONENT;
+        fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_OPPONENT | B2DVars.BIT_BULLET;
         body.createFixture(fdef).setUserData(B2DVars.ID_GROUND);
     }
 
@@ -244,12 +244,7 @@ public class PlayState extends GameState {
             bullets.removeValue((SPBullet) b.getUserData(), true);
             world.destroyBody(b);
         }
-        for (SPBullet spb : bullets) {
-            if (spb.getXPos() < 0 || spb.getXPos() > cam.viewportWidth / B2DVars.PPM) {
-                bullets.removeValue(spb, true);
-                world.destroyBody(spb.getBody());
-            }
-        }
+        cl.clearBulletArray();
     }
 
     private void playerHit() {

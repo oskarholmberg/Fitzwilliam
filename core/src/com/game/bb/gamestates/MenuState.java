@@ -1,5 +1,7 @@
 package com.game.bb.gamestates;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -52,6 +54,8 @@ public class MenuState extends GameState {
     @Override
     public void handleInput() {
         if (playButton.isClicked()) {
+            Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
+            sound.play();
             System.out.println("Game button clicked!");
             gsm.setState(1);
         }
