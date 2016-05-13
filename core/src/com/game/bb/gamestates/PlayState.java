@@ -75,7 +75,7 @@ public class PlayState extends GameState {
         buildMap();
 
         //Players
-        player = new SPPlayer(world, B2DVars.MY_ID, cam.viewportWidth / 2, cam.viewportHeight / 2, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
+        player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2, B2DVars.CAM_HEIGHT, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
 
 
         // set up box2d cam
@@ -223,7 +223,7 @@ public class PlayState extends GameState {
     private void respawnPlayer() {
         respawnTimer = 0;
         player.revive();
-        player.jump(0, 0, B2DVars.CAM_WIDTH / (B2DVars.PPM*2), B2DVars.CAM_HEIGHT / (B2DVars.PPM*2));
+        player.jump(0, 0, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM , B2DVars.CAM_HEIGHT / B2DVars.PPM);
         gsm.addAction(B2DVars.MY_ID + ":RESPAWN:0:0:" + player.getPosition().x + ":" + player.getPosition().y);
         cl.resetJumps();
         cl.revivePlayer();
@@ -238,12 +238,12 @@ public class PlayState extends GameState {
         }
     }
 
-    public void removeDeadBodes() {
+    public void removeDeadBodies() {
         for (Body b : cl.getBodiesToRemove()) {
             bullets.removeValue((SPBullet) b.getUserData(), true);
             world.destroyBody(b);
         }
-        cl.clearBulletArray();
+        cl.clearBulletList();
     }
 
     private void playerHit() {
@@ -261,6 +261,8 @@ public class PlayState extends GameState {
     public void update(float dt) {
         handleInput();
         world.step(dt, 6, 2);
+        //removeDeadBodies();
+
         player.update(dt);
         for (SPPlayer player : opponents) {
             player.update(dt);
@@ -276,7 +278,6 @@ public class PlayState extends GameState {
                 respawnPlayer();
             }
         }
-        removeDeadBodes();
     }
 
     @Override
@@ -299,7 +300,7 @@ public class PlayState extends GameState {
 
         //Do this last in render
         //b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
-        sb.setProjectionMatrix(cam.combined);
+        //sb.setProjectionMatrix(cam.combined);
     }
 
     @Override

@@ -102,7 +102,7 @@ public class SPContactListener implements ContactListener {
         amntJumps=0;
     }
 
-    public void clearBulletArray() {
+    public void clearBulletList() {
         if (bodiesToRemove.size > 0)
             bodiesToRemove.clear();
     }

@@ -34,7 +34,7 @@ public class SPPlayer extends SPSprite {
 
     public void jump(float xForce, float yForce, float xPos, float yPos){
         if(!isDead) {
-            body.setTransform(xPos, yPos, 0);
+            body.setTransform(xPos , yPos, 0);
             body.setLinearVelocity(0, 0);
             body.applyForceToCenter(xForce, yForce, true);
             textureTimer = 0;
