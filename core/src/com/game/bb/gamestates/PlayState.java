@@ -9,7 +9,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -85,9 +84,9 @@ public class PlayState extends GameState {
     }
 
     private void buildMap(){
-        tiledMap = new TmxMapLoader().load("maps/testMap.tmx");
+        tiledMap = new TmxMapLoader().load("maps/Moon.tmx");
         tmr = new OrthogonalTiledMapRenderer(tiledMap);
-        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("blue");
+        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("moonBlocks");
 
         float ts = layer.getTileWidth();
         for(int row = 0; row < layer.getHeight(); row++) {
@@ -112,7 +111,7 @@ public class PlayState extends GameState {
                 FixtureDef fd = new FixtureDef();
                 fd.shape = cs;
                 fd.filter.categoryBits = B2DVars.BIT_GROUND;
-                fd.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BULLET;
+                fd.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BULLET | B2DVars.BIT_OPPONENT;
                 world.createBody(bdef).createFixture(fd).setUserData(B2DVars.ID_GROUND);
                 cs.dispose();
 
@@ -249,11 +248,10 @@ public class PlayState extends GameState {
 
     private void playerHit() {
         if (!player.isDead()) {
-            if (cl.getKillingBullet() != null) {
-                cl.getKillingBullet().getBody().setTransform(cam.viewportWidth * 2, cam.viewportHeight * 2, 0);
-            }
             player.kill();
             hud.addPlayerDeath();
+
+            //In this addAction add the ID of the killing bullet last
             gsm.addAction(B2DVars.MY_ID + ":DEATH:" + hud.getDeathCount() + ":0:" + player.getPosition().x + ":" + player.getPosition().y);
         }
     }
@@ -269,7 +267,7 @@ public class PlayState extends GameState {
         }
         opponentActions();
         refreshBullets(dt);
-        if (cl.isPlayerDead()) {
+        if (cl.isPlayerHit()) {
             playerHit();
         }
         if (player.isDead()) {

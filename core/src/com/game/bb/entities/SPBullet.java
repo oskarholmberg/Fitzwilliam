@@ -56,8 +56,9 @@ public class SPBullet extends SPSprite {
         fdef.filter.categoryBits = B2DVars.BIT_BULLET;
         if (harmful) {
             fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND;
+        } else {
+            fdef.filter.maskBits = B2DVars.BIT_GROUND |B2DVars.BIT_OPPONENT;
         }
-        fdef.filter.maskBits = B2DVars.BIT_GROUND;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.DynamicBody; // Should be dynamic

@@ -7,17 +7,13 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Array;
-import com.game.bb.entities.SPPlayer;
-import com.game.bb.gamestates.GameState;
-
-import java.util.ArrayList;
 
 /**
  * Created by erik on 08/05/16.
  */
 public class SPContactListener implements ContactListener {
     private int footContact = 0, amntJumps = 0;
-    private boolean playerDead = false;
+    private boolean playerHit = false;
     private Array<Body> bodiesToRemove;
     private Fixture killingBullet;
 
@@ -38,17 +34,13 @@ public class SPContactListener implements ContactListener {
         }
         if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
             //Unless player is dead, mark him as dead.
-            if (!playerDead) {
-                playerDead = true;
+                playerHit = true;
                 killingBullet = fb;
                 bodiesToRemove.add(fb.getBody());
-            }
         } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_PLAYER)) {
-            if (!playerDead) {
-                playerDead = true;
+                playerHit = true;
                 killingBullet = fa;
                 bodiesToRemove.add(fa.getBody());
-            }
         }
         if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_GROUND)) {
             bodiesToRemove.add(fa.getBody());
@@ -72,12 +64,16 @@ public class SPContactListener implements ContactListener {
         return bodiesToRemove;
     }
 
-    public boolean isPlayerDead() {
-        return playerDead;
+    public boolean isPlayerHit() {
+        if (playerHit){
+            playerHit=false;
+            return true;
+        }
+        return false;
     }
 
     public void revivePlayer(){
-        playerDead = false;
+        playerHit = false;
     }
 
     public Fixture getKillingBullet() {

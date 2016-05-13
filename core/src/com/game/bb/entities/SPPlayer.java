@@ -3,10 +3,8 @@ package com.game.bb.entities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -101,15 +99,13 @@ public class SPPlayer extends SPSprite {
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         fdef.filter.categoryBits = bodyCategory;
-        if (bodyID.equals(B2DVars.ID_PLAYER))
-            fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET;
-        else
-            fdef.filter.maskBits = B2DVars.BIT_GROUND;
+        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos / B2DVars.PPM, yPos / B2DVars.PPM);
         bdef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bdef);
         body.createFixture(fdef).setUserData(bodyID);
+        body.setUserData(this);
 
         //add foot
         if (bodyID.equals(B2DVars.ID_PLAYER)) {

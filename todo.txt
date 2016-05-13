@@ -1,3 +1,6 @@
+##HighPrio unsorted##
+	Add ID for bullet. That was the opponent can tell which bullet hit him and you can remove it from the world.
+
 ##Network##
 	Select host or join on start.
 	Send relevant information when connecting.
