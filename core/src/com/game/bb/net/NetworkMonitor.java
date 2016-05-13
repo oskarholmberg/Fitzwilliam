@@ -20,8 +20,17 @@ public class NetworkMonitor {
     }
 
     public String netPacketBuilder(String ID, String command, float xPos, float yPos, float xForce, float yForce, String... misc ){
+        String packet = ID + ":" + command + ":" + xPos + ":" + yPos + ":" + xForce + ":" + yForce;
+        for (String s : misc){
+            packet += (":" + s);
+        }
+        return packet;
+    }
 
-        return null;
+    public float[] getPacketFloats(String packet){
+        String[] split = packet.split(":");
+        float[] floats = {Float.valueOf(split[2]), Float.valueOf(split[3]), Float.valueOf(split[4]), Float.valueOf(split[5])};
+        return floats;
     }
 
     public synchronized void sendPlayerAction(String s){

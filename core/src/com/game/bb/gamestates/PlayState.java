@@ -62,7 +62,6 @@ public class PlayState extends GameState {
         b2dr = new Box2DDebugRenderer();
 
         hud = new HUD();
-        System.out.println("touchnbrs0 " + touchNbrs[0] + " touchnbrs1 " + touchNbrs[1]);
 
         bullets = new Array<SPBullet>();
         opponents = new Array<SPPlayer>();
