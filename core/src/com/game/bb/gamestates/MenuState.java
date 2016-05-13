@@ -27,8 +27,8 @@ public class MenuState extends GameState {
     private float newFallingBody = 0f;
 
 
-    public MenuState(final GameStateManager gsm, NetworkMonitor mon) {
-        super(gsm, mon);
+    public MenuState(final GameStateManager gsm) {
+        super(gsm);
 
         world = new World(new Vector2(0, -9.81f), true);
         itRains = new Array<FallingBody>();

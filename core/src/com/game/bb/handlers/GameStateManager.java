@@ -41,17 +41,15 @@ public class GameStateManager {
     }
 
     private GameState getState(int state) {
-        if (state == PLAY)
-            return new PlayState(this, mon);
-        else if (state == START_SCREEN)
-            return new MenuState(this, mon);
+        if (state == PLAY) {
+            return new PlayState(this);
+        } else if (state == START_SCREEN) {
+            return new MenuState(this);
+        }
         return null;
     }
 
     public void setState(int state) {
-        if(state == PLAY){
-            mon = new NetworkMonitor();
-        }
         popState();
         pushState(state);
     }

@@ -50,12 +50,15 @@ public class PlayState extends GameState {
     private Texture backGround = new Texture("images/spaceBackground.png");
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
     private int debugShoot = 0, debugRemoveBullet = 0; // remove these variables
+    private NetworkMonitor mon;
 
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer tmr;
 
-    public PlayState(GameStateManager gsm, NetworkMonitor mon) {
-        super(gsm, mon);
+    public PlayState(GameStateManager gsm) {
+        super(gsm);
+
+        mon = new NetworkMonitor(this);
 
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
@@ -141,8 +144,7 @@ public class PlayState extends GameState {
             Vector2 pos = player.getPosition();
             SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false);
             bullets.add(bullet);
-            
-            mon.sendPlayerAction(B2DVars.MY_ID + ":SHOOT:0:0:" + pos.x + ":" + pos.y + ":" + lastJumpDirection);
+            mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection));
             amntBullets--;
             debugShoot++;
         }
@@ -153,6 +155,10 @@ public class PlayState extends GameState {
         bullets.add(bullet);
     }
 
+    public Vector2 playerPosition(){
+        return player.getPosition();
+    }
+
 
     public void handleInput() {
 
@@ -160,14 +166,14 @@ public class PlayState extends GameState {
                 SPInput.isPressed() && SPInput.x > touchNbrs[1] && cl.canJump()) {
             SPInput.down = false;
             player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
-            mon.sendPlayerAction(B2DVars.MY_ID + ":MOVE:" + B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + player.getPosition().x + ":" + player.getPosition().y);
+            mon.sendPlayerAction("MOVE", B2DVars.PH_JUMPX, B2DVars.PH_JUMPY);
             lastJumpDirection = 1;
         }
         if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x < touchNbrs[0] && cl.canJump()) {
             SPInput.down = false;
             player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
-            mon.sendPlayerAction(B2DVars.MY_ID + ":MOVE:" + -B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + player.getPosition().x + ":" + player.getPosition().y);
+            mon.sendPlayerAction("MOVE", -B2DVars.PH_JUMPX, B2DVars.PH_JUMPY);
             lastJumpDirection = -1;
         }
         if (SPInput.isPressed(SPInput.BUTTON_W) ||
@@ -180,24 +186,25 @@ public class PlayState extends GameState {
 
     private void opponentActions() {
         String[] action = mon.getOpponentAction().split(":");
+        float[] floats = mon.getPacketFloats(action);
         SPPlayer opponent = getOpponent(action[0]);
         if (validOpponentAction(action)) {
             if (action[1].equals("MOVE") && opponent != null)
-                opponent.jump(Float.valueOf(action[2]), Float.valueOf(action[3]),
-                        Float.valueOf(action[4]), Float.valueOf(action[5]));
+                opponent.jump(floats[0], floats[1],
+                        floats[2], floats[3]);
             else if (action[1].equals("SHOOT") && opponent != null)
-                opponentShot(Float.valueOf(action[4]), Float.valueOf(action[5]), Float.valueOf(action[6]));
+                opponentShot(floats[2], floats[3], Float.valueOf(action[6]));
             else if (action[1].equals("DEATH") && opponent != null) {
-                hud.setOpponentDeath(action[1], action[2]);
+                hud.setOpponentDeath(action[1], action[6]);
                 opponent.kill();
             } else if (action[1].equals("RESPAWN") && opponent != null) {
                 opponent.revive();
-                opponent.jump(Float.valueOf(action[2]), Float.valueOf(action[3]),
-                        Float.valueOf(action[4]), Float.valueOf(action[5]));
+                opponent.jump(floats[0], floats[1],
+                        floats[2], floats[3]);
             } else if (action[1].equals("CONNECT")) {
                 if (getOpponent(action[0]) == null) {
                     System.out.println("Opponent added at: " + action[4] + ":" + action[5]);
-                    opponents.add(new SPPlayer(world, action[0], Float.valueOf(action[4]), Float.valueOf(action[5]), Short.valueOf(action[6]), action[7], action[8]));
+                    opponents.add(new SPPlayer(world, action[0], floats[2], floats[3], Short.valueOf(action[6]), action[7], action[8]));
                 }
             } else if (action[1].equals("DISCONNECT")) {
                 opponent = getOpponent(action[0]);
@@ -226,7 +233,7 @@ public class PlayState extends GameState {
         respawnTimer = 0;
         player.revive();
         player.jump(0, 0, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM, B2DVars.CAM_HEIGHT/B2DVars.PPM);
-        mon.sendPlayerAction(B2DVars.MY_ID + ":RESPAWN:0:0:" + player.getPosition().x + ":" + player.getPosition().y);
+        mon.sendPlayerAction("RESPAWN", 0, 0);
         cl.resetJumps();
         cl.revivePlayer();
     }
@@ -256,7 +263,7 @@ public class PlayState extends GameState {
             hud.addPlayerDeath();
 
             //In this addAction add the ID of the killing bullet last
-            mon.sendPlayerAction(B2DVars.MY_ID + ":DEATH:" + hud.getDeathCount() + ":0:" + player.getPosition().x + ":" + player.getPosition().y);
+            mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount());
         }
     }
 

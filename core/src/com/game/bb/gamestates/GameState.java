@@ -15,11 +15,9 @@ public abstract class GameState {
     protected SpriteBatch sb;
     protected OrthographicCamera cam;
     protected OrthographicCamera hudCam;
-    protected NetworkMonitor mon;
 
-    protected GameState(com.game.bb.handlers.GameStateManager gsm, NetworkMonitor mon){
+    protected GameState(com.game.bb.handlers.GameStateManager gsm){
         this.gsm=gsm;
-        this.mon=mon;
         game=gsm.game();
         sb = game.getBatch();
         cam = game.getCam();
