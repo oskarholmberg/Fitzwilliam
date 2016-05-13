@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
+import com.game.bb.net.NetworkMonitor;
 
 /**
  * Created by erik on 12/05/16.
@@ -26,8 +27,8 @@ public class MenuState extends GameState {
     private float newFallingBody = 0f;
 
 
-    public MenuState(final GameStateManager gsm) {
-        super(gsm);
+    public MenuState(final GameStateManager gsm, NetworkMonitor mon) {
+        super(gsm, mon);
 
         world = new World(new Vector2(0, -9.81f), true);
         itRains = new Array<FallingBody>();

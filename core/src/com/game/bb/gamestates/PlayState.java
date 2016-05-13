@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Array;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
+import com.game.bb.net.NetworkMonitor;
 
 
 /**
@@ -53,8 +54,8 @@ public class PlayState extends GameState {
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer tmr;
 
-    public PlayState(GameStateManager gsm) {
-        super(gsm);
+    public PlayState(GameStateManager gsm, NetworkMonitor mon) {
+        super(gsm, mon);
 
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
@@ -141,7 +142,7 @@ public class PlayState extends GameState {
             SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false);
             bullets.add(bullet);
             
-            gsm.addAction(B2DVars.MY_ID + ":SHOOT:0:0:" + pos.x + ":" + pos.y + ":" + lastJumpDirection);
+            mon.sendPlayerAction(B2DVars.MY_ID + ":SHOOT:0:0:" + pos.x + ":" + pos.y + ":" + lastJumpDirection);
             amntBullets--;
             debugShoot++;
         }
@@ -159,14 +160,14 @@ public class PlayState extends GameState {
                 SPInput.isPressed() && SPInput.x > touchNbrs[1] && cl.canJump()) {
             SPInput.down = false;
             player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
-            gsm.addAction(B2DVars.MY_ID + ":MOVE:" + B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + player.getPosition().x + ":" + player.getPosition().y);
+            mon.sendPlayerAction(B2DVars.MY_ID + ":MOVE:" + B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + player.getPosition().x + ":" + player.getPosition().y);
             lastJumpDirection = 1;
         }
         if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x < touchNbrs[0] && cl.canJump()) {
             SPInput.down = false;
             player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
-            gsm.addAction(B2DVars.MY_ID + ":MOVE:" + -B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + player.getPosition().x + ":" + player.getPosition().y);
+            mon.sendPlayerAction(B2DVars.MY_ID + ":MOVE:" + -B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + player.getPosition().x + ":" + player.getPosition().y);
             lastJumpDirection = -1;
         }
         if (SPInput.isPressed(SPInput.BUTTON_W) ||
@@ -178,7 +179,7 @@ public class PlayState extends GameState {
     }
 
     private void opponentActions() {
-        String[] action = gsm.getOpponentAction().split(":");
+        String[] action = mon.getOpponentAction().split(":");
         SPPlayer opponent = getOpponent(action[0]);
         if (validOpponentAction(action)) {
             if (action[1].equals("MOVE") && opponent != null)
@@ -225,7 +226,7 @@ public class PlayState extends GameState {
         respawnTimer = 0;
         player.revive();
         player.jump(0, 0, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM, B2DVars.CAM_HEIGHT/B2DVars.PPM);
-        gsm.addAction(B2DVars.MY_ID + ":RESPAWN:0:0:" + player.getPosition().x + ":" + player.getPosition().y);
+        mon.sendPlayerAction(B2DVars.MY_ID + ":RESPAWN:0:0:" + player.getPosition().x + ":" + player.getPosition().y);
         cl.resetJumps();
         cl.revivePlayer();
     }
@@ -255,7 +256,7 @@ public class PlayState extends GameState {
             hud.addPlayerDeath();
 
             //In this addAction add the ID of the killing bullet last
-            gsm.addAction(B2DVars.MY_ID + ":DEATH:" + hud.getDeathCount() + ":0:" + player.getPosition().x + ":" + player.getPosition().y);
+            mon.sendPlayerAction(B2DVars.MY_ID + ":DEATH:" + hud.getDeathCount() + ":0:" + player.getPosition().x + ":" + player.getPosition().y);
         }
     }
 
@@ -302,7 +303,7 @@ public class PlayState extends GameState {
 
         //Do this last in render
         //b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
-        //sb.setProjectionMatrix(cam.combined);
+        sb.setProjectionMatrix(cam.combined);
     }
 
     @Override
