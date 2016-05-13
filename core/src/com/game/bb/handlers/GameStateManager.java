@@ -43,8 +43,7 @@ public class GameStateManager {
         client = new GameClient(this, ipAddress, port);
         client.start();
         Runtime.getRuntime().addShutdownHook(new Thread(client.getDisconnecter()));
-        byte[] clientInfo = (B2DVars.MY_ID + ":CONNECT:0:0:" + B2DVars.CAM_WIDTH/2/B2DVars.PPM+":"+B2DVars.CAM_HEIGHT/B2DVars.PPM+":"+B2DVars.BIT_OPPONENT+":"+B2DVars.ID_OPPONENT+":red").getBytes();
-        client.sendData(clientInfo);
+        addAction(B2DVars.MY_ID + ":CONNECT:0:0:" + B2DVars.CAM_WIDTH/2/B2DVars.PPM+":"+B2DVars.CAM_HEIGHT/B2DVars.PPM+":"+B2DVars.BIT_OPPONENT+":"+B2DVars.ID_OPPONENT+":red");
     }
 
     public Game game() {
