@@ -136,7 +136,7 @@ public class PlayState extends GameState {
     }
 
     public void shoot() {
-        if (amntBullets > 0) {
+        if (amntBullets > 0 && !player.isDead()) {
             Vector2 pos = player.getPosition();
             SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false);
             bullets.add(bullet);
@@ -155,18 +155,16 @@ public class PlayState extends GameState {
 
         if (SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x > touchNbrs[1] && cl.canJump()) {
-            Vector2 temp = player.getPosition();
             SPInput.down = false;
-            player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, temp.x, temp.y);
-            gsm.addAction(B2DVars.MY_ID + ":MOVE:" + B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + temp.x + ":" + temp.y);
+            player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
+            gsm.addAction(B2DVars.MY_ID + ":MOVE:" + B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + player.getPosition().x + ":" + player.getPosition().y);
             lastJumpDirection = 1;
         }
         if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x < touchNbrs[0] && cl.canJump()) {
-            Vector2 temp = player.getPosition();
             SPInput.down = false;
-            player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, temp.x, temp.y);
-            gsm.addAction(B2DVars.MY_ID + ":MOVE:" + -B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + temp.x + ":" + temp.y);
+            player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
+            gsm.addAction(B2DVars.MY_ID + ":MOVE:" + -B2DVars.PH_JUMPX + ":" + B2DVars.PH_JUMPY + ":" + player.getPosition().x + ":" + player.getPosition().y);
             lastJumpDirection = -1;
         }
         if (SPInput.isPressed(SPInput.BUTTON_W) ||
@@ -195,6 +193,7 @@ public class PlayState extends GameState {
                         Float.valueOf(action[4]), Float.valueOf(action[5]));
             } else if (action[1].equals("CONNECT")) {
                 if (getOpponent(action[0]) == null) {
+                    System.out.println("Opponent added at: " + action[4] + ":" + action[5]);
                     opponents.add(new SPPlayer(world, action[0], Float.valueOf(action[4]), Float.valueOf(action[5]), Short.valueOf(action[6]), action[7], action[8]));
                 }
             } else if (action[1].equals("DISCONNECT")) {
@@ -262,7 +261,6 @@ public class PlayState extends GameState {
         handleInput();
         world.step(dt, 6, 2);
         //removeDeadBodies();
-
         player.update(dt);
         for (SPPlayer player : opponents) {
             player.update(dt);
