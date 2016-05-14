@@ -51,7 +51,7 @@ public class PlayState extends GameState {
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
     private NetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
-    private boolean clipIsEmpty=false;
+    private boolean clipIsEmpty = false;
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -75,8 +75,7 @@ public class PlayState extends GameState {
         tmr = mb.buildMap();
 
         //Players
-        player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM, B2DVars.CAM_HEIGHT/B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
-
+        player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM, B2DVars.CAM_HEIGHT / B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
 
 
         // set up box2d cam
@@ -92,9 +91,9 @@ public class PlayState extends GameState {
             mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection));
             amntBullets--;
             hud.setAmountBulletsLeft(amntBullets);
-            if (amntBullets==0) {
+            if (amntBullets == 0) {
                 clipIsEmpty = true;
-                bulletRefresh=0;
+                bulletRefresh = 0;
             }
         }
     }
@@ -104,7 +103,7 @@ public class PlayState extends GameState {
         bullets.add(bullet);
     }
 
-    public Vector2 playerPosition(){
+    public Vector2 playerPosition() {
         return player.getPosition();
     }
 
@@ -151,12 +150,16 @@ public class PlayState extends GameState {
                         floats[2], floats[3]);
             } else if (action[1].equals("CONNECT")) {
                 if (getOpponent(action[0]) == null) {
-                    opponents.add(new SPPlayer(world, action[0], floats[2], floats[3], Short.valueOf(action[6]), action[7], action[8]));
+                    SPPlayer newOpponent = new SPPlayer(world, action[0], floats[2], floats[3], Short.valueOf(action[6]), action[7], action[8]);
+                    opponents.add(newOpponent);
+                    newOpponent.jump(floats[0], floats[1], floats[2], floats[3]);
                 }
             } else if (action[1].equals("DISCONNECT")) {
                 opponent = getOpponent(action[0]);
-                opponents.removeValue(opponent, false);
-                world.destroyBody(opponent.getBody());
+                if (opponent != null) {
+                    opponents.removeValue(opponent, false);
+                    world.destroyBody(opponent.getBody());
+                }
             }
         }
     }
@@ -179,7 +182,7 @@ public class PlayState extends GameState {
     private void respawnPlayer() {
         respawnTimer = 0;
         player.revive();
-        player.jump(0, 0, (B2DVars.CAM_WIDTH / 2 / B2DVars.PPM)*(float)Math.random(), B2DVars.CAM_HEIGHT/B2DVars.PPM);
+        player.jump(0, 0, (B2DVars.CAM_WIDTH / 2 / B2DVars.PPM) * (float) Math.random(), B2DVars.CAM_HEIGHT / B2DVars.PPM);
         mon.sendPlayerAction("RESPAWN", 0, 0);
         cl.resetJumps();
         cl.revivePlayer();
@@ -188,7 +191,7 @@ public class PlayState extends GameState {
     private void refreshBullets(float dt) {
         if (bulletRefresh > 0f && clipIsEmpty) {
             amntBullets = 3;
-            clipIsEmpty=false;
+            clipIsEmpty = false;
             hud.setAmountBulletsLeft(amntBullets);
         } else {
             bulletRefresh += dt;
@@ -197,7 +200,7 @@ public class PlayState extends GameState {
 
     public void removeDeadBodies() {
         for (Body b : cl.getBodiesToRemove()) {
-            if(b != null) {
+            if (b.getUserData() instanceof SPBullet) {
                 bullets.removeValue((SPBullet) b.getUserData(), true);
                 world.destroyBody(b);
             }

@@ -19,6 +19,7 @@ public class GameServer extends Thread {
 
     private DatagramSocket socket;
     private HashMap<String, String> connectedClients;
+    private String ipAddress;
 
     public GameServer(int port) {
         // First String is ipAddress, second is last known action.
@@ -41,19 +42,19 @@ public class GameServer extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String ipAddress = packet.getAddress().getHostAddress() + ":" + packet.getPort();
+            ipAddress = packet.getAddress().getHostAddress() + ":" + packet.getPort();
             String content = new String(packet.getData()).trim();
             String[] segments = content.split(":");
-            if (connectedClients.get(ipAddress) == null) {
+            if (segments[1].equals("CONNECT")) {
                 //New client has connected
                 connectedClients.put(ipAddress, content);
                 for (String id : connectedClients.keySet()) {
-                    String[] info=connectedClients.get(id).split(":");
-                    sendData((info[0]+":CONNECT:0:0:"+info[4]+":"+info[5]+":"+ B2DVars.BIT_OPPONENT+":"+B2DVars.ID_OPPONENT+":red").getBytes());
+                    String[] info = connectedClients.get(id).split(":");
+                    sendData((info[0] + ":CONNECT:" + info[2] + ":" + info[3] + ":" + info[4] + ":" + info[5] + ":" + B2DVars.BIT_OPPONENT + ":" + B2DVars.ID_OPPONENT + ":red").getBytes(), id);
                 }
                 System.out.println("CLIENT[" + ipAddress + "] connected.");
             }
-            if(segments[1].equals("MOVE")){
+            if (segments[1].equals("MOVE")) {
                 connectedClients.put(ipAddress, content);
             }
             if (segments[1].equals("DISCONNECT")) {
@@ -62,26 +63,34 @@ public class GameServer extends Thread {
                 System.out.println("CLIENT[" + ipAddress + "] disconnected.");
             }
             System.out.println("CLIENT[" + ipAddress + "] > " + content);
-            sendData(packet.getData());
+            sendData(packet.getData(), ipAddress);
 
         }
     }
 
-    public void sendData(byte[] data) {
+    /**
+     * Sends data to client unless client ip = ipAddress
+     *
+     * @param data,      Data to send
+     * @param ipAddress, IP address to ignore.
+     */
+    public void sendData(byte[] data, String ipAddress) {
         for (String s : connectedClients.keySet()) {
-            String[] address = s.split(":");
-            try {
-                InetAddress ip = InetAddress.getByName(address[0]);
-                int port = Integer.valueOf(address[1]);
-                DatagramPacket packet = new DatagramPacket(data, data.length, ip, port);
+            if (!s.equals(ipAddress)) {
+                String[] address = s.split(":");
                 try {
-                    socket.send(packet);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    InetAddress ip = InetAddress.getByName(address[0]);
+                    int port = Integer.valueOf(address[1]);
+                    DatagramPacket packet = new DatagramPacket(data, data.length, ip, port);
+                    try {
+                        socket.send(packet);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } catch (UnknownHostException e) {
+                    connectedClients.remove(s);
+                    System.out.println("CLIENT[" + s + "] disconnected.");
                 }
-            } catch (UnknownHostException e) {
-                connectedClients.remove(s);
-                System.out.println("CLIENT[" + s + "] disconnected.");
             }
         }
     }
