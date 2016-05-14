@@ -19,13 +19,11 @@ public class MapBuilder {
     private World world;
     private TiledMap tiledMap;
     boolean boundaries;
-    private Vector2 cam;
 
     public MapBuilder(World world, TiledMap tiledMap, Vector2 cam, boolean boundaries){
         this.world=world;
         this.tiledMap=tiledMap;
         this.boundaries=boundaries;
-        this.cam=cam;
 
         if(boundaries) {
             createBoundary(cam.x / 2, cam.y, cam.x / 2, 5); //top
