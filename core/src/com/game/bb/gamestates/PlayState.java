@@ -1,6 +1,7 @@
 package com.game.bb.gamestates;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -48,6 +49,7 @@ public class PlayState extends GameState {
     private float respawnTimer = 0;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
+    private Sound reload = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
     private NetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
@@ -191,10 +193,11 @@ public class PlayState extends GameState {
     }
 
     private void refreshBullets(float dt) {
-        if (bulletRefresh > 0f && clipIsEmpty) {
+        if (bulletRefresh > 3f && clipIsEmpty) {
             amntBullets = 3;
             clipIsEmpty = false;
             hud.setAmountBulletsLeft(amntBullets);
+            reload.play();
         } else {
             bulletRefresh += dt;
         }

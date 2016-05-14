@@ -58,7 +58,7 @@ public class SPBullet extends SPSprite {
         if (harmful) {
             fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND;
         } else {
-            fdef.filter.maskBits = B2DVars.BIT_GROUND |B2DVars.BIT_OPPONENT;
+            fdef.filter.maskBits = B2DVars.BIT_OPPONENT | B2DVars.BIT_GROUND;
         }
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);

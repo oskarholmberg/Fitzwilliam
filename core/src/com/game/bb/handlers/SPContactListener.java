@@ -41,9 +41,9 @@ public class SPContactListener implements ContactListener {
                 killingBullet = fa;
                 bodiesToRemove.add(fa.getBody());
         }
-        if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_GROUND)) {
+        if (fa.getUserData().equals(B2DVars.ID_BULLET) && (fb.getUserData().equals(B2DVars.ID_GROUND) || fb.getUserData().equals(B2DVars.ID_OPPONENT))) {
             bodiesToRemove.add(fa.getBody());
-        }else if (fa.getUserData().equals(B2DVars.ID_GROUND) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
+        }else if ((fa.getUserData().equals(B2DVars.ID_GROUND) || fa.getUserData().equals(B2DVars.ID_OPPONENT)) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
             bodiesToRemove.add(fb.getBody());
         }
     }
