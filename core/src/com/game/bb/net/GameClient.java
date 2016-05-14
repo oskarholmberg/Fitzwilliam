@@ -19,15 +19,15 @@ import javax.xml.crypto.Data;
  */
 public class GameClient extends Thread {
 
-    private GameStateManager gsm;
     private InetAddress ipAddress;
     private DatagramSocket socket;
     private int port;
     private Disconnecter disconnecter;
+    private NetworkMonitor mon;
 
-    public GameClient(GameStateManager gsm, String ipAddress, int port) {
-        this.gsm = gsm;
+    public GameClient(NetworkMonitor mon, String ipAddress, int port) {
         this.port = port;
+        this.mon=mon;
         disconnecter = new Disconnecter(this);
         try {
             System.out.println("Connecting to " + ipAddress + ":" + port);
@@ -58,7 +58,7 @@ public class GameClient extends Thread {
 
                 }
             } else {
-                gsm.addOpponentAction(content);
+                mon.addOpponentAction(content);
             }
         }
     }

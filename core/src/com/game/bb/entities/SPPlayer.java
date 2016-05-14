@@ -84,6 +84,10 @@ public class SPPlayer extends SPSprite {
         }
     }
 
+    public void shoot(){
+
+    }
+
     @Override
     public void update(float dt){
         textureTimer+=dt;
