@@ -297,8 +297,8 @@ public class PlayState extends GameState {
         hud.render(sb);
 
         //Do this last in render
-        //b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
-        //sb.setProjectionMatrix(cam.combined);
+        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+        sb.setProjectionMatrix(cam.combined);
     }
 
     @Override
