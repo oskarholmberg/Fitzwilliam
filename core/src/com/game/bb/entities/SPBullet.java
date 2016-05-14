@@ -18,10 +18,11 @@ import com.game.bb.handlers.B2DVars;
 public class SPBullet extends SPSprite {
 
     private int offset = 0;
+    private float posYoffset = 5/B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
 
     public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful) {
         super(world);
-        createBullet(xPos, yPos, dir, harmful);
+        createBullet(xPos+dir*getPosXoffset, yPos-posYoffset, dir, harmful);
         Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
         sound.play();
         if (harmful) {

@@ -49,7 +49,6 @@ public class PlayState extends GameState {
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
-    private int debugShoot = 0, debugRemoveBullet = 0; // remove these variables
     private NetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
     private boolean clipIsEmpty=false;
@@ -93,7 +92,6 @@ public class PlayState extends GameState {
             mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection));
             amntBullets--;
             hud.setAmountBulletsLeft(amntBullets);
-            debugShoot++; // deb var... remove later
             if (amntBullets==0) {
                 clipIsEmpty = true;
                 bulletRefresh=0;
@@ -153,7 +151,6 @@ public class PlayState extends GameState {
                         floats[2], floats[3]);
             } else if (action[1].equals("CONNECT")) {
                 if (getOpponent(action[0]) == null) {
-                    System.out.println("Opponent added at: " + action[4] + ":" + action[5]);
                     opponents.add(new SPPlayer(world, action[0], floats[2], floats[3], Short.valueOf(action[6]), action[7], action[8]));
                 }
             } else if (action[1].equals("DISCONNECT")) {
@@ -182,14 +179,14 @@ public class PlayState extends GameState {
     private void respawnPlayer() {
         respawnTimer = 0;
         player.revive();
-        player.jump(0, 0, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM, B2DVars.CAM_HEIGHT/B2DVars.PPM);
+        player.jump(0, 0, (B2DVars.CAM_WIDTH / 2 / B2DVars.PPM)*(float)Math.random(), B2DVars.CAM_HEIGHT/B2DVars.PPM);
         mon.sendPlayerAction("RESPAWN", 0, 0);
         cl.resetJumps();
         cl.revivePlayer();
     }
 
     private void refreshBullets(float dt) {
-        if (bulletRefresh > 3f && clipIsEmpty) {
+        if (bulletRefresh > 0f && clipIsEmpty) {
             amntBullets = 3;
             clipIsEmpty=false;
             hud.setAmountBulletsLeft(amntBullets);
@@ -200,8 +197,6 @@ public class PlayState extends GameState {
 
     public void removeDeadBodies() {
         for (Body b : cl.getBodiesToRemove()) {
-            debugRemoveBullet++;
-            System.out.println("I removed a bullet! Good job me. Bullets shot: " + debugShoot + " Bullets removed: " + debugRemoveBullet);
             if(b != null) {
                 bullets.removeValue((SPBullet) b.getUserData(), true);
                 world.destroyBody(b);
@@ -218,7 +213,6 @@ public class PlayState extends GameState {
             mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount());
         }
     }
-
 
     @Override
     public void update(float dt) {
