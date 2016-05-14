@@ -19,9 +19,11 @@ public class SPBullet extends SPSprite {
 
     private int offset = 0;
     private float posYoffset = 5/B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
+    private float dir;
 
     public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful) {
         super(world);
+        this.dir=dir;
         createBullet(xPos+dir*getPosXoffset, yPos-posYoffset, dir, harmful);
         Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
         sound.play();
@@ -34,8 +36,8 @@ public class SPBullet extends SPSprite {
         }
     }
 
-    public float getXPos(){
-        return body.getPosition().x;
+    public float getDir(){
+        return dir;
     }
 
     @Override

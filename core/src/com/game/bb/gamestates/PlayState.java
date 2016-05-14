@@ -145,7 +145,7 @@ public class PlayState extends GameState {
                 opponentShot(floats[2], floats[3], Float.valueOf(action[6]));
             else if (action[1].equals("DEATH") && opponent != null) {
                 hud.setOpponentDeath(action[0], action[6]);
-                opponent.kill();
+                opponent.kill(1);
             } else if (action[1].equals("RESPAWN") && opponent != null) {
                 opponent.revive();
                 opponent.jump(floats[0], floats[1],
@@ -215,7 +215,7 @@ public class PlayState extends GameState {
 
     private void playerHit() {
         if (!player.isDead()) {
-            player.kill();
+            player.kill(1);
             hud.addPlayerDeath();
             //In this addAction add the ID of the killing bullet last
             mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount());

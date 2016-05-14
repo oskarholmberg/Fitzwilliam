@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Array;
+import com.game.bb.entities.SPBullet;
 
 /**
  * Created by erik on 08/05/16.
@@ -33,18 +34,20 @@ public class SPContactListener implements ContactListener {
         }
         if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
             //Unless player is dead, mark him as dead.
-                playerHit = true;
-                killingBullet = fb;
-                bodiesToRemove.add(fb.getBody());
+            playerHit = true;
+            killingBullet = fb;
+            bodiesToRemove.add(fb.getBody());
         } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_PLAYER)) {
-                playerHit = true;
-                killingBullet = fa;
-                bodiesToRemove.add(fa.getBody());
+            playerHit = true;
+            killingBullet = fa;
+            bodiesToRemove.add(fa.getBody());
         }
         if (fa.getUserData().equals(B2DVars.ID_BULLET) && (fb.getUserData().equals(B2DVars.ID_GROUND) || fb.getUserData().equals(B2DVars.ID_OPPONENT))) {
             bodiesToRemove.add(fa.getBody());
-        }else if ((fa.getUserData().equals(B2DVars.ID_GROUND) || fa.getUserData().equals(B2DVars.ID_OPPONENT)) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
+            killingBullet = fa;
+        } else if ((fa.getUserData().equals(B2DVars.ID_GROUND) || fa.getUserData().equals(B2DVars.ID_OPPONENT)) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
             bodiesToRemove.add(fb.getBody());
+            killingBullet = fb;
         }
     }
 
@@ -62,19 +65,21 @@ public class SPContactListener implements ContactListener {
     }
 
     public boolean isPlayerHit() {
-        if (playerHit){
-            playerHit=false;
+        if (playerHit) {
+            playerHit = false;
             return true;
         }
         return false;
     }
 
-    public void revivePlayer(){
+    public void revivePlayer() {
         playerHit = false;
     }
 
-    public Fixture getKillingBullet() {
-        return killingBullet;
+    public SPBullet getKillingBullet() {
+        if (killingBullet.getBody().getUserData() instanceof SPBullet)
+            return (SPBullet) killingBullet.getBody().getUserData();
+        return null;
     }
 
     public boolean canJump() {
@@ -96,7 +101,7 @@ public class SPContactListener implements ContactListener {
     }
 
     public void resetJumps() {
-        amntJumps=0;
+        amntJumps = 0;
     }
 
     public void clearBulletList() {
