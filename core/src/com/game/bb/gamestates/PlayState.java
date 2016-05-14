@@ -42,7 +42,7 @@ public class PlayState extends GameState {
     private SPContactListener cl;
     private SPPlayer player;
     private Array<SPPlayer> opponents;
-    private int amntBullets = 5;
+    private int amntBullets = 3;
     private float bulletRefresh, lastJumpDirection = 1;
     private Array<SPBullet> bullets;
     private float respawnTimer = 0;
@@ -51,9 +51,8 @@ public class PlayState extends GameState {
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
     private int debugShoot = 0, debugRemoveBullet = 0; // remove these variables
     private NetworkMonitor mon;
-
-    private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer tmr;
+    private boolean clipIsEmpty=false;
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -70,73 +69,20 @@ public class PlayState extends GameState {
         bullets = new Array<SPBullet>();
         opponents = new Array<SPPlayer>();
         // create boundaries
-        createBoundary(cam.viewportWidth / 2, cam.viewportHeight, cam.viewportWidth / 2, 5); //top
-        createBoundary(cam.viewportWidth / 2, 0, cam.viewportWidth / 2, 5); //bottom
-        createBoundary(0, cam.viewportHeight / 2, 5, cam.viewportHeight / 2); // left
-        createBoundary(cam.viewportWidth, cam.viewportHeight / 2, 5, cam.viewportHeight / 2); // right
 
-        //Vectors for handling android touch input
-        buildMap();
+
+        MapBuilder mb = new MapBuilder(world, new TmxMapLoader().load("maps/Moon.tmx"),
+                new Vector2(cam.viewportWidth, cam.viewportHeight), true);
+        tmr = mb.buildMap();
 
         //Players
         player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM, B2DVars.CAM_HEIGHT/B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
 
 
+
         // set up box2d cam
         b2dCam = new OrthographicCamera();
         b2dCam.setToOrtho(false, B2DVars.CAM_WIDTH / B2DVars.PPM, B2DVars.CAM_HEIGHT / B2DVars.PPM);
-    }
-
-    private void buildMap(){
-        tiledMap = new TmxMapLoader().load("maps/Moon.tmx");
-        tmr = new OrthogonalTiledMapRenderer(tiledMap);
-        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("moonBlocks");
-
-        float ts = layer.getTileWidth();
-        for(int row = 0; row < layer.getHeight(); row++) {
-            for(int col = 0; col < layer.getWidth(); col++) {
-                // get cell
-                TiledMapTileLayer.Cell cell = layer.getCell(col, row);
-
-                // check that there is a cell
-                if(cell == null) continue;
-                if(cell.getTile() == null) continue;
-
-                // create body from cell
-                BodyDef bdef = new BodyDef();
-                bdef.type = BodyDef.BodyType.StaticBody;
-                bdef.position.set((col + 0.5f) * ts / B2DVars.PPM, (row + 0.5f) * ts / B2DVars.PPM);
-                ChainShape cs = new ChainShape();
-                Vector2[] v = new Vector2[3];
-                v[0] = new Vector2(-ts / 2 / B2DVars.PPM, -ts / 2 / B2DVars.PPM);
-                v[1] = new Vector2(-ts / 2 / B2DVars.PPM, ts / 2 / B2DVars.PPM);
-                v[2] = new Vector2(ts / 2 / B2DVars.PPM, ts / 2 / B2DVars.PPM);
-                cs.createChain(v);
-                FixtureDef fd = new FixtureDef();
-                fd.shape = cs;
-                fd.filter.categoryBits = B2DVars.BIT_GROUND;
-                fd.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BULLET | B2DVars.BIT_OPPONENT;
-                world.createBody(bdef).createFixture(fd).setUserData(B2DVars.ID_GROUND);
-                cs.dispose();
-
-            }
-        }
-    }
-
-    private void createBoundary(float xPos, float yPos, float width, float height) {
-        BodyDef bdef = new BodyDef();
-        bdef.position.set(xPos / B2DVars.PPM, yPos / B2DVars.PPM);
-        bdef.type = BodyDef.BodyType.StaticBody;
-        Body body = world.createBody(bdef);
-
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(width / B2DVars.PPM, height / B2DVars.PPM);
-        FixtureDef fdef = new FixtureDef();
-        fdef.shape = shape;
-        // set bits to collide with
-        fdef.filter.categoryBits = B2DVars.BIT_GROUND;
-        fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_OPPONENT | B2DVars.BIT_BULLET;
-        body.createFixture(fdef).setUserData(B2DVars.ID_GROUND);
     }
 
     public void shoot() {
@@ -146,7 +92,12 @@ public class PlayState extends GameState {
             bullets.add(bullet);
             mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection));
             amntBullets--;
-            debugShoot++;
+            hud.setAmountBulletsLeft(amntBullets);
+            debugShoot++; // deb var... remove later
+            if (amntBullets==0) {
+                clipIsEmpty = true;
+                bulletRefresh=0;
+            }
         }
     }
 
@@ -161,7 +112,6 @@ public class PlayState extends GameState {
 
 
     public void handleInput() {
-
         if (SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x > touchNbrs[1] && cl.canJump()) {
             SPInput.down = false;
@@ -239,9 +189,10 @@ public class PlayState extends GameState {
     }
 
     private void refreshBullets(float dt) {
-        if (bulletRefresh > 5f) {
-            amntBullets = 5;
-            bulletRefresh = 0;
+        if (bulletRefresh > 3f && clipIsEmpty) {
+            amntBullets = 3;
+            clipIsEmpty=false;
+            hud.setAmountBulletsLeft(amntBullets);
         } else {
             bulletRefresh += dt;
         }
@@ -261,7 +212,6 @@ public class PlayState extends GameState {
         if (!player.isDead()) {
             player.kill();
             hud.addPlayerDeath();
-
             //In this addAction add the ID of the killing bullet last
             mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount());
         }
