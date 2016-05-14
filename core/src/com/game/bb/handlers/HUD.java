@@ -68,7 +68,7 @@ public class HUD {
             offset+=200;
         }
         for (int i = 0; i < bulletsLeft; i++) {
-            sb.draw(bulletTexture, 20 + i*50, 10, 25, 15);
+            sb.draw(bulletTexture, 50 + i*50, B2DVars.CAM_HEIGHT-120, 25, 15);
         }
         sb.end();
     }
