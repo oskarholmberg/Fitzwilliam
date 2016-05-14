@@ -46,7 +46,8 @@ public class GameServer extends Thread {
             String content = new String(packet.getData()).trim();
             String[] segments = content.split(":");
             if (segments[1].equals("CONNECT")) {
-                //New client has connected
+                //New client has connected, give that client info of all other clients
+                //and their location.
                 connectedClients.put(ipAddress, content);
                 for (String id : connectedClients.keySet()) {
                     String[] info = connectedClients.get(id).split(":");

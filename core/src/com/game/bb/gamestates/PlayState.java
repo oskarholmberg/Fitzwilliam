@@ -142,7 +142,7 @@ public class PlayState extends GameState {
             else if (action[1].equals("SHOOT") && opponent != null)
                 opponentShot(floats[2], floats[3], Float.valueOf(action[6]));
             else if (action[1].equals("DEATH") && opponent != null) {
-                hud.setOpponentDeath(action[1], action[6]);
+                hud.setOpponentDeath(action[0], action[6]);
                 opponent.kill();
             } else if (action[1].equals("RESPAWN") && opponent != null) {
                 opponent.revive();
@@ -152,12 +152,14 @@ public class PlayState extends GameState {
                 if (getOpponent(action[0]) == null) {
                     SPPlayer newOpponent = new SPPlayer(world, action[0], floats[2], floats[3], Short.valueOf(action[6]), action[7], action[8]);
                     opponents.add(newOpponent);
+                    hud.setOpponentDeath(action[0], "0");
                     newOpponent.jump(floats[0], floats[1], floats[2], floats[3]);
                 }
             } else if (action[1].equals("DISCONNECT")) {
                 opponent = getOpponent(action[0]);
                 if (opponent != null) {
                     opponents.removeValue(opponent, false);
+                    hud.removeOpponentDeathCount(action[0]);
                     world.destroyBody(opponent.getBody());
                 }
             }
@@ -258,7 +260,7 @@ public class PlayState extends GameState {
         hud.render(sb);
 
         //Do this last in render
-        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+//        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         sb.setProjectionMatrix(cam.combined);
     }
 
