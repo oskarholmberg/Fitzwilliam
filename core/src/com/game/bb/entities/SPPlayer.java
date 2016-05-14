@@ -27,7 +27,7 @@ public class SPPlayer extends SPSprite {
         super(world);
         createPlayer(xPos, yPos, bodyBIT, bodyType);
         this.id=id;
-        sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jump.wav"));
+        sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
         loadTexture(color);
         setTexture(onGroundRight);
     }

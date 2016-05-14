@@ -202,8 +202,10 @@ public class PlayState extends GameState {
         for (Body b : cl.getBodiesToRemove()) {
             debugRemoveBullet++;
             System.out.println("I removed a bullet! Good job me. Bullets shot: " + debugShoot + " Bullets removed: " + debugRemoveBullet);
-            bullets.removeValue((SPBullet) b.getUserData(), true);
-            world.destroyBody(b);
+            if(b != null) {
+                bullets.removeValue((SPBullet) b.getUserData(), true);
+                world.destroyBody(b);
+            }
         }
         cl.clearBulletList();
     }
