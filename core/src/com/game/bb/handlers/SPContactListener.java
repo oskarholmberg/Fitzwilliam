@@ -30,36 +30,44 @@ public class SPContactListener implements ContactListener {
         Fixture fb = contact.getFixtureB();
 
 
+        // if a foot touches ground
         if (fa.getUserData().equals(B2DVars.ID_FOOT) || fb.getUserData().equals(B2DVars.ID_FOOT)) {
             footContact++;
             amntJumps = 0;
+            //If the player is hit by an enemy bullet
         } else if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
-            //Unless player is dead, mark him as dead.
             killingEntity = fb;
             playerHit = true;
             bodiesToRemove.add(fb.getBody());
+            // - || -
         } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_PLAYER)) {
             killingEntity = fa;
             playerHit = true;
             bodiesToRemove.add(fa.getBody());
-        } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && (fb.getUserData().equals(B2DVars.ID_GROUND) || fb.getUserData().equals(B2DVars.ID_OPPONENT))) {
+            // If a bullet touches ground
+        } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_GROUND)) {
             killingEntity = fa;
             bodiesToRemove.add(fa.getBody());
-        } else if ((fa.getUserData().equals(B2DVars.ID_GROUND) || fa.getUserData().equals(B2DVars.ID_OPPONENT)) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
+            // - || -
+        } else if (fa.getUserData().equals(B2DVars.ID_GROUND)  && fb.getUserData().equals(B2DVars.ID_BULLET)) {
             killingEntity = fb;
             bodiesToRemove.add(fb.getBody());
+            // If a grenade touches player
         } else if (fa.getUserData().equals(B2DVars.ID_GRENADE) && fb.getUserData().equals(B2DVars.ID_PLAYER)){
             killingEntity = fa;
             playerHit = true;
             bodiesToRemove.add(fa.getBody());
+            // - || -
         } else if (fb.getUserData().equals(B2DVars.ID_GRENADE) && fa.getUserData().equals(B2DVars.ID_PLAYER)){
             killingEntity = fb;
             playerHit = true;
             bodiesToRemove.add(fb.getBody());
+            // If a grenade bounces
         } else if (fa.getUserData().equals(B2DVars.ID_GRENADE)){
             if (!grenadeBounces.contains(fa.getBody(), true)){
                 grenadeBounces.add(fa.getBody());
             }
+            // - || -
         } else if (fb.getUserData().equals(B2DVars.ID_GRENADE)){
             if (!grenadeBounces.contains(fb.getBody(), true)){
                 grenadeBounces.add(fb.getBody());

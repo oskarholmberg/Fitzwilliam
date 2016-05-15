@@ -207,8 +207,11 @@ public class PlayState extends GameState {
 
     private void removeKillingEntity(String killerID){
         for(SPSprite s : worldEntities){
-            if (s.getID().equals(killerID))
+            if (s.getID().equals(killerID)) {
+                System.out.println("removing entitiy: " + s.getID());
                 worldEntities.removeValue(s, true);
+                world.destroyBody(s.getBody());
+            }
         }
     }
 
