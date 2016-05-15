@@ -13,7 +13,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
-import com.game.bb.net.NetworkMonitor;
 
 /**
  * Created by erik on 12/05/16.
@@ -23,6 +22,7 @@ public class ConnectionState extends GameState {
     private SPButton hostButton, joinButton;
     private World world;
     private Texture background = new Texture("images/spaceBackground.png");
+    private Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
     private Array<FallingBody> itRains;
     private float newFallingBody = 0f;
 
@@ -54,8 +54,13 @@ public class ConnectionState extends GameState {
     @Override
     public void handleInput() {
         if (hostButton.isClicked()) {
-            Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
             sound.play();
+            gsm.hostGame(true);
+            gsm.setState(GameStateManager.PLAY);
+        }
+        if(joinButton.isClicked()){
+            sound.play();
+            gsm.hostGame(false);
             gsm.setState(GameStateManager.PLAY);
         }
     }
@@ -71,6 +76,7 @@ public class ConnectionState extends GameState {
         }
         world.step(dt, 6, 2);
         hostButton.update(dt);
+        joinButton.update(dt);
     }
 
     @Override
@@ -82,6 +88,7 @@ public class ConnectionState extends GameState {
         for (FallingBody body : itRains)
             body.render(sb);
         hostButton.render(sb);
+        joinButton.render(sb);
     }
 
     @Override

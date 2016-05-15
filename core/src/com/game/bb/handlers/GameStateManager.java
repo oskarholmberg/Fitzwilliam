@@ -1,10 +1,11 @@
 package com.game.bb.handlers;
 
+import com.game.bb.gamestates.ConnectionState;
 import com.game.bb.gamestates.StartScreenState;
 import com.game.bb.gamestates.PlayState;
 import com.game.bb.main.Game;
 import com.game.bb.gamestates.GameState;
-import com.game.bb.net.NetworkMonitor;
+import com.game.bb.net.GameServer;
 
 import java.util.Stack;
 
@@ -14,6 +15,9 @@ import java.util.Stack;
 public class GameStateManager {
     private Game game;
     private Stack<GameState> states;
+    private String ipAddress = "localhost";
+    private int port = 8080;
+    private boolean hosting = false;
     public static final int PLAY = 1, START_SCREEN = 2, CONNECTION_STATE = 3;
 
 
@@ -38,9 +42,14 @@ public class GameStateManager {
 
     private GameState getState(int state) {
         if (state == PLAY) {
-            return new PlayState(this);
+            if (hosting) {
+                new GameServer(port).start();
+            }
+            return new PlayState(this, ipAddress, port);
         } else if (state == START_SCREEN) {
             return new StartScreenState(this);
+        } else if (state == CONNECTION_STATE) {
+            return new ConnectionState(this);
         }
         return null;
     }
@@ -56,6 +65,10 @@ public class GameStateManager {
 
     public void popState() {
         states.pop().dispose();
+    }
+
+    public void hostGame(boolean hosting) {
+        this.hosting = hosting;
     }
 }
 

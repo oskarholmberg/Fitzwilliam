@@ -4,7 +4,6 @@ package com.game.bb.gamestates;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.game.bb.main.Game;
-import com.game.bb.net.NetworkMonitor;
 
 /**
  * Created by erik on 06/05/16.
