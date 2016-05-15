@@ -7,7 +7,6 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Array;
-import com.game.bb.entities.SPBullet;
 import com.game.bb.entities.SPSprite;
 
 /**
@@ -17,7 +16,7 @@ public class SPContactListener implements ContactListener {
     private int footContact = 0, amntJumps = 0;
     private boolean playerHit = false;
     private Array<Body> bodiesToRemove, grenadeBounces;
-    private Fixture killingBullet;
+    private Fixture killingEntity;
 
     public SPContactListener() {
         bodiesToRemove = new Array<Body>();
@@ -36,32 +35,32 @@ public class SPContactListener implements ContactListener {
             amntJumps = 0;
         } else if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
             //Unless player is dead, mark him as dead.
+            killingEntity = fb;
             playerHit = true;
-            killingBullet = fb;
             bodiesToRemove.add(fb.getBody());
         } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_PLAYER)) {
+            killingEntity = fa;
             playerHit = true;
-            killingBullet = fa;
             bodiesToRemove.add(fa.getBody());
         } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && (fb.getUserData().equals(B2DVars.ID_GROUND) || fb.getUserData().equals(B2DVars.ID_OPPONENT))) {
+            killingEntity = fa;
             bodiesToRemove.add(fa.getBody());
-            killingBullet = fa;
         } else if ((fa.getUserData().equals(B2DVars.ID_GROUND) || fa.getUserData().equals(B2DVars.ID_OPPONENT)) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
+            killingEntity = fb;
             bodiesToRemove.add(fb.getBody());
-            killingBullet = fb;
         } else if (fa.getUserData().equals(B2DVars.ID_GRENADE) && fb.getUserData().equals(B2DVars.ID_PLAYER)){
+            killingEntity = fa;
             playerHit = true;
             bodiesToRemove.add(fa.getBody());
         } else if (fb.getUserData().equals(B2DVars.ID_GRENADE) && fa.getUserData().equals(B2DVars.ID_PLAYER)){
+            killingEntity = fb;
             playerHit = true;
             bodiesToRemove.add(fb.getBody());
         } else if (fa.getUserData().equals(B2DVars.ID_GRENADE)){
-            System.out.println("Grenade contact!");
             if (!grenadeBounces.contains(fa.getBody(), true)){
                 grenadeBounces.add(fa.getBody());
             }
         } else if (fb.getUserData().equals(B2DVars.ID_GRENADE)){
-            System.out.println("Grenade contact!");
             if (!grenadeBounces.contains(fb.getBody(), true)){
                 grenadeBounces.add(fb.getBody());
             }
@@ -98,7 +97,8 @@ public class SPContactListener implements ContactListener {
     }
 
     public SPSprite getKillingEntity() {
-        return ((SPSprite) killingBullet.getBody().getUserData());
+        System.out.println(killingEntity.getUserData());
+        return (SPSprite) killingEntity.getBody().getUserData();
     }
 
     public boolean canJump() {
