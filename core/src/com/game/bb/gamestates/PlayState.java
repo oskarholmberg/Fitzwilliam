@@ -114,7 +114,7 @@ public class PlayState extends GameState {
     }
     public String newEntityID(){
         String[] split = entityID.split(":");
-        entityID = split[0] + (Integer.valueOf(split[1]) + 1);
+        entityID = split[0] + ":" + (Integer.valueOf(split[1]) + 1);
         return entityID;
     }
 
@@ -284,7 +284,7 @@ public class PlayState extends GameState {
             hud.addPlayerDeath();
             //In this addAction add the ID of the killing bullet last
             mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
-                    cl.getKillingBullet().getID(), Float.toString(cl.getKillingBullet().getDir()));
+                    cl.getKillingEntity().getID(), Float.toString(cl.getKillingEntity().getDirection()));
         }
     }
 

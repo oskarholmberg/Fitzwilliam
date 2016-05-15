@@ -16,12 +16,17 @@ public abstract class SPSprite {
     protected float height, width;
     protected Texture texture;
     protected String ID;
+    protected float dir;
     // maybe add animation, check the tutorial
     // protected Animation animation;
 
     public SPSprite(World world, String ID){
         this.ID=ID;
         this.world=world;
+    }
+
+    public float getDirection(){
+        return dir;
     }
 
     public void setTexture(Texture texture){

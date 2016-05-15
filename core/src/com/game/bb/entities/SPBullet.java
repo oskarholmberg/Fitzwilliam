@@ -19,7 +19,6 @@ public class SPBullet extends SPSprite {
 
     private int offset = 0, ID;
     private float posYoffset = 5/B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
-    private float dir;
 
     public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful, String ID) {
         super(world, ID);
@@ -34,9 +33,6 @@ public class SPBullet extends SPSprite {
             // set friendly color texture
             setTexture(new Texture("images/blueBullet.png"));
         }
-    }
-    public float getDir(){
-        return dir;
     }
 
     @Override

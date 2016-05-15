@@ -18,7 +18,6 @@ public class SPGrenade extends SPSprite {
 
     private int offset = 0, amountBounces = 0;
     private float posYoffset = 5/B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
-    private float dir;
 
     public SPGrenade(World world, float xPos, float yPos, float dir, String ID) {
         super(world, ID);
