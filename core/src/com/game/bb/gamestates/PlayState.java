@@ -178,7 +178,8 @@ public class PlayState extends GameState {
                 hud.setOpponentDeath(action[0], action[6]);
                 opponent.kill(1);
                 removeKillingEntity(action[7]);
-                opponent.getBody().applyForceToCenter(50*Float.valueOf(action[8]), 20, true);
+                //In order for body to fly through the air when killed.
+                opponent.getBody().applyForceToCenter(50*Float.valueOf(action[8]), 50, true);
             } else if (action[1].equals("RESPAWN") && opponent != null) {
                 opponent.revive();
                 opponent.jump(floats[0], floats[1],
@@ -283,8 +284,6 @@ public class PlayState extends GameState {
             player.kill(1);
             hud.addPlayerDeath();
             //In this addAction add the ID of the killing bullet last
-            System.out.println("Sprite ID: " + cl.getKillingEntity().getID());
-            System.out.println("Direction: " + cl.getKillingEntity().getDirection());
             mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
                     cl.getKillingEntity().getID(), Float.toString(cl.getKillingEntity().getDirection()));
         }

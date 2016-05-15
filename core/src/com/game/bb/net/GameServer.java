@@ -60,7 +60,9 @@ public class GameServer extends Thread {
                 clientDeaths.put(ipAddress, 0);
                 for (String id : connectedClients.keySet()) {
                     String[] info = connectedClients.get(id).split(":");
-                    sendData((info[0] + ":CONNECT:" + info[2] + ":" + info[3] + ":" + info[4] + ":" + info[5] + ":" + B2DVars.BIT_OPPONENT + ":" + B2DVars.ID_OPPONENT + ":red" + ":" + clientDeaths.get(id)).getBytes(), id);
+                    sendData((info[0] + ":CONNECT:" + info[2] + ":" + info[3] + ":" + info[4] + ":" + info[5] +
+                            ":" + B2DVars.BIT_OPPONENT + ":" + B2DVars.ID_OPPONENT + ":red" +
+                            ":" + clientDeaths.get(id) + ":SPRITE_ID").getBytes(), id);
                 }
                 System.out.println("CLIENT[" + ipAddress + "] connected.");
             }

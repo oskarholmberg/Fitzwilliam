@@ -40,7 +40,6 @@ public class SPGrenade extends SPSprite {
         }
     }
     public boolean finishedBouncing(){
-        System.out.println("I've bounced: " + amountBounces + " times");
         if (amountBounces > 5)
             return true;
         amountBounces++;
