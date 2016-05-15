@@ -259,14 +259,9 @@ public class PlayState extends GameState {
 
     private void removeDeadBodies() {
         for (Body b : cl.getBodiesToRemove()) {
-            if (b.getUserData() instanceof SPBullet) {
+            if (b.getUserData() instanceof SPSprite) {
                 worldEntities.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);
-            } else if (b.getUserData() instanceof SPGrenade){
-                if (((SPGrenade) b.getUserData()).finishedBouncing()){
-                    worldEntities.removeValue((SPSprite) b.getUserData(), true);
-                    world.destroyBody(b);
-                }
             }
         }
         cl.clearBulletList();
@@ -274,7 +269,7 @@ public class PlayState extends GameState {
 
     private void grenadeBounces() {
         for (Body b : cl.getGrenadeBounces()) {
-            if ( ((SPGrenade) b.getUserData()).finishedBouncing()){
+            if ( b!=null && ((SPGrenade) b.getUserData()).finishedBouncing()){
                 worldEntities.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);
             }
