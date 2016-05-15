@@ -1,13 +1,10 @@
 package com.game.bb.entities;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.game.bb.handlers.B2DVars;
 
@@ -22,7 +19,7 @@ public class SPGrenade extends SPSprite {
     public SPGrenade(World world, float xPos, float yPos, float dir, String ID) {
         super(world, ID);
         this.dir=dir;
-        createBullet(xPos+dir*getPosXoffset, yPos-posYoffset, dir);
+        createGrenadeBody(xPos+dir*getPosXoffset, yPos-posYoffset, dir);
         setTexture(new Texture("images/redBullet.png"));
     }
 
@@ -48,7 +45,7 @@ public class SPGrenade extends SPSprite {
         return false;
     }
 
-    private void createBullet(float xPos, float yPos, float dir){
+    private void createGrenadeBody(float xPos, float yPos, float dir){
         CircleShape shape = new CircleShape();
         shape.setRadius(8 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
