@@ -1,28 +1,25 @@
 ##HighPrio unsorted##
-	Add ID for bullet. That was the opponent can tell which bullet hit him and you can remove it from the world.
+	Check direction for bouncing grenades through getLinearVelocity.x
+	and fix proper death texture.
+	Remove own grenades when they hit.
 
 ##Network##
-	Select host or join on start.
 	Send relevant information when connecting.
-		- Server answer with number of connected clients and their 			  location.
 		- Server settings (map, nbr of players) 
 
 ##Code##
-	Remove dead bullet textures/bodies due to bullets list size.
 	Add start screen. Score screen. etc.
-	Add background image.
 	Change reload functionality to work as IRL.
-	Fix removal of striking bullets.
 
 ##Functionality##
-	Add score count.
-	Balance; jumping, laser overheat
-	Set respawn delay and killed sprite.
+	Multiple layers in maps for functionality such as bullet proof
+	domes etc.
+	Add score screen with finish condition. Think SuperSmash!
+	Upon death, send cause to server for display after game.
 
 ##Extra##
 	Add functionality for Tiled.map and level select.
 	Add spawn location list for different maps.
-	Add grenades.
 
 	#Powerups#
 		Sabotage - Change enemy gravity scale

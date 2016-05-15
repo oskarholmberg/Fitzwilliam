@@ -18,7 +18,7 @@ public abstract class SPSprite {
     protected String ID;
     protected float dir;
     // maybe add animation, check the tutorial
-    // protected Animation animation;
+    // protected SPAnimation animation;
 
     public SPSprite(World world, String ID){
         this.ID=ID;

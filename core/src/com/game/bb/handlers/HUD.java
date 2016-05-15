@@ -13,7 +13,9 @@ public class HUD {
     private String playerDeaths = "0";
     private HashMap<String, String> opponentDeaths;
     private Texture playerTexture, opponentTexture, bulletTexture;
-    private int bulletsLeft = 3;
+    private TextureRegion grenadeTexture;
+    private int bulletsLeft = B2DVars.AMOUNT_BULLET;
+    private int grenadesLeft = B2DVars.AMOUNT_GRENADE;
 
     public HUD() {
 
@@ -21,6 +23,7 @@ public class HUD {
         playerTexture = new Texture("images/player/bluePlayerStandRight.png");
         opponentTexture = new Texture("images/player/redPlayerStandRight.png");
         bulletTexture = new Texture("images/weapons/blueBullet.png");
+        grenadeTexture = TextureRegion.split(new Texture("images/weapons/blueGrenade.png"), 30, 30)[0][0];
         opponentDeaths = new HashMap<String, String>();
 
         font = new TextureRegion[11];
@@ -40,6 +43,8 @@ public class HUD {
     public void setAmountBulletsLeft(int amount){
         bulletsLeft = amount;
     }
+
+    public void setAmountGrenadesLeft(int amount) { grenadesLeft = amount;}
 
     public void setOpponentDeath(String id,String deaths) {
         opponentDeaths.put(id, deaths);
@@ -65,7 +70,10 @@ public class HUD {
             offset+=200;
         }
         for (int i = 0; i < bulletsLeft; i++) {
-            sb.draw(bulletTexture, 50 + i*50, B2DVars.CAM_HEIGHT-120, 25, 15);
+            sb.draw(bulletTexture, 50 + i*50, B2DVars.CAM_HEIGHT-90, 25, 10);
+        }
+        for (int i = 0; i < grenadesLeft; i++) {
+            sb.draw(grenadeTexture, 50 + i*50, B2DVars.CAM_HEIGHT-120, 20, 20);
         }
         sb.end();
     }

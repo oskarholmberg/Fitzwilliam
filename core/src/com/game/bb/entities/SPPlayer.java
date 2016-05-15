@@ -66,7 +66,7 @@ public class SPPlayer extends SPSprite {
 
     public void revive() {
         isDead = false;
-        setTexture(onGroundRight);
+        setTexture(onGroundLeft);
     }
 
     public String getId() {

@@ -39,7 +39,7 @@ public class PlayState extends GameState {
     private SPContactListener cl;
     private SPPlayer player;
     private Array<SPPlayer> opponents;
-    private int amntBullets = 3, amntGrenades = 1;
+    private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
     private String entityID = B2DVars.MY_ID + "%0";
     private Array<SPSprite> worldEntities;
@@ -104,8 +104,9 @@ public class PlayState extends GameState {
             mon.sendPlayerAction("GRENADE", 0, 0, Float.toString(lastJumpDirection),
                     Long.toString(System.currentTimeMillis()), ID);
             Vector2 pos = player.getPosition();
-            worldEntities.add(new SPGrenade(world, pos.x, pos.y, lastJumpDirection, ID));
+            worldEntities.add(new SPGrenade(world, pos.x, pos.y, lastJumpDirection, false, ID));
             amntGrenades--;
+            hud.setAmountGrenadesLeft(amntGrenades);
             if (amntGrenades == 0) {
                 grenadesIsEmpty = true;
                 grenadeRefresh = 0;
@@ -122,7 +123,7 @@ public class PlayState extends GameState {
         long timeDiff = System.currentTimeMillis() - timeSync;
         xPos = xPos + (B2DVars.PH_GRENADE_X * timeDiff/1000) / B2DVars.PPM * dir;
         yPos = yPos + (B2DVars.PH_GRENADE_Y * timeDiff/1000) / B2DVars.PPM;
-        worldEntities.add(new SPGrenade(world, xPos, yPos, dir, ID));
+        worldEntities.add(new SPGrenade(world, xPos, yPos, dir, true ,ID));
     }
 
     public void opponentShot(float xPos, float yPos, float dir, long timeSync, String bulletID) {
@@ -236,13 +237,17 @@ public class PlayState extends GameState {
         player.jump(0, 0, ((((B2DVars.CAM_WIDTH - 100) / B2DVars.PPM) * (float) Math.random() + 50) / B2DVars.PPM),
                 (B2DVars.CAM_HEIGHT / B2DVars.PPM) - B2DVars.PLAYER_HEIGHT / 2);
         mon.sendPlayerAction("RESPAWN", 0, 0);
+        amntBullets = B2DVars.AMOUNT_BULLET;
+        amntGrenades = B2DVars.AMOUNT_GRENADE;
+        hud.setAmountBulletsLeft(amntBullets);
+        hud.setAmountGrenadesLeft(amntGrenades);
         cl.resetJumps();
         cl.revivePlayer();
     }
 
     private void refreshAmmo(float dt) {
         if (bulletRefresh > 3f && clipIsEmpty) {
-            amntBullets = 3;
+            amntBullets = B2DVars.AMOUNT_BULLET;
             clipIsEmpty = false;
             hud.setAmountBulletsLeft(amntBullets);
             reload.play();
@@ -250,8 +255,9 @@ public class PlayState extends GameState {
             bulletRefresh += dt;
         }
         if (grenadeRefresh > 8f && grenadesIsEmpty) {
-            amntGrenades = 1;
+            amntGrenades = B2DVars.AMOUNT_GRENADE;
             grenadesIsEmpty = false;
+            hud.setAmountGrenadesLeft(amntGrenades);
         } else {
             grenadeRefresh += dt;
         }
@@ -304,6 +310,9 @@ public class PlayState extends GameState {
         for (SPPlayer player : opponents) {
             player.update(dt);
         }
+        for(SPSprite sprite : worldEntities){
+            sprite.update(dt);
+        }
         opponentActions();
         refreshAmmo(dt);
         if (cl.isPlayerHit()) {
@@ -338,7 +347,7 @@ public class PlayState extends GameState {
         hud.render(sb);
 
         //Do this last in render
-        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+//        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         sb.setProjectionMatrix(cam.combined);
     }
 
