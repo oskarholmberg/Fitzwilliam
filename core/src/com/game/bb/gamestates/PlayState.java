@@ -41,7 +41,7 @@ public class PlayState extends GameState {
     private Array<SPPlayer> opponents;
     private int amntBullets = 3, amntGrenades = 1;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
-    private String entityID = B2DVars.MY_ID + ":0";
+    private String entityID = B2DVars.MY_ID + "%0";
     private Array<SPSprite> worldEntities;
     private float respawnTimer = 0;
     private HUD hud;
@@ -113,8 +113,8 @@ public class PlayState extends GameState {
         }
     }
     public String newEntityID(){
-        String[] split = entityID.split(":");
-        entityID = split[0] + ":" +(Integer.valueOf(split[1]) + 1);
+        String[] split = entityID.split("%");
+        entityID = split[0] + "%" +(Integer.valueOf(split[1]) + 1);
         return entityID;
     }
 
