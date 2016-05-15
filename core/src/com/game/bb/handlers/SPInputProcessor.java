@@ -26,8 +26,8 @@ public class SPInputProcessor extends InputAdapter{
     public boolean keyDown(int k){
         if (k == Input.Keys.W)
             SPInput.setKey(SPInput.BUTTON_W, true);
-        if (k == Input.Keys.S)
-            SPInput.setKey(SPInput.BUTTON_S, true);
+        if (k == Input.Keys.E)
+            SPInput.setKey(SPInput.BUTTON_E, true);
         if (k == Input.Keys.RIGHT)
             SPInput.setKey(SPInput.BUTTON_RIGHT, true);
         if (k == Input.Keys.LEFT)
@@ -38,8 +38,8 @@ public class SPInputProcessor extends InputAdapter{
     public boolean keyUp(int k){
         if (k == Input.Keys.W)
             SPInput.setKey(SPInput.BUTTON_W, false);
-        if (k == Input.Keys.S)
-            SPInput.setKey(SPInput.BUTTON_S, false);
+        if (k == Input.Keys.E)
+            SPInput.setKey(SPInput.BUTTON_E, false);
         if (k == Input.Keys.RIGHT)
             SPInput.setKey(SPInput.BUTTON_RIGHT, false);
         if (k == Input.Keys.LEFT)

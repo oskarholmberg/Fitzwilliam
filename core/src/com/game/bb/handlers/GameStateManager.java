@@ -15,7 +15,7 @@ import java.util.Stack;
 public class GameStateManager {
     private Game game;
     private Stack<GameState> states;
-    private String ipAddress = "192.168.0.103";
+    private String ipAddress = "127.0.1.1";
     private int port = 8080;
     private boolean hosting = false;
     public static final int PLAY = 1, START_SCREEN = 2, CONNECTION_STATE = 3;

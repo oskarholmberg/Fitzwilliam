@@ -45,7 +45,7 @@ public class MapBuilder {
         fdef.shape = shape;
         // set bits to collide with
         fdef.filter.categoryBits = B2DVars.BIT_GROUND;
-        fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_OPPONENT | B2DVars.BIT_BULLET;
+        fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_OPPONENT | B2DVars.BIT_BULLET | B2DVars.BIT_GRENADE;
         body.createFixture(fdef).setUserData(B2DVars.ID_GROUND);
     }
 
@@ -54,6 +54,7 @@ public class MapBuilder {
         TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("moonBlocks");
 
         float ts = layer.getTileWidth();
+
         for(int row = 0; row < layer.getHeight(); row++) {
             for(int col = 0; col < layer.getWidth(); col++) {
                 // get cell
@@ -68,15 +69,18 @@ public class MapBuilder {
                 bdef.type = BodyDef.BodyType.StaticBody;
                 bdef.position.set((col + 0.5f) * ts / B2DVars.PPM, (row + 0.5f) * ts / B2DVars.PPM);
                 ChainShape cs = new ChainShape();
-                Vector2[] v = new Vector2[3];
+                Vector2[] v = new Vector2[5];
                 v[0] = new Vector2(-ts / 2 / B2DVars.PPM, -ts / 2 / B2DVars.PPM);
                 v[1] = new Vector2(-ts / 2 / B2DVars.PPM, ts / 2 / B2DVars.PPM);
                 v[2] = new Vector2(ts / 2 / B2DVars.PPM, ts / 2 / B2DVars.PPM);
+                v[3] = new Vector2(ts / 2 / B2DVars.PPM, -ts / 2 / B2DVars.PPM);
+                v[4] = new Vector2(-ts / 2 / B2DVars.PPM, -ts / 2 / B2DVars.PPM);
                 cs.createChain(v);
                 FixtureDef fd = new FixtureDef();
                 fd.shape = cs;
                 fd.filter.categoryBits = B2DVars.BIT_GROUND;
-                fd.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BULLET | B2DVars.BIT_OPPONENT;
+                fd.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BULLET | B2DVars.BIT_OPPONENT
+                        | B2DVars.BIT_GRENADE;
                 world.createBody(bdef).createFixture(fd).setUserData(B2DVars.ID_GROUND);
                 cs.dispose();
             }

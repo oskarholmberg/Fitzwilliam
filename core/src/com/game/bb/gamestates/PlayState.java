@@ -2,6 +2,7 @@ package com.game.bb.gamestates;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,6 +14,8 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.game.bb.entities.SPBullet;
+import com.game.bb.entities.SPGrenade;
+import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
 import com.game.bb.net.PlayStateNetworkMonitor;
@@ -20,7 +23,7 @@ import com.game.bb.net.PlayStateNetworkMonitor;
 
 /**
  * TODO LIST --
- * --Remove dead bullet textures/bodies (check how big the bullets list gets)
+ * --Remove dead bullet textures/bodies (check how big the worldEnteties list gets)
  * --Add different game screens with options to host or join
  * --CLEAN UP CODE ( LOL XD )
  * --Add textures to entities
@@ -37,9 +40,9 @@ public class PlayState extends GameState {
     private SPContactListener cl;
     private SPPlayer player;
     private Array<SPPlayer> opponents;
-    private int amntBullets = 3;
-    private float bulletRefresh, lastJumpDirection = 1;
-    private Array<SPBullet> bullets;
+    private int amntBullets = 3, amntGrenades = 2;
+    private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
+    private Array<SPSprite> worldEnteties;
     private float respawnTimer = 0;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
@@ -47,7 +50,7 @@ public class PlayState extends GameState {
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
     private PlayStateNetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
-    private boolean clipIsEmpty = false;
+    private boolean clipIsEmpty = false, grenadesIsEmpty = false;
 
     public PlayState(GameStateManager gsm, String ipAddress, int port) {
         super(gsm);
@@ -61,7 +64,7 @@ public class PlayState extends GameState {
 
         hud = new HUD();
 
-        bullets = new Array<SPBullet>();
+        worldEnteties = new Array<SPSprite>();
         opponents = new Array<SPPlayer>();
         // create boundaries
 
@@ -82,10 +85,10 @@ public class PlayState extends GameState {
 
     public void shoot() {
         if (amntBullets > 0 && !player.isDead()) {
+            mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection), Long.toString(System.currentTimeMillis()));
             Vector2 pos = player.getPosition();
             SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false);
-            bullets.add(bullet);
-            mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection), Long.toString(System.currentTimeMillis()));
+            worldEnteties.add(bullet);
             amntBullets--;
             hud.setAmountBulletsLeft(amntBullets);
             if (amntBullets == 0) {
@@ -95,13 +98,31 @@ public class PlayState extends GameState {
         }
     }
 
+    private void throwGrenade(){
+        if (amntGrenades > 0 && !player.isDead()) {
+            mon.sendPlayerAction("GRENADE", 0, 0, Float.toString(lastJumpDirection), Long.toString(System.currentTimeMillis()));
+            Vector2 pos = player.getPosition();
+            worldEnteties.add(new SPGrenade(world, pos.x, pos.y, lastJumpDirection));
+            amntGrenades--;
+            if (amntGrenades == 0){
+                grenadesIsEmpty = true;
+                grenadeRefresh = 0;
+            }
+        }
+    }
+
+    private void enemyGrenade(float xPos, float yPos, float dir, long timeSync){
+        long timeDiff = System.currentTimeMillis() - timeSync;
+        xPos = xPos + (B2DVars.PH_GRENADE_X * timeDiff/1000) / B2DVars.PPM * dir;
+        yPos = yPos + (B2DVars.PH_GRENADE_Y * timeDiff/1000) / B2DVars.PPM;
+        worldEnteties.add(new SPGrenade(world, xPos, yPos, dir));
+    }
+
     public void opponentShot(float xPos, float yPos, float dir, long timeSync) {
         long timeDiff = System.currentTimeMillis() - timeSync;
-        System.out.println("TimeDiff: " + timeDiff + " previous xPos: " + xPos);
         xPos = xPos + (B2DVars.PH_BULLET_SPEED * timeDiff/1000) / B2DVars.PPM * dir;
-        System.out.println("Time synced xPos: " + xPos);
         SPBullet bullet = new SPBullet(world, xPos, yPos, dir, true);
-        bullets.add(bullet);
+        worldEnteties.add(bullet);
     }
 
     public Vector2 playerPosition() {
@@ -113,20 +134,24 @@ public class PlayState extends GameState {
         if (SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x > touchNbrs[1] && cl.canJump()) {
             SPInput.down = false;
-            player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
             mon.sendPlayerAction("MOVE", B2DVars.PH_JUMPX, B2DVars.PH_JUMPY);
+            player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
             lastJumpDirection = 1;
         } else if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x < touchNbrs[0] && cl.canJump()) {
             SPInput.down = false;
-            player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
             mon.sendPlayerAction("MOVE", -B2DVars.PH_JUMPX, B2DVars.PH_JUMPY);
+            player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
             lastJumpDirection = -1;
         }
         if (SPInput.isPressed(SPInput.BUTTON_W) ||
                 SPInput.isPressed() && SPInput.x > touchNbrs[0] && SPInput.x < touchNbrs[1]) {
             SPInput.down = false;
             shoot();
+        }
+        if (SPInput.isPressed(SPInput.BUTTON_E)){
+
+            throwGrenade();
         }
 
     }
@@ -162,6 +187,8 @@ public class PlayState extends GameState {
                     hud.removeOpponentDeathCount(action[0]);
                     world.destroyBody(opponent.getBody());
                 }
+            } else if (action[1].equals("GRENADE")) {
+                enemyGrenade(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]));
             }
         }
     }
@@ -200,16 +227,38 @@ public class PlayState extends GameState {
         } else {
             bulletRefresh += dt;
         }
+        if (grenadeRefresh > 5f && grenadesIsEmpty) {
+            amntGrenades = 2;
+            grenadesIsEmpty = false;
+        } else {
+            grenadeRefresh += dt;
+        }
     }
 
-    public void removeDeadBodies() {
+    private void removeDeadBodies() {
         for (Body b : cl.getBodiesToRemove()) {
             if (b.getUserData() instanceof SPBullet) {
-                bullets.removeValue((SPBullet) b.getUserData(), true);
+                worldEnteties.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);
+            } else if (b.getUserData() instanceof SPGrenade){
+                if (((SPGrenade) b.getUserData()).finishedBouncing()){
+                    worldEnteties.removeValue((SPSprite) b.getUserData(), true);
+                    world.destroyBody(b);
+                }
             }
         }
         cl.clearBulletList();
+    }
+
+    private void grenadeBounces(){
+        for (Body b : cl.getGrenadeBounces()){
+            System.out.println("Bounciebounce");
+            if ( ((SPGrenade) b.getUserData()).finishedBouncing()){
+                worldEnteties.removeValue((SPSprite) b.getUserData(), true);
+                world.destroyBody(b);
+            }
+        }
+        cl.clearGrenadeList();
     }
 
     private void playerHit() {
@@ -225,6 +274,7 @@ public class PlayState extends GameState {
     public void update(float dt) {
         handleInput();
         world.step(dt, 6, 2);
+        grenadeBounces();
         removeDeadBodies();
         player.update(dt);
         for (SPPlayer player : opponents) {
@@ -252,7 +302,7 @@ public class PlayState extends GameState {
         sb.end();
         tmr.setView(cam);
         tmr.render();
-        for (SPBullet b : bullets) {
+        for (SPSprite b : worldEnteties) {
             b.render(sb);
         }
         for (SPPlayer opponent : opponents) {
@@ -262,7 +312,7 @@ public class PlayState extends GameState {
         hud.render(sb);
 
         //Do this last in render
-//        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         sb.setProjectionMatrix(cam.combined);
     }
 
