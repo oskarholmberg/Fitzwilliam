@@ -184,7 +184,8 @@ public class PlayState extends GameState {
     private void respawnPlayer() {
         respawnTimer = 0;
         player.revive();
-        player.jump(0, 0, (B2DVars.CAM_WIDTH / 2 / B2DVars.PPM) * (float) Math.random(), B2DVars.CAM_HEIGHT / B2DVars.PPM);
+        player.jump(0, 0, (B2DVars.CAM_WIDTH / 2 / B2DVars.PPM) * (float) Math.random() + 100 / B2DVars.PPM,
+                B2DVars.CAM_HEIGHT / B2DVars.PPM);
         mon.sendPlayerAction("RESPAWN", 0, 0);
         cl.resetJumps();
         cl.revivePlayer();
