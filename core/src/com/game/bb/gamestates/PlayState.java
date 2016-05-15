@@ -283,6 +283,8 @@ public class PlayState extends GameState {
             player.kill(1);
             hud.addPlayerDeath();
             //In this addAction add the ID of the killing bullet last
+            System.out.println("Sprite ID: " + cl.getKillingEntity().getID());
+            System.out.println("Direction: " + cl.getKillingEntity().getDirection());
             mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
                     cl.getKillingEntity().getID(), Float.toString(cl.getKillingEntity().getDirection()));
         }
@@ -296,8 +298,6 @@ public class PlayState extends GameState {
     public void update(float dt) {
         handleInput();
         world.step(dt, 6, 2);
-        grenadeBounces();
-        removeDeadBodies();
         player.update(dt);
         for (SPPlayer player : opponents) {
             player.update(dt);
@@ -313,6 +313,8 @@ public class PlayState extends GameState {
                 respawnPlayer();
             }
         }
+        grenadeBounces();
+        removeDeadBodies();
     }
 
     @Override
