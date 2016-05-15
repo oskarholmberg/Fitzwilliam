@@ -20,7 +20,7 @@ public class HUD {
         Texture hudTex = new Texture("images/hud.png");
         playerTexture = new Texture("images/player/bluePlayerStandRight.png");
         opponentTexture = new Texture("images/player/redPlayerStandRight.png");
-        bulletTexture = new Texture("images/blueBullet.png");
+        bulletTexture = new Texture("images/weapons/blueBullet.png");
         opponentDeaths = new HashMap<String, String>();
 
         font = new TextureRegion[11];

@@ -28,10 +28,10 @@ public class SPBullet extends SPSprite {
         sound.play();
         if (harmful) {
             // set enemy color texture
-            setTexture(new Texture("images/redBullet.png"));
+            setTexture(new Texture("images/weapons/redBullet.png"));
         } else {
             // set friendly color texture
-            setTexture(new Texture("images/blueBullet.png"));
+            setTexture(new Texture("images/weapons/blueBullet.png"));
         }
     }
 
