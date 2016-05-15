@@ -148,7 +148,7 @@ public class PlayState extends GameState {
                 if (getOpponent(action[0]) == null) {
                     SPPlayer newOpponent = new SPPlayer(world, action[0], floats[2], floats[3], Short.valueOf(action[6]), action[7], action[8]);
                     opponents.add(newOpponent);
-                    hud.setOpponentDeath(action[0], "0");
+                    hud.setOpponentDeath(action[0], action[9]);
                     newOpponent.jump(floats[0], floats[1], floats[2], floats[3]);
                 }
             } else if (action[1].equals("DISCONNECT")) {
