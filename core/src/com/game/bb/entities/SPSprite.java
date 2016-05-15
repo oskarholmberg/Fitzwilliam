@@ -15,10 +15,12 @@ public abstract class SPSprite {
     protected Body body;
     protected float height, width;
     protected Texture texture;
+    protected String ID;
     // maybe add animation, check the tutorial
     // protected Animation animation;
 
-    public SPSprite(World world){
+    public SPSprite(World world, String ID){
+        this.ID=ID;
         this.world=world;
     }
 
@@ -31,6 +33,8 @@ public abstract class SPSprite {
     public void update(float dt){
 
     }
+
+    public String getID(){return ID;}
 
     public void render(SpriteBatch sb){
 

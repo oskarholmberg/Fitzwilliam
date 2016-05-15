@@ -20,8 +20,8 @@ public class SPGrenade extends SPSprite {
     private float posYoffset = 5/B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
     private float dir;
 
-    public SPGrenade(World world, float xPos, float yPos, float dir) {
-        super(world);
+    public SPGrenade(World world, float xPos, float yPos, float dir, String ID) {
+        super(world, ID);
         this.dir=dir;
         createBullet(xPos+dir*getPosXoffset, yPos-posYoffset, dir);
         setTexture(new Texture("images/redBullet.png"));
@@ -57,7 +57,7 @@ public class SPGrenade extends SPSprite {
         fdef.restitution=1f;
         fdef.friction=0f;
         fdef.filter.categoryBits = B2DVars.BIT_GRENADE;
-        fdef.filter.maskBits =  B2DVars.BIT_GROUND | B2DVars.BIT_PLAYER | B2DVars.BIT_OPPONENT;
+        fdef.filter.maskBits =  B2DVars.BIT_GROUND | B2DVars.BIT_PLAYER;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.DynamicBody;

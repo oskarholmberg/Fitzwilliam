@@ -22,7 +22,7 @@ import com.game.bb.net.PlayStateNetworkMonitor;
 
 /**
  * TODO LIST --
- * --Remove dead bullet textures/bodies (check how big the worldEnteties list gets)
+ * --Remove dead bullet textures/bodies (check how big the worldEntities list gets)
  * --Add different game screens with options to host or join
  * --CLEAN UP CODE ( LOL XD )
  * --Add textures to entities
@@ -41,7 +41,8 @@ public class PlayState extends GameState {
     private Array<SPPlayer> opponents;
     private int amntBullets = 3, amntGrenades = 1;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
-    private Array<SPSprite> worldEnteties;
+    private String entityID = B2DVars.MY_ID + ":0";
+    private Array<SPSprite> worldEntities;
     private float respawnTimer = 0;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
@@ -63,7 +64,7 @@ public class PlayState extends GameState {
 
         hud = new HUD();
 
-        worldEnteties = new Array<SPSprite>();
+        worldEntities = new Array<SPSprite>();
         opponents = new Array<SPPlayer>();
         // create boundaries
 
@@ -84,10 +85,12 @@ public class PlayState extends GameState {
 
     public void shoot() {
         if (amntBullets > 0 && !player.isDead()) {
-            mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection), Long.toString(System.currentTimeMillis()));
+            String ID = newEntityID();
+            mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection),
+                    Long.toString(System.currentTimeMillis()), ID);
             Vector2 pos = player.getPosition();
-            SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false);
-            worldEnteties.add(bullet);
+            SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false, ID);
+            worldEntities.add(bullet);
             amntBullets--;
             hud.setAmountBulletsLeft(amntBullets);
             if (amntBullets == 0) {
@@ -99,9 +102,11 @@ public class PlayState extends GameState {
 
     private void throwGrenade(){
         if (amntGrenades > 0 && !player.isDead()) {
-            mon.sendPlayerAction("GRENADE", 0, 0, Float.toString(lastJumpDirection), Long.toString(System.currentTimeMillis()));
+            String ID = newEntityID();
+            mon.sendPlayerAction("GRENADE", 0, 0, Float.toString(lastJumpDirection),
+                    Long.toString(System.currentTimeMillis()), ID);
             Vector2 pos = player.getPosition();
-            worldEnteties.add(new SPGrenade(world, pos.x, pos.y, lastJumpDirection));
+            worldEntities.add(new SPGrenade(world, pos.x, pos.y, lastJumpDirection, ID));
             amntGrenades--;
             if (amntGrenades == 0){
                 grenadesIsEmpty = true;
@@ -109,19 +114,24 @@ public class PlayState extends GameState {
             }
         }
     }
+    private String newEntityID(){
+        String[] split = entityID.split(":");
+        entityID = split[0] + (Integer.valueOf(split[1]) + 1);
+        return entityID;
+    }
 
-    private void enemyGrenade(float xPos, float yPos, float dir, long timeSync){
+    private void enemyGrenade(float xPos, float yPos, float dir, long timeSync, String ID){
         long timeDiff = System.currentTimeMillis() - timeSync;
         xPos = xPos + (B2DVars.PH_GRENADE_X * timeDiff/1000) / B2DVars.PPM * dir;
         yPos = yPos + (B2DVars.PH_GRENADE_Y * timeDiff/1000) / B2DVars.PPM;
-        worldEnteties.add(new SPGrenade(world, xPos, yPos, dir));
+        worldEntities.add(new SPGrenade(world, xPos, yPos, dir, ID));
     }
 
-    public void opponentShot(float xPos, float yPos, float dir, long timeSync) {
+    public void opponentShot(float xPos, float yPos, float dir, long timeSync, String bulletID) {
         long timeDiff = System.currentTimeMillis() - timeSync;
         xPos = xPos + (B2DVars.PH_BULLET_SPEED * timeDiff/1000) / B2DVars.PPM * dir;
-        SPBullet bullet = new SPBullet(world, xPos, yPos, dir, true);
-        worldEnteties.add(bullet);
+        SPBullet bullet = new SPBullet(world, xPos, yPos, dir, true, bulletID);
+        worldEntities.add(bullet);
     }
 
     public Vector2 playerPosition() {
@@ -164,17 +174,21 @@ public class PlayState extends GameState {
                 opponent.jump(floats[0], floats[1],
                         floats[2], floats[3]);
             else if (action[1].equals("SHOOT") && opponent != null)
-                opponentShot(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]));
+                opponentShot(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]),
+                        action[8]);
             else if (action[1].equals("DEATH") && opponent != null) {
                 hud.setOpponentDeath(action[0], action[6]);
                 opponent.kill(1);
+                removeKillingEntity(action[7]);
+                opponent.getBody().applyForceToCenter(50*Float.valueOf(action[8]), 20, true);
             } else if (action[1].equals("RESPAWN") && opponent != null) {
                 opponent.revive();
                 opponent.jump(floats[0], floats[1],
                         floats[2], floats[3]);
             } else if (action[1].equals("CONNECT")) {
                 if (getOpponent(action[0]) == null) {
-                    SPPlayer newOpponent = new SPPlayer(world, action[0], floats[2], floats[3], Short.valueOf(action[6]), action[7], action[8]);
+                    SPPlayer newOpponent = new SPPlayer(world, action[0], floats[2], floats[3],
+                            Short.valueOf(action[6]), action[7], action[8]);
                     opponents.add(newOpponent);
                     hud.setOpponentDeath(action[0], action[9]);
                     newOpponent.jump(floats[0], floats[1], floats[2], floats[3]);
@@ -187,8 +201,15 @@ public class PlayState extends GameState {
                     world.destroyBody(opponent.getBody());
                 }
             } else if (action[1].equals("GRENADE")) {
-                enemyGrenade(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]));
+                enemyGrenade(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]), action[8]);
             }
+        }
+    }
+
+    private void removeKillingEntity(String killerID){
+        for(SPSprite s : worldEntities){
+            if (s.getID().equals(killerID))
+                worldEntities.removeValue(s, true);
         }
     }
 
@@ -237,11 +258,11 @@ public class PlayState extends GameState {
     private void removeDeadBodies() {
         for (Body b : cl.getBodiesToRemove()) {
             if (b.getUserData() instanceof SPBullet) {
-                worldEnteties.removeValue((SPSprite) b.getUserData(), true);
+                worldEntities.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);
             } else if (b.getUserData() instanceof SPGrenade){
                 if (((SPGrenade) b.getUserData()).finishedBouncing()){
-                    worldEnteties.removeValue((SPSprite) b.getUserData(), true);
+                    worldEntities.removeValue((SPSprite) b.getUserData(), true);
                     world.destroyBody(b);
                 }
             }
@@ -253,7 +274,7 @@ public class PlayState extends GameState {
         for (Body b : cl.getGrenadeBounces()){
             System.out.println("Bounciebounce");
             if ( ((SPGrenade) b.getUserData()).finishedBouncing()){
-                worldEnteties.removeValue((SPSprite) b.getUserData(), true);
+                worldEntities.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);
             }
         }
@@ -265,7 +286,8 @@ public class PlayState extends GameState {
             player.kill(1);
             hud.addPlayerDeath();
             //In this addAction add the ID of the killing bullet last
-            mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount());
+            mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
+                    cl.getKillingBullet().getID(), Float.toString(cl.getKillingBullet().getDir()));
         }
     }
 
@@ -301,7 +323,7 @@ public class PlayState extends GameState {
         sb.end();
         tmr.setView(cam);
         tmr.render();
-        for (SPSprite b : worldEnteties) {
+        for (SPSprite b : worldEntities) {
             b.render(sb);
         }
         for (SPPlayer opponent : opponents) {
