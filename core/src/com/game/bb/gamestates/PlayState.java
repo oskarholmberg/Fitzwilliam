@@ -76,8 +76,8 @@ public class PlayState extends GameState {
         tmr = mb.buildMap();
 
         //Players
-        player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM, B2DVars.CAM_HEIGHT/B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
-
+        player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM,
+                B2DVars.CAM_HEIGHT/B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
 
 
         // set up box2d cam
