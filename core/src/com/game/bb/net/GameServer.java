@@ -31,14 +31,7 @@ public class GameServer extends Thread {
             this.socket = new DatagramSocket(port);
             System.out.println("Success! Server listening on port: " + port);
         } catch (SocketException e) {
-            e.printStackTrace();
-        }
-        try {
-            multiSocket = new MulticastSocket(8082);
-            InetAddress group = InetAddress.getByName("224.0.0.20");
-            multiSocket.joinGroup(group);
-        } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Server already running. Joining own game.");
         }
     }
 
