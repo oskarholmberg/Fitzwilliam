@@ -21,19 +21,19 @@ public class SPPlayer extends SPSprite {
     private boolean onGround = true, isDead = false;
     private float textureTimer = 0;
     private String id;
-    private int xOffset = 23, yOffset=25;
+    private int xOffset = 23, yOffset = 25;
 
     public SPPlayer(World world, String id, float xPos, float yPos, short bodyBIT, String bodyType, String color) {
         super(world);
         createPlayer(xPos, yPos, bodyBIT, bodyType);
-        this.id=id;
+        this.id = id;
         sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
         loadTexture(color);
         setTexture(onGroundRight);
     }
 
-    public void jump(float xForce, float yForce, float xPos, float yPos){
-        if(!isDead) {
+    public void jump(float xForce, float yForce, float xPos, float yPos) {
+        if (!isDead) {
             body.setTransform(xPos, yPos, 0);
             body.setLinearVelocity(0, 0);
             body.applyForceToCenter(xForce, yForce, true);
@@ -50,59 +50,60 @@ public class SPPlayer extends SPSprite {
 
     /**
      * Kills the Player and sets it status to dead.
+     *
      * @param dir, the direction of the bullet causing the killing blow.
      */
-    public void kill(float dir){
+    public void kill(float dir) {
         isDead = true;
-        if(dir < 0 ){
+        if (dir < 0) {
             setTexture(deadRight);
-        }
-        else{
+        } else {
             setTexture(deadLeft);
         }
     }
 
-    public void revive(){
+    public void revive() {
         isDead = false;
         setTexture(onGroundRight);
     }
 
-    public String getId(){
+    public String getId() {
         return id;
     }
 
     @Override
-    public void render(SpriteBatch sb){
-        if(texture != null && !isDead) {
-            sb.begin();
+    public void render(SpriteBatch sb) {
+        if (texture != null) {
             float x = body.getPosition().x * B2DVars.PPM - B2DVars.PLAYER_WIDTH;
             float y = body.getPosition().y * B2DVars.PPM - B2DVars.PLAYER_HEIGHT;
-            if(textureTimer>=0.5f && !onGround){
-                if(texture.equals(inAirLeft)){
-                    setTexture(onGroundLeft);
-                    xOffset = 30;
+            if (!isDead) {
+                sb.begin();
+                if (textureTimer >= 0.5f && !onGround) {
+                    if (texture.equals(inAirLeft)) {
+                        setTexture(onGroundLeft);
+                        xOffset = 30;
+                    } else {
+                        setTexture(onGroundRight);
+                        xOffset = 23;
+                    }
+                    onGround = true;
                 }
-                else{
-                    setTexture(onGroundRight);
-                    xOffset = 23;
-                }
-                onGround=true;
             }
-            sb.draw(texture, x-xOffset, y-yOffset, 54, 48);
+            sb.draw(texture, x - xOffset, y - yOffset, 54, 48);
             sb.end();
         }
     }
 
     @Override
-    public void update(float dt){
-        textureTimer+=dt;
+    public void update(float dt) {
+        textureTimer += dt;
     }
 
     public boolean isDead() {
         return isDead;
     }
 
-    private void createPlayer(float xPos, float yPos, short bodyCategory, String bodyID){
+    private void createPlayer(float xPos, float yPos, short bodyCategory, String bodyID) {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT);
         FixtureDef fdef = new FixtureDef();
@@ -118,7 +119,7 @@ public class SPPlayer extends SPSprite {
 
         //add foot
         if (bodyID.equals(B2DVars.ID_PLAYER)) {
-            shape.setAsBox(B2DVars.PLAYER_WIDTH - 2/B2DVars.PPM, 2 / B2DVars.PPM, new Vector2(0, -B2DVars.PLAYER_HEIGHT), 0);
+            shape.setAsBox(B2DVars.PLAYER_WIDTH - 2 / B2DVars.PPM, 2 / B2DVars.PPM, new Vector2(0, -B2DVars.PLAYER_HEIGHT), 0);
             fdef.shape = shape;
             fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
             fdef.filter.maskBits = B2DVars.BIT_GROUND;
@@ -127,16 +128,15 @@ public class SPPlayer extends SPSprite {
         }
     }
 
-    private void loadTexture(String color){
-        if(color.equals("blue")){
+    private void loadTexture(String color) {
+        if (color.equals("blue")) {
             onGroundRight = new Texture("images/player/bluePlayerStandRight.png");
             inAirRight = new Texture("images/player/bluePlayerJumpRight.png");
             onGroundLeft = new Texture("images/player/bluePlayerStandLeft.png");
             inAirLeft = new Texture("images/player/bluePlayerJumpLeft.png");
             deadRight = new Texture("images/player/bluePlayerDeadRight.png");
             deadLeft = new Texture("images/player/bluePlayerDeadLeft.png");
-        }
-        else {
+        } else {
             onGroundRight = new Texture("images/player/redPlayerStandRight.png");
             inAirRight = new Texture("images/player/redPlayerJumpRight.png");
             onGroundLeft = new Texture("images/player/redPlayerStandLeft.png");
