@@ -67,6 +67,7 @@ public class LobbyState extends GameState {
             if(joinButton.isClicked()){
                 gsm.setIpAddress(joinButton.getInfo());
                 gsm.setState(GameStateManager.PLAY);
+                searcher.stopSearch();
                 sound.play();
             }
         }
