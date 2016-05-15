@@ -20,25 +20,20 @@ public class GameServer extends Thread {
 
     private DatagramSocket socket;
     private HashMap<String, String> connectedClients;
-    private MulticastSocket multiSocket;
+    private HashMap<String, Integer> clientDeaths;
     private String ipAddress;
 
     public GameServer(int port) {
         // First String is ipAddress, second is last known action.
         connectedClients = new HashMap<String, String>();
+        // First String is ipAddress, second is deathcount;
+        clientDeaths = new HashMap<String, Integer>();
         try {
             System.out.println("Trying to start server on port: " + port);
             this.socket = new DatagramSocket(port);
             System.out.println("Success! Server listening on port: " + port);
         } catch (SocketException e) {
-            e.printStackTrace();
-        }
-        try {
-            multiSocket = new MulticastSocket(8082);
-            InetAddress group = InetAddress.getByName("224.0.0.20");
-            multiSocket.joinGroup(group);
-        } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Server already running. Joining own game.");
         }
     }
 
@@ -58,14 +53,18 @@ public class GameServer extends Thread {
                 //New client has connected, give that client info of all other clients
                 //and their location.
                 connectedClients.put(ipAddress, content);
+                clientDeaths.put(ipAddress, 0);
                 for (String id : connectedClients.keySet()) {
                     String[] info = connectedClients.get(id).split(":");
-                    sendData((info[0] + ":CONNECT:" + info[2] + ":" + info[3] + ":" + info[4] + ":" + info[5] + ":" + B2DVars.BIT_OPPONENT + ":" + B2DVars.ID_OPPONENT + ":red").getBytes(), id);
+                    sendData((info[0] + ":CONNECT:" + info[2] + ":" + info[3] + ":" + info[4] + ":" + info[5] + ":" + B2DVars.BIT_OPPONENT + ":" + B2DVars.ID_OPPONENT + ":red"+":"+clientDeaths.get(id)).getBytes(), id);
                 }
                 System.out.println("CLIENT[" + ipAddress + "] connected.");
             }
             if (segments[1].equals("MOVE")) {
                 connectedClients.put(ipAddress, content);
+            }
+            if(segments[1].equals("DEATH")){
+                clientDeaths.put(ipAddress, clientDeaths.get(ipAddress)+1);
             }
             if (segments[1].equals("DISCONNECT")) {
                 //Client has disconnected
