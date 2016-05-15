@@ -10,8 +10,8 @@ import com.game.bb.handlers.B2DVars;
  * Created by erik on 15/05/16.
  */
 public class SPPower extends SPSprite{
-    public SPPower(World world) {
-        super(world);
+    public SPPower(World world, String ID) {
+        super(world, ID);
     }
 
     private void createBody(float xPos, float yPos){

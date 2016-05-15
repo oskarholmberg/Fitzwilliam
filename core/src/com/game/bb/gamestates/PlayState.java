@@ -73,7 +73,7 @@ public class PlayState extends GameState {
 
         //Players
         player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM,
-                B2DVars.CAM_HEIGHT / B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
+                B2DVars.CAM_HEIGHT / B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue", newEntityID());
 
 
         // set up box2d cam
@@ -112,7 +112,7 @@ public class PlayState extends GameState {
             }
         }
     }
-    private String newEntityID(){
+    public String newEntityID(){
         String[] split = entityID.split(":");
         entityID = split[0] + (Integer.valueOf(split[1]) + 1);
         return entityID;
@@ -186,7 +186,7 @@ public class PlayState extends GameState {
             } else if (action[1].equals("CONNECT")) {
                 if (getOpponent(action[0]) == null) {
                     SPPlayer newOpponent = new SPPlayer(world, action[0], floats[2], floats[3],
-                            Short.valueOf(action[6]), action[7], action[8]);
+                            Short.valueOf(action[6]), action[7], action[8], action[9]);
                     opponents.add(newOpponent);
                     hud.setOpponentDeath(action[0], action[9]);
                     newOpponent.jump(floats[0], floats[1], floats[2], floats[3]);
@@ -270,7 +270,6 @@ public class PlayState extends GameState {
 
     private void grenadeBounces() {
         for (Body b : cl.getGrenadeBounces()) {
-            System.out.println("Bounciebounce");
             if ( ((SPGrenade) b.getUserData()).finishedBouncing()){
                 worldEntities.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);

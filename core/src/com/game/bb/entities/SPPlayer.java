@@ -23,8 +23,9 @@ public class SPPlayer extends SPSprite {
     private String id;
     private int xOffset = 23, yOffset = 25;
 
-    public SPPlayer(World world, String id, float xPos, float yPos, short bodyBIT, String bodyType, String color) {
-        super(world);
+    public SPPlayer(World world, String id, float xPos, float yPos, short bodyBIT,
+                    String bodyType, String color, String ID) {
+        super(world, ID);
         createPlayer(xPos, yPos, bodyBIT, bodyType);
         this.id = id;
         sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
