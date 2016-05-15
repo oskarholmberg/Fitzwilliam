@@ -3,6 +3,7 @@ package com.game.bb.entities;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -22,7 +23,9 @@ public class SPGrenade extends SPSprite {
         super(world, ID);
         this.dir=dir;
         createGrenadeBody(xPos+dir*getPosXoffset, yPos-posYoffset, dir);
-        setTexture(new Texture("images/weapons/redBullet.png"));
+        Texture pulsingGrenade = new Texture("images/weapons/redGrenade.png");
+        TextureRegion[][] regions = TextureRegion.split(pulsingGrenade, 30, 1);
+        animation = Animation(0.5f, regions);
     }
 
     public float getDir(){
@@ -40,7 +43,6 @@ public class SPGrenade extends SPSprite {
         }
     }
     public boolean finishedBouncing(){
-        System.out.println("I've bounced: " + amountBounces + " times");
         if (amountBounces > 5)
             return true;
         amountBounces++;
