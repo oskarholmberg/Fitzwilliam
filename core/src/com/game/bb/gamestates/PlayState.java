@@ -55,8 +55,6 @@ public class PlayState extends GameState {
     public PlayState(GameStateManager gsm) {
         super(gsm);
 
-        mon = new PlayStateNetworkMonitor(this);
-
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
 
@@ -75,7 +73,7 @@ public class PlayState extends GameState {
 
         //Players
         player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM,
-                B2DVars.CAM_HEIGHT/B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
+                B2DVars.CAM_HEIGHT / B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
 
 
         // set up box2d cam
@@ -100,7 +98,7 @@ public class PlayState extends GameState {
         }
     }
 
-    private void throwGrenade(){
+    private void throwGrenade() {
         if (amntGrenades > 0 && !player.isDead()) {
             String ID = newEntityID();
             mon.sendPlayerAction("GRENADE", 0, 0, Float.toString(lastJumpDirection),
@@ -108,7 +106,7 @@ public class PlayState extends GameState {
             Vector2 pos = player.getPosition();
             worldEntities.add(new SPGrenade(world, pos.x, pos.y, lastJumpDirection, ID));
             amntGrenades--;
-            if (amntGrenades == 0){
+            if (amntGrenades == 0) {
                 grenadesIsEmpty = true;
                 grenadeRefresh = 0;
             }
@@ -158,7 +156,7 @@ public class PlayState extends GameState {
             SPInput.down = false;
             shoot();
         }
-        if (SPInput.isPressed(SPInput.BUTTON_E)){
+        if (SPInput.isPressed(SPInput.BUTTON_E)) {
 
             throwGrenade();
         }
@@ -231,8 +229,8 @@ public class PlayState extends GameState {
     private void respawnPlayer() {
         respawnTimer = 0;
         player.revive();
-        player.jump(0, 0, ((((B2DVars.CAM_WIDTH-100) / B2DVars.PPM) * (float) Math.random() +50 )/ B2DVars.PPM),
-                (B2DVars.CAM_HEIGHT / B2DVars.PPM) - B2DVars.PLAYER_HEIGHT/2);
+        player.jump(0, 0, ((((B2DVars.CAM_WIDTH - 100) / B2DVars.PPM) * (float) Math.random() + 50) / B2DVars.PPM),
+                (B2DVars.CAM_HEIGHT / B2DVars.PPM) - B2DVars.PLAYER_HEIGHT / 2);
         mon.sendPlayerAction("RESPAWN", 0, 0);
         cl.resetJumps();
         cl.revivePlayer();
@@ -270,8 +268,8 @@ public class PlayState extends GameState {
         cl.clearBulletList();
     }
 
-    private void grenadeBounces(){
-        for (Body b : cl.getGrenadeBounces()){
+    private void grenadeBounces() {
+        for (Body b : cl.getGrenadeBounces()) {
             System.out.println("Bounciebounce");
             if ( ((SPGrenade) b.getUserData()).finishedBouncing()){
                 worldEntities.removeValue((SPSprite) b.getUserData(), true);
@@ -289,6 +287,10 @@ public class PlayState extends GameState {
             mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
                     cl.getKillingBullet().getID(), Float.toString(cl.getKillingBullet().getDir()));
         }
+    }
+
+    public void setNetworkMonitor(PlayStateNetworkMonitor mon) {
+        this.mon = mon;
     }
 
     @Override

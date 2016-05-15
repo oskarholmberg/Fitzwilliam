@@ -13,6 +13,7 @@ public class SPButton {
     private Texture texture;
     private float xPos, yPos, texWidth, texHeight;
     private OrthographicCamera cam;
+    private String info="";
 
     private Vector3 vector3;
     private boolean clicked;
@@ -49,4 +50,11 @@ public class SPButton {
         sb.end();
     }
 
+    public void setInfo(String server) {
+        info = server;
+    }
+
+    public String getInfo(){
+        return info;
+    }
 }

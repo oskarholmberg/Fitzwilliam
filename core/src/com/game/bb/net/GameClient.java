@@ -1,5 +1,6 @@
 package com.game.bb.net;
 
+import com.badlogic.gdx.utils.Array;
 import com.game.bb.handlers.B2DVars;
 
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 /**
  * Created by oskar on 5/11/16.
@@ -16,24 +18,21 @@ public class GameClient extends Thread {
 
     private InetAddress ipAddress;
     private DatagramSocket socket;
-    private int port;
-    private Disconnecter disconnecter;
+    private int port = 8080;
     private PlayStateNetworkMonitor mon;
 
-    public GameClient(PlayStateNetworkMonitor mon, String ipAddress, int port) {
-        this.port = port;
-        this.mon=mon;
-        disconnecter = new Disconnecter(this);
+    public GameClient(PlayStateNetworkMonitor mon, String ipAddress) {
+        this.mon = mon;
         try {
-            System.out.println("Connecting to " + ipAddress + ":" + port);
-            this.socket = new DatagramSocket();
             this.ipAddress = InetAddress.getByName(ipAddress);
-            System.out.println("Connection successful!");
-        } catch (SocketException e) {
-            e.printStackTrace();
+            socket = new DatagramSocket();
         } catch (UnknownHostException e) {
             e.printStackTrace();
+        } catch (SocketException e) {
+            e.printStackTrace();
         }
+        //Setup run hook to send a disconnect message when program is closed.
+        Runtime.getRuntime().addShutdownHook(new Thread(new Disconnecter(this)));
     }
 
     public void run() {
@@ -68,12 +67,8 @@ public class GameClient extends Thread {
     }
 
     protected void disconnect() {
-        byte[] disconnect = (B2DVars.MY_ID+":DISCONNECT").getBytes();
+        byte[] disconnect = (B2DVars.MY_ID + ":DISCONNECT").getBytes();
         sendData(disconnect);
-    }
-
-    public Runnable getDisconnecter() {
-        return disconnecter;
     }
 
     private static class Disconnecter implements Runnable {
