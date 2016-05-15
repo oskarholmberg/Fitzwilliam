@@ -2,6 +2,8 @@
 	Check direction for bouncing grenades through getLinearVelocity.x
 	and fix proper death texture.
 	Remove own grenades when they hit.
+	Create content/assets class for startup load.
+	Read about real time game synch.
 
 ##Network##
 	Send relevant information when connecting.

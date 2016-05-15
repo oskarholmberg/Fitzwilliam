@@ -46,7 +46,8 @@ public class PlayState extends GameState {
     private float respawnTimer = 0;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
-    private Sound reload = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
+    private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
+    private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
     private PlayStateNetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
@@ -82,6 +83,8 @@ public class PlayState extends GameState {
     }
 
     public void shoot() {
+        if(clipIsEmpty)
+            emptyClipSound.play();
         if (amntBullets > 0 && !player.isDead()) {
             String ID = newEntityID();
             mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection),
@@ -250,7 +253,7 @@ public class PlayState extends GameState {
             amntBullets = B2DVars.AMOUNT_BULLET;
             clipIsEmpty = false;
             hud.setAmountBulletsLeft(amntBullets);
-            reload.play();
+            reloadSound.play();
         } else {
             bulletRefresh += dt;
         }
