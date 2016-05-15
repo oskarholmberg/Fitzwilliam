@@ -114,7 +114,7 @@ public class PlayState extends GameState {
     }
     public String newEntityID(){
         String[] split = entityID.split(":");
-        entityID = split[0] + (Integer.valueOf(split[1]) + 1);
+        entityID = split[0] + ":" +(Integer.valueOf(split[1]) + 1);
         return entityID;
     }
 
