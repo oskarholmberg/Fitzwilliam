@@ -22,5 +22,5 @@ public class B2DVars {
     public static final float PLAYER_HEIGHT = 22/PPM, PLAYER_WIDTH = 18/PPM;
 
     public static final String ID_FOOT = "foot", ID_PLAYER = "player", ID_OPPONENT = "opponent",
-    ID_GROUND = "ground", ID_BULLET = "bullet";
+    ID_GROUND = "ground", ID_BULLET = "bullet";;
 }

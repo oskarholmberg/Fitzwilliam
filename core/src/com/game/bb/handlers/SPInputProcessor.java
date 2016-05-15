@@ -12,7 +12,6 @@ public class SPInputProcessor extends InputAdapter{
         SPInput.x = x;
         SPInput.y = y;
         SPInput.down = true;
-        System.out.println(x);
         return true;
     }
 

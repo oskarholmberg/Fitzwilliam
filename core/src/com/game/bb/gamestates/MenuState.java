@@ -56,7 +56,6 @@ public class MenuState extends GameState {
         if (playButton.isClicked()) {
             Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
             sound.play();
-            System.out.println("Game button clicked!");
             gsm.setState(1);
         }
     }

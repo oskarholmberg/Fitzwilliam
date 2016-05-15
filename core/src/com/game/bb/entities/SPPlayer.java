@@ -27,7 +27,7 @@ public class SPPlayer extends SPSprite {
         super(world);
         createPlayer(xPos, yPos, bodyBIT, bodyType);
         this.id=id;
-        sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jump.wav"));
+        sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
         loadTexture(color);
         setTexture(onGroundRight);
     }
@@ -48,9 +48,18 @@ public class SPPlayer extends SPSprite {
         }
     }
 
-    public void kill(){
+    /**
+     * Kills the Player and sets it status to dead.
+     * @param dir, the direction of the bullet causing the killing blow.
+     */
+    public void kill(float dir){
         isDead = true;
-        setTexture(deadRight);
+        if(dir < 0 ){
+            setTexture(deadRight);
+        }
+        else{
+            setTexture(deadLeft);
+        }
     }
 
     public void revive(){
@@ -82,10 +91,6 @@ public class SPPlayer extends SPSprite {
             sb.draw(texture, x-xOffset, y-yOffset, 54, 48);
             sb.end();
         }
-    }
-
-    public void shoot(){
-
     }
 
     @Override

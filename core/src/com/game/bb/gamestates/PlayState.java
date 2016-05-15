@@ -1,6 +1,7 @@
 package com.game.bb.gamestates;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -48,11 +49,11 @@ public class PlayState extends GameState {
     private float respawnTimer = 0;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
+    private Sound reload = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
-    private int debugShoot = 0, debugRemoveBullet = 0; // remove these variables
     private NetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
-    private boolean clipIsEmpty=false;
+    private boolean clipIsEmpty = false;
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -93,10 +94,9 @@ public class PlayState extends GameState {
             mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection));
             amntBullets--;
             hud.setAmountBulletsLeft(amntBullets);
-            debugShoot++; // deb var... remove later
-            if (amntBullets==0) {
+            if (amntBullets == 0) {
                 clipIsEmpty = true;
-                bulletRefresh=0;
+                bulletRefresh = 0;
             }
         }
     }
@@ -106,7 +106,7 @@ public class PlayState extends GameState {
         bullets.add(bullet);
     }
 
-    public Vector2 playerPosition(){
+    public Vector2 playerPosition() {
         return player.getPosition();
     }
 
@@ -144,21 +144,26 @@ public class PlayState extends GameState {
             else if (action[1].equals("SHOOT") && opponent != null)
                 opponentShot(floats[2], floats[3], Float.valueOf(action[6]));
             else if (action[1].equals("DEATH") && opponent != null) {
-                hud.setOpponentDeath(action[1], action[6]);
-                opponent.kill();
+                hud.setOpponentDeath(action[0], action[6]);
+                opponent.kill(1);
             } else if (action[1].equals("RESPAWN") && opponent != null) {
                 opponent.revive();
                 opponent.jump(floats[0], floats[1],
                         floats[2], floats[3]);
             } else if (action[1].equals("CONNECT")) {
                 if (getOpponent(action[0]) == null) {
-                    System.out.println("Opponent added at: " + action[4] + ":" + action[5]);
-                    opponents.add(new SPPlayer(world, action[0], floats[2], floats[3], Short.valueOf(action[6]), action[7], action[8]));
+                    SPPlayer newOpponent = new SPPlayer(world, action[0], floats[2], floats[3], Short.valueOf(action[6]), action[7], action[8]);
+                    opponents.add(newOpponent);
+                    hud.setOpponentDeath(action[0], "0");
+                    newOpponent.jump(floats[0], floats[1], floats[2], floats[3]);
                 }
             } else if (action[1].equals("DISCONNECT")) {
                 opponent = getOpponent(action[0]);
-                opponents.removeValue(opponent, false);
-                world.destroyBody(opponent.getBody());
+                if (opponent != null) {
+                    opponents.removeValue(opponent, false);
+                    hud.removeOpponentDeathCount(action[0]);
+                    world.destroyBody(opponent.getBody());
+                }
             }
         }
     }
@@ -181,7 +186,7 @@ public class PlayState extends GameState {
     private void respawnPlayer() {
         respawnTimer = 0;
         player.revive();
-        player.jump(0, 0, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM, B2DVars.CAM_HEIGHT/B2DVars.PPM);
+        player.jump(0, 0, (B2DVars.CAM_WIDTH / 2 / B2DVars.PPM) * (float) Math.random(), B2DVars.CAM_HEIGHT / B2DVars.PPM);
         mon.sendPlayerAction("RESPAWN", 0, 0);
         cl.resetJumps();
         cl.revivePlayer();
@@ -190,8 +195,9 @@ public class PlayState extends GameState {
     private void refreshBullets(float dt) {
         if (bulletRefresh > 3f && clipIsEmpty) {
             amntBullets = 3;
-            clipIsEmpty=false;
+            clipIsEmpty = false;
             hud.setAmountBulletsLeft(amntBullets);
+            reload.play();
         } else {
             bulletRefresh += dt;
         }
@@ -199,23 +205,22 @@ public class PlayState extends GameState {
 
     public void removeDeadBodies() {
         for (Body b : cl.getBodiesToRemove()) {
-            debugRemoveBullet++;
-            System.out.println("I removed a bullet! Good job me. Bullets shot: " + debugShoot + " Bullets removed: " + debugRemoveBullet);
-            bullets.removeValue((SPBullet) b.getUserData(), true);
-            world.destroyBody(b);
+            if (b.getUserData() instanceof SPBullet) {
+                bullets.removeValue((SPBullet) b.getUserData(), true);
+                world.destroyBody(b);
+            }
         }
         cl.clearBulletList();
     }
 
     private void playerHit() {
         if (!player.isDead()) {
-            player.kill();
+            player.kill(1);
             hud.addPlayerDeath();
             //In this addAction add the ID of the killing bullet last
             mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount());
         }
     }
-
 
     @Override
     public void update(float dt) {
@@ -258,7 +263,7 @@ public class PlayState extends GameState {
         hud.render(sb);
 
         //Do this last in render
-        //b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+//        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         sb.setProjectionMatrix(cam.combined);
     }
 

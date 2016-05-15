@@ -18,10 +18,13 @@ import com.game.bb.handlers.B2DVars;
 public class SPBullet extends SPSprite {
 
     private int offset = 0;
+    private float posYoffset = 5/B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
+    private float dir;
 
     public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful) {
         super(world);
-        createBullet(xPos, yPos, dir, harmful);
+        this.dir=dir;
+        createBullet(xPos+dir*getPosXoffset, yPos-posYoffset, dir, harmful);
         Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
         sound.play();
         if (harmful) {
@@ -33,8 +36,8 @@ public class SPBullet extends SPSprite {
         }
     }
 
-    public float getXPos(){
-        return body.getPosition().x;
+    public float getDir(){
+        return dir;
     }
 
     @Override
@@ -57,7 +60,7 @@ public class SPBullet extends SPSprite {
         if (harmful) {
             fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND;
         } else {
-            fdef.filter.maskBits = B2DVars.BIT_GROUND |B2DVars.BIT_OPPONENT;
+            fdef.filter.maskBits = B2DVars.BIT_OPPONENT | B2DVars.BIT_GROUND;
         }
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
