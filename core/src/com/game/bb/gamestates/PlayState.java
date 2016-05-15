@@ -85,7 +85,7 @@ public class PlayState extends GameState {
             Vector2 pos = player.getPosition();
             SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false);
             bullets.add(bullet);
-            mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection));
+            mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection), Float.toString(System.currentTimeMillis()));
             amntBullets--;
             hud.setAmountBulletsLeft(amntBullets);
             if (amntBullets == 0) {
@@ -95,7 +95,9 @@ public class PlayState extends GameState {
         }
     }
 
-    public void opponentShot(float xPos, float yPos, float dir) {
+    public void opponentShot(float xPos, float yPos, float dir, float timeSync) {
+        float timeDiff = System.currentTimeMillis() - timeSync;
+        xPos = xPos + (B2DVars.PH_BULLET_SPEED * timeDiff/1000) / B2DVars.PPM;
         SPBullet bullet = new SPBullet(world, xPos, yPos, dir, true);
         bullets.add(bullet);
     }
@@ -136,7 +138,7 @@ public class PlayState extends GameState {
                 opponent.jump(floats[0], floats[1],
                         floats[2], floats[3]);
             else if (action[1].equals("SHOOT") && opponent != null)
-                opponentShot(floats[2], floats[3], Float.valueOf(action[6]));
+                opponentShot(floats[2], floats[3], Float.valueOf(action[6]), Float.valueOf(action[7]));
             else if (action[1].equals("DEATH") && opponent != null) {
                 hud.setOpponentDeath(action[0], action[6]);
                 opponent.kill(1);

@@ -68,7 +68,7 @@ public class SPBullet extends SPSprite {
         body = world.createBody(bdef);
         body.setGravityScale(0f);
         body.createFixture(fdef).setUserData(B2DVars.ID_BULLET);
-        body.setLinearVelocity(200f * dir / B2DVars.PPM, 0);
+        body.setLinearVelocity(B2DVars.PH_BULLET_SPEED * dir / B2DVars.PPM, 0);
         body.setUserData(this);
     }
 }
