@@ -49,10 +49,10 @@ public class PlayState extends GameState {
     private OrthogonalTiledMapRenderer tmr;
     private boolean clipIsEmpty = false;
 
-    public PlayState(GameStateManager gsm, String ipAddress, int port) {
+    public PlayState(GameStateManager gsm) {
         super(gsm);
 
-        mon = new PlayStateNetworkMonitor(this, ipAddress, port);
+        mon = new PlayStateNetworkMonitor(this);
 
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
