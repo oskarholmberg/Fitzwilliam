@@ -284,7 +284,7 @@ public class PlayState extends GameState {
             hud.addPlayerDeath();
             //In this addAction add the ID of the killing bullet last
             mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
-                    cl.getKillingBullet().getID(), Float.toString(cl.getKillingBullet().getDir()));
+                    cl.getKillingEntity().getID(), Float.toString(cl.getKillingEntity().getDirection()));
         }
     }
 

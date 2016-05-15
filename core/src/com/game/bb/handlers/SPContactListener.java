@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Array;
 import com.game.bb.entities.SPBullet;
+import com.game.bb.entities.SPSprite;
 
 /**
  * Created by erik on 08/05/16.
@@ -96,10 +97,8 @@ public class SPContactListener implements ContactListener {
         playerHit = false;
     }
 
-    public SPBullet getKillingBullet() {
-        if (killingBullet.getBody().getUserData() instanceof SPBullet)
-            return (SPBullet) killingBullet.getBody().getUserData();
-        return null;
+    public SPSprite getKillingEntity() {
+        return ((SPSprite) killingBullet.getBody().getUserData());
     }
 
     public boolean canJump() {
