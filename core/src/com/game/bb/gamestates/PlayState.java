@@ -2,7 +2,6 @@ package com.game.bb.gamestates;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -40,7 +39,7 @@ public class PlayState extends GameState {
     private SPContactListener cl;
     private SPPlayer player;
     private Array<SPPlayer> opponents;
-    private int amntBullets = 3, amntGrenades = 2;
+    private int amntBullets = 3, amntGrenades = 1;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
     private Array<SPSprite> worldEnteties;
     private float respawnTimer = 0;
@@ -216,7 +215,7 @@ public class PlayState extends GameState {
         cl.revivePlayer();
     }
 
-    private void refreshBullets(float dt) {
+    private void refreshAmmo(float dt) {
         if (bulletRefresh > 3f && clipIsEmpty) {
             amntBullets = 3;
             clipIsEmpty = false;
@@ -225,8 +224,8 @@ public class PlayState extends GameState {
         } else {
             bulletRefresh += dt;
         }
-        if (grenadeRefresh > 5f && grenadesIsEmpty) {
-            amntGrenades = 2;
+        if (grenadeRefresh > 8f && grenadesIsEmpty) {
+            amntGrenades = 1;
             grenadesIsEmpty = false;
         } else {
             grenadeRefresh += dt;
@@ -283,7 +282,7 @@ public class PlayState extends GameState {
             player.update(dt);
         }
         opponentActions();
-        refreshBullets(dt);
+        refreshAmmo(dt);
         if (cl.isPlayerHit()) {
             playerHit();
         }
