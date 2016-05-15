@@ -52,10 +52,10 @@ public class PlayState extends GameState {
     private OrthogonalTiledMapRenderer tmr;
     private boolean clipIsEmpty = false, grenadesIsEmpty = false;
 
-    public PlayState(GameStateManager gsm, String ipAddress, int port) {
+    public PlayState(GameStateManager gsm) {
         super(gsm);
 
-        mon = new PlayStateNetworkMonitor(this, ipAddress, port);
+        mon = new PlayStateNetworkMonitor(this);
 
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
@@ -211,8 +211,8 @@ public class PlayState extends GameState {
     private void respawnPlayer() {
         respawnTimer = 0;
         player.revive();
-        player.jump(0, 0, (B2DVars.CAM_WIDTH / 2 / B2DVars.PPM) * (float) Math.random() + 100 / B2DVars.PPM,
-                B2DVars.CAM_HEIGHT / B2DVars.PPM);
+        player.jump(0, 0, (((B2DVars.CAM_WIDTH-100) / B2DVars.PPM) * (float) Math.random() / B2DVars.PPM) + 50,
+                (B2DVars.CAM_HEIGHT / B2DVars.PPM) - B2DVars.PLAYER_HEIGHT/2);
         mon.sendPlayerAction("RESPAWN", 0, 0);
         cl.resetJumps();
         cl.revivePlayer();

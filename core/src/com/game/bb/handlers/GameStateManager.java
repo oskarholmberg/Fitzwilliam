@@ -15,8 +15,6 @@ import java.util.Stack;
 public class GameStateManager {
     private Game game;
     private Stack<GameState> states;
-    private String ipAddress = "127.0.1.1";
-    private int port = 8080;
     private boolean hosting = false;
     public static final int PLAY = 1, START_SCREEN = 2, CONNECTION_STATE = 3;
 
@@ -43,9 +41,9 @@ public class GameStateManager {
     private GameState getState(int state) {
         if (state == PLAY) {
             if (hosting) {
-                new GameServer(port).start();
+                new GameServer().start();
             }
-            return new PlayState(this, ipAddress, port);
+            return new PlayState(this);
         } else if (state == START_SCREEN) {
             return new StartScreenState(this);
         } else if (state == CONNECTION_STATE) {
