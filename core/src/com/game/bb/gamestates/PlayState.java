@@ -118,7 +118,7 @@ public class PlayState extends GameState {
             mon.sendPlayerAction("MOVE", B2DVars.PH_JUMPX, B2DVars.PH_JUMPY);
             lastJumpDirection = 1;
         }
-        if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
+        else if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x < touchNbrs[0] && cl.canJump()) {
             SPInput.down = false;
             player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);

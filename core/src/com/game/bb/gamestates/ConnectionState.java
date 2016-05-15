@@ -18,24 +18,23 @@ import com.game.bb.net.NetworkMonitor;
 /**
  * Created by erik on 12/05/16.
  */
-public class MenuState extends GameState {
+public class ConnectionState extends GameState {
 
-    private SPButton playButton;
+    private SPButton hostButton, joinButton;
     private World world;
     private Texture background = new Texture("images/spaceBackground.png");
     private Array<FallingBody> itRains;
     private float newFallingBody = 0f;
 
 
-    public MenuState(final GameStateManager gsm) {
+    public ConnectionState(GameStateManager gsm) {
         super(gsm);
 
         world = new World(new Vector2(0, -9.81f), true);
         itRains = new Array<FallingBody>();
 
-
-        playButton = new SPButton(new Texture("images/button/playButton.png"),
-                B2DVars.CAM_WIDTH / 2, B2DVars.CAM_HEIGHT / 2, cam);
+        hostButton = new SPButton(new Texture("images/button/hostButton.png"), B2DVars.CAM_WIDTH/2, (B2DVars.CAM_HEIGHT/2)+100, cam);
+        joinButton = new SPButton(new Texture("images/button/joinButton.png"), B2DVars.CAM_WIDTH/2, (B2DVars.CAM_HEIGHT/2), cam);
         fallingBody();
     }
 
@@ -54,10 +53,10 @@ public class MenuState extends GameState {
 
     @Override
     public void handleInput() {
-        if (playButton.isClicked()) {
+        if (hostButton.isClicked()) {
             Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
             sound.play();
-            gsm.setState(1);
+            gsm.setState(GameStateManager.PLAY);
         }
     }
 
@@ -71,7 +70,7 @@ public class MenuState extends GameState {
             newFallingBody+=dt;
         }
         world.step(dt, 6, 2);
-        playButton.update(dt);
+        hostButton.update(dt);
     }
 
     @Override
@@ -82,7 +81,7 @@ public class MenuState extends GameState {
         sb.end();
         for (FallingBody body : itRains)
             body.render(sb);
-        playButton.render(sb);
+        hostButton.render(sb);
     }
 
     @Override
