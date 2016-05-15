@@ -34,7 +34,7 @@ public class PlayStateNetworkMonitor {
         String initConnect = B2DVars.MY_ID + ":" + "CONNECT" + ":" + "0" + ":" + "0" +
                 ":" + B2DVars.CAM_WIDTH / 2 / B2DVars.PPM +
                 ":" + B2DVars.CAM_HEIGHT / B2DVars.PPM + ":" + B2DVars.BIT_OPPONENT +
-                ":" + B2DVars.ID_OPPONENT + ":" + "red" + ps.newEntityID();
+                ":" + B2DVars.ID_OPPONENT + ":" + "red:0:" + ps.newEntityID();
         client.sendData(initConnect.getBytes());
     }
 
