@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class GameServer extends Thread {
 
     private DatagramSocket socket;
     private HashMap<String, String> connectedClients;
+    private MulticastSocket multiSocket;
     private String ipAddress;
 
     public GameServer(int port) {
@@ -29,6 +31,13 @@ public class GameServer extends Thread {
             this.socket = new DatagramSocket(port);
             System.out.println("Success! Server listening on port: " + port);
         } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        try {
+            multiSocket = new MulticastSocket(8082);
+            InetAddress group = InetAddress.getByName("224.0.0.20");
+            multiSocket.joinGroup(group);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

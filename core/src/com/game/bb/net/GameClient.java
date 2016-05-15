@@ -1,9 +1,6 @@
 package com.game.bb.net;
 
 import com.game.bb.handlers.B2DVars;
-import com.game.bb.handlers.GameStateManager;
-import com.game.bb.main.Game;
-import com.sun.org.apache.xpath.internal.SourceTree;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -11,8 +8,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-
-import javax.xml.crypto.Data;
 
 /**
  * Created by oskar on 5/11/16.
@@ -23,9 +18,9 @@ public class GameClient extends Thread {
     private DatagramSocket socket;
     private int port;
     private Disconnecter disconnecter;
-    private NetworkMonitor mon;
+    private PlayStateNetworkMonitor mon;
 
-    public GameClient(NetworkMonitor mon, String ipAddress, int port) {
+    public GameClient(PlayStateNetworkMonitor mon, String ipAddress, int port) {
         this.port = port;
         this.mon=mon;
         disconnecter = new Disconnecter(this);

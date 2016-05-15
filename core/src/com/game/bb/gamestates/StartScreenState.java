@@ -17,7 +17,7 @@ import com.game.bb.handlers.GameStateManager;
 /**
  * Created by erik on 12/05/16.
  */
-public class MenuState extends GameState {
+public class StartScreenState extends GameState {
 
     private SPButton playButton;
     private World world;
@@ -26,7 +26,7 @@ public class MenuState extends GameState {
     private float newFallingBody = 0f;
 
 
-    public MenuState(final GameStateManager gsm) {
+    public StartScreenState(GameStateManager gsm) {
         super(gsm);
 
         world = new World(new Vector2(0, -9.81f), true);
@@ -56,7 +56,7 @@ public class MenuState extends GameState {
         if (playButton.isClicked()) {
             Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
             sound.play();
-            gsm.setState(1);
+            gsm.setState(GameStateManager.CONNECTION_STATE);
         }
     }
 

@@ -5,23 +5,17 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.ChainShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
-import com.game.bb.net.NetworkMonitor;
+import com.game.bb.net.PlayStateNetworkMonitor;
 
 
 /**
@@ -51,14 +45,14 @@ public class PlayState extends GameState {
     private Texture backGround = new Texture("images/spaceBackground.png");
     private Sound reload = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
-    private NetworkMonitor mon;
+    private PlayStateNetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
     private boolean clipIsEmpty = false;
 
-    public PlayState(GameStateManager gsm) {
+    public PlayState(GameStateManager gsm, String ipAddress, int port) {
         super(gsm);
 
-        mon = new NetworkMonitor(this);
+        mon = new PlayStateNetworkMonitor(this, ipAddress, port);
 
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());

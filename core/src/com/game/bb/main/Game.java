@@ -29,7 +29,7 @@ public class Game extends ApplicationAdapter {
 
         Gdx.input.setInputProcessor(new SPInputProcessor());
 
-        gsm = new com.game.bb.handlers.GameStateManager(this, "localhost", 8080);
+        gsm = new com.game.bb.handlers.GameStateManager(this);
 	}
 
 
