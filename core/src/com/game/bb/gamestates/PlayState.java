@@ -55,8 +55,6 @@ public class PlayState extends GameState {
     public PlayState(GameStateManager gsm) {
         super(gsm);
 
-        mon = new PlayStateNetworkMonitor(this);
-
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
 
@@ -75,7 +73,7 @@ public class PlayState extends GameState {
 
         //Players
         player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM,
-                B2DVars.CAM_HEIGHT/B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
+                B2DVars.CAM_HEIGHT / B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue");
 
 
         // set up box2d cam
@@ -98,29 +96,29 @@ public class PlayState extends GameState {
         }
     }
 
-    private void throwGrenade(){
+    private void throwGrenade() {
         if (amntGrenades > 0 && !player.isDead()) {
             mon.sendPlayerAction("GRENADE", 0, 0, Float.toString(lastJumpDirection), Long.toString(System.currentTimeMillis()));
             Vector2 pos = player.getPosition();
             worldEnteties.add(new SPGrenade(world, pos.x, pos.y, lastJumpDirection));
             amntGrenades--;
-            if (amntGrenades == 0){
+            if (amntGrenades == 0) {
                 grenadesIsEmpty = true;
                 grenadeRefresh = 0;
             }
         }
     }
 
-    private void enemyGrenade(float xPos, float yPos, float dir, long timeSync){
+    private void enemyGrenade(float xPos, float yPos, float dir, long timeSync) {
         long timeDiff = System.currentTimeMillis() - timeSync;
-        xPos = xPos + (B2DVars.PH_GRENADE_X * timeDiff/1000) / B2DVars.PPM * dir;
-        yPos = yPos + (B2DVars.PH_GRENADE_Y * timeDiff/1000) / B2DVars.PPM;
+        xPos = xPos + (B2DVars.PH_GRENADE_X * timeDiff / 1000) / B2DVars.PPM * dir;
+        yPos = yPos + (B2DVars.PH_GRENADE_Y * timeDiff / 1000) / B2DVars.PPM;
         worldEnteties.add(new SPGrenade(world, xPos, yPos, dir));
     }
 
     public void opponentShot(float xPos, float yPos, float dir, long timeSync) {
         long timeDiff = System.currentTimeMillis() - timeSync;
-        xPos = xPos + (B2DVars.PH_BULLET_SPEED * timeDiff/1000) / B2DVars.PPM * dir;
+        xPos = xPos + (B2DVars.PH_BULLET_SPEED * timeDiff / 1000) / B2DVars.PPM * dir;
         SPBullet bullet = new SPBullet(world, xPos, yPos, dir, true);
         worldEnteties.add(bullet);
     }
@@ -149,7 +147,7 @@ public class PlayState extends GameState {
             SPInput.down = false;
             shoot();
         }
-        if (SPInput.isPressed(SPInput.BUTTON_E)){
+        if (SPInput.isPressed(SPInput.BUTTON_E)) {
 
             throwGrenade();
         }
@@ -211,8 +209,8 @@ public class PlayState extends GameState {
     private void respawnPlayer() {
         respawnTimer = 0;
         player.revive();
-        player.jump(0, 0, ((((B2DVars.CAM_WIDTH-100) / B2DVars.PPM) * (float) Math.random() +50 )/ B2DVars.PPM),
-                (B2DVars.CAM_HEIGHT / B2DVars.PPM) - B2DVars.PLAYER_HEIGHT/2);
+        player.jump(0, 0, ((((B2DVars.CAM_WIDTH - 100) / B2DVars.PPM) * (float) Math.random() + 50) / B2DVars.PPM),
+                (B2DVars.CAM_HEIGHT / B2DVars.PPM) - B2DVars.PLAYER_HEIGHT / 2);
         mon.sendPlayerAction("RESPAWN", 0, 0);
         cl.resetJumps();
         cl.revivePlayer();
@@ -240,8 +238,8 @@ public class PlayState extends GameState {
             if (b.getUserData() instanceof SPBullet) {
                 worldEnteties.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);
-            } else if (b.getUserData() instanceof SPGrenade){
-                if (((SPGrenade) b.getUserData()).finishedBouncing()){
+            } else if (b.getUserData() instanceof SPGrenade) {
+                if (((SPGrenade) b.getUserData()).finishedBouncing()) {
                     worldEnteties.removeValue((SPSprite) b.getUserData(), true);
                     world.destroyBody(b);
                 }
@@ -250,10 +248,10 @@ public class PlayState extends GameState {
         cl.clearBulletList();
     }
 
-    private void grenadeBounces(){
-        for (Body b : cl.getGrenadeBounces()){
+    private void grenadeBounces() {
+        for (Body b : cl.getGrenadeBounces()) {
             System.out.println("Bounciebounce");
-            if ( ((SPGrenade) b.getUserData()).finishedBouncing()){
+            if (((SPGrenade) b.getUserData()).finishedBouncing()) {
                 worldEnteties.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);
             }
@@ -268,6 +266,10 @@ public class PlayState extends GameState {
             //In this addAction add the ID of the killing bullet last
             mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount());
         }
+    }
+
+    public void setNetworkMonitor(PlayStateNetworkMonitor mon) {
+        this.mon = mon;
     }
 
     @Override

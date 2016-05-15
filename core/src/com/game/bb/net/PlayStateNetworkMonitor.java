@@ -18,46 +18,22 @@ public class PlayStateNetworkMonitor {
     private Array<String> opponentActions;
     private GameClient client;
     private PlayState ps;
-    private int port = 8080;
+    private String ipAddress;
 
-    public PlayStateNetworkMonitor(PlayState ps) {
+    public PlayStateNetworkMonitor(PlayState ps, String ipAddress) {
         this.ps = ps;
+        this.ipAddress = ipAddress;
         opponentActions = new Array<String>();
-        init(port);
+        init();
     }
 
-    private void init(int port) {
-        String serverIp = getServerIp();
+    private void init() {
         System.out.println("Starting client.");
-        client = new GameClient(this, serverIp, port);
+        client = new GameClient(this, ipAddress);
         client.start();
-        Runtime.getRuntime().addShutdownHook(new Thread(client.getDisconnecter()));
         String initConnect = B2DVars.MY_ID + ":" + "CONNECT" + ":" + "0" + ":" + "0" + ":" + B2DVars.CAM_WIDTH / 2 / B2DVars.PPM +
                 ":" + B2DVars.CAM_HEIGHT / B2DVars.PPM + ":" + B2DVars.BIT_OPPONENT + ":" + B2DVars.ID_OPPONENT + ":" + "red" + ":0";
         client.sendData(initConnect.getBytes());
-    }
-
-    private String getServerIp() {
-        try {
-            DatagramSocket socket = new DatagramSocket();
-            byte[] hello = "HELLO".getBytes();
-            DatagramPacket packet = new DatagramPacket(hello, hello.length, InetAddress.getByName("224.0.13.37"), port+1);
-            socket.send(packet);
-            System.out.println("Hello sent! Waiting for response.");
-            byte[] serverInfo = new byte[1024];
-            DatagramPacket received = new DatagramPacket(serverInfo, serverInfo.length);
-            socket.receive(received);
-            System.out.println("Server info received.");
-            return new String(received.getData()).trim();
-        } catch (SocketException e) {
-            e.printStackTrace();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
-
     }
 
     public float[] getPacketFloats(String[] split) {

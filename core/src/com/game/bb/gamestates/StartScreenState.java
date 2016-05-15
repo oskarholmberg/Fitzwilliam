@@ -56,7 +56,7 @@ public class StartScreenState extends GameState {
         if (playButton.isClicked()) {
             Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
             sound.play();
-            gsm.setState(GameStateManager.CONNECTION_STATE);
+            gsm.setState(GameStateManager.CONNECT);
         }
     }
 
