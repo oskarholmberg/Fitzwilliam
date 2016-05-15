@@ -1,6 +1,7 @@
 package com.game.bb.entities;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -15,12 +16,13 @@ public class SPGrenade extends SPSprite {
 
     private int offset = 0, amountBounces = 0;
     private float posYoffset = 5/B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
+    private Animation animation;
 
     public SPGrenade(World world, float xPos, float yPos, float dir, String ID) {
         super(world, ID);
         this.dir=dir;
         createGrenadeBody(xPos+dir*getPosXoffset, yPos-posYoffset, dir);
-        setTexture(new Texture("images/redBullet.png"));
+        setTexture(new Texture("images/weapons/redBullet.png"));
     }
 
     public float getDir(){
