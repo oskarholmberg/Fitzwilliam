@@ -73,7 +73,7 @@ public class SPPlayer extends SPSprite {
 
     @Override
     public void render(SpriteBatch sb){
-        if(texture != null) {
+        if(texture != null && !isDead) {
             sb.begin();
             float x = body.getPosition().x * B2DVars.PPM - B2DVars.PLAYER_WIDTH;
             float y = body.getPosition().y * B2DVars.PPM - B2DVars.PLAYER_HEIGHT;
