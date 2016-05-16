@@ -105,7 +105,6 @@ public class SPContactListener implements ContactListener {
     }
 
     public SPSprite getKillingEntity() {
-        System.out.println(killingEntity.getUserData());
         return (SPSprite) killingEntity.getBody().getUserData();
     }
 
