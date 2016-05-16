@@ -40,6 +40,7 @@ public class PlayState extends GameState {
     private SPContactListener cl;
     private SPPlayer player;
     private Array<SPPlayer> opponents;
+    private Array<Vector2> spawnLocations;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh, powerReload = 30f;
     private String entityID = B2DVars.MY_ID + "%0";
@@ -68,10 +69,11 @@ public class PlayState extends GameState {
         opponents = new Array<SPPlayer>();
         // create boundaries
 
-        String[] layers = {"moonLayer",  "domeLayer"};
-        MapBuilder mb = new MapBuilder(world, new TmxMapLoader().load("maps/moonWithDome.tmx"),
+        String[] layers = {"moonBlocks",  "domeBlocks"};
+        MapBuilder mb = new MapBuilder(world, new TmxMapLoader().load("maps/moonSpawnDome.tmx"),
                 new Vector2(cam.viewportWidth, cam.viewportHeight), layers, true);
         tmr = mb.buildMap();
+        spawnLocations = mb.getSpawnLocations();
 
         //Players
         player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM,
@@ -238,10 +240,10 @@ public class PlayState extends GameState {
     }
 
     private void respawnPlayer() {
+        Vector2 spawnLoc = spawnLocations.random();
         respawnTimer = 0;
         player.revive();
-        player.jump(0, 0, ((((B2DVars.CAM_WIDTH - 100) / B2DVars.PPM) * (float) Math.random() + 50) / B2DVars.PPM),
-                (B2DVars.CAM_HEIGHT / B2DVars.PPM) - B2DVars.PLAYER_HEIGHT / 2);
+        player.jump(0, 0, spawnLoc.x, spawnLoc.y);
         mon.sendPlayerAction("RESPAWN", 0, 0);
         amntBullets = B2DVars.AMOUNT_BULLET;
         amntGrenades = B2DVars.AMOUNT_GRENADE;

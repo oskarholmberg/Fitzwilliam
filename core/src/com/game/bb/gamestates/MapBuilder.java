@@ -3,6 +3,7 @@ package com.game.bb.gamestates;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.game.bb.handlers.B2DVars;
 
 /**
@@ -51,6 +53,22 @@ public class MapBuilder {
         body.createFixture(fdef).setUserData(B2DVars.ID_GROUND);
     }
 
+    public Array<Vector2> getSpawnLocations(){
+        Array<Vector2> spawnLocArray = new Array<Vector2>();
+        TiledMapTileLayer spawnLocs = (TiledMapTileLayer) tiledMap.getLayers().get("spawnBlocks");
+        float ts = spawnLocs.getTileWidth();
+
+        for (int row = 0; row < spawnLocs.getHeight(); row++) {
+            for (int col = 0; col < spawnLocs.getWidth(); col++) {
+                TiledMapTileLayer.Cell cell = spawnLocs.getCell(col, row);
+                if (cell == null || cell.getTile() == null) continue;
+
+                spawnLocArray.add(new Vector2((col + 0.5f) * ts / B2DVars.PPM, (row + 0.5f) * ts / B2DVars.PPM));
+            }
+        }
+        return spawnLocArray;
+    }
+
     public OrthogonalTiledMapRenderer buildMap(){
         for (String layerString : layers) {
             TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get(layerString);
@@ -80,12 +98,12 @@ public class MapBuilder {
                     cs.createChain(v);
                     FixtureDef fd = new FixtureDef();
                     fd.shape = cs;
-                    if (layerString.equals("moonLayer")) {
+                    if (layerString.equals(layers[0])) {
                         fd.filter.categoryBits = B2DVars.BIT_GROUND;
                         fd.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BULLET | B2DVars.BIT_OPPONENT
                                 | B2DVars.BIT_GRENADE | B2DVars.BIT_POWERUP;
                         world.createBody(bdef).createFixture(fd).setUserData(B2DVars.ID_GROUND);
-                    } else if (layerString.equals("domeLayer")){
+                    } else if (layerString.equals(layers[1])){
                         fd.filter.categoryBits = B2DVars.BIT_DOME;
                         fd.filter.maskBits = B2DVars.BIT_BULLET | B2DVars.BIT_GRENADE;
                         world.createBody(bdef).createFixture(fd).setUserData(B2DVars.ID_DOME);

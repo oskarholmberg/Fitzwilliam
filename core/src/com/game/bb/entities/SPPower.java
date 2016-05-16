@@ -33,7 +33,7 @@ public class SPPower extends SPSprite{
         fdef.filter.maskBits =  B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
-        bdef.gravityScale=0.5f;
+        bdef.gravityScale=0.2f;
         bdef.type = BodyDef.BodyType.DynamicBody; // Should be dynamic
         body = world.createBody(bdef);
         body.createFixture(fdef).setUserData(B2DVars.ID_POWERUP);

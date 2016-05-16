@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" nextobjectid="1">
+ <tileset firstgid="1" name="mapTileSet3" tilewidth="32" tileheight="32" tilecount="7" columns="7">
+  <image source="tileset/mapTileSet3.png" width="224" height="32"/>
+ </tileset>
+ <layer name="moonBlocks" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2BkA0YoHuyAEQ3jkxsK/hmJYKDjZqikD2zpmRpuppW5o2BwA1zxTmsMAIDYADs=
+  </data>
+ </layer>
+ <layer name="domeBlocks" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRMApGwWAGTEDMAsXMdLSXFYnNNgLspSYAADSgACQ=
+  </data>
+ </layer>
+ <layer name="spawnBlocks" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2DwAPaBdgAJAJdbh5IfRsEoGAxgNM+MLEBsfA/1dAEAreAAKw==
+  </data>
+ </layer>
+</map>
