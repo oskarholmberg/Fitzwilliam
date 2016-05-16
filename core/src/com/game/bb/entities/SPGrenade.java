@@ -21,6 +21,7 @@ public class SPGrenade extends SPSprite {
     private TextureRegion[] regions;
     private Texture grenade;
     private boolean opponentGrenade;
+    private float lifetime = 0f;
 
     public SPGrenade(World world, float xPos, float yPos, float dir, boolean opponentGrenade, String ID) {
         super(world, ID);
@@ -58,10 +59,12 @@ public class SPGrenade extends SPSprite {
         sb.end();
     }
 
-    public boolean finishedBouncing() {
-        if (amountBounces > 5)
+    public boolean lifeTimeReached(float dt) {
+        System.out.println(dt-lifetime);
+        lifetime+=dt;
+        if (lifetime > 5f) {
             return true;
-        amountBounces++;
+        }
         return false;
     }
 
