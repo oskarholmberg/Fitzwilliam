@@ -212,7 +212,7 @@ public class PlayState extends GameState {
             } else if (action[1].equals("GRENADE")) {
                 enemyGrenade(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]), action[8]);
             } else if (action[1].equals("UPDATE_GRENADE")){
-                updateGrenade(floats[2], floats[3], Float.valueOf(action[7]),
+                updateGrenade(floats[0], floats[1], Float.valueOf(action[7]),
                         Float.valueOf(action[8]), action[6]);
             }
         }
