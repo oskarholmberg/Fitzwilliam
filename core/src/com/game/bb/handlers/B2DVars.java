@@ -26,5 +26,5 @@ public class B2DVars {
 
     public static final String ID_FOOT = "foot", ID_PLAYER = "player", ID_OPPONENT = "opponent",
     ID_GROUND = "ground", ID_BULLET = "bullet", ID_GRENADE = "grenade", ID_DOME = "dome",
-    ID_POWERUP = "powerup";
+    ID_POWERUP = "powerup", ID_ENEMY_GRENADE = "enemygrenade";
 }
