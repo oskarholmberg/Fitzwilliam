@@ -58,7 +58,6 @@ public class PlayState extends GameState {
 
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
-        world.setContinuousPhysics(true);
 
         b2dr = new Box2DDebugRenderer();
 
