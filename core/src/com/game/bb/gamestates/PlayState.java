@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.maps.tiled.AtlasTmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -45,9 +46,9 @@ public class PlayState extends GameState {
     private Array<SPSprite> worldEntities;
     private float respawnTimer = 0;
     private HUD hud;
-    private Texture backGround = new Texture("images/spaceBackground.png");
-    private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
-    private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
+    private Texture backGround = Assets.TEX_BACKGROUND;
+    private Sound reloadSound = Assets.SOUND_RELOAD;
+    private Sound emptyClipSound = Assets.SOUND_EMPTY_CLIP;
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
     private PlayStateNetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
@@ -69,7 +70,7 @@ public class PlayState extends GameState {
         // create boundaries
 
         String[] layers = {"moonLayer",  "domeLayer"};
-        MapBuilder mb = new MapBuilder(world, new TmxMapLoader().load("maps/moonWithDome.tmx"),
+        MapBuilder mb = new MapBuilder(world, Assets.MAP_MOONDOME,
                 new Vector2(cam.viewportWidth, cam.viewportHeight), layers, true);
         tmr = mb.buildMap();
 
