@@ -334,7 +334,7 @@ public class PlayState extends GameState {
     @Override
     public void update(float dt) {
         handleInput();
-        world.step(dt, 6, 2);
+        grenadeBounces(dt);
         player.update(dt);
         for (SPPlayer player : opponents) {
             player.update(dt);
@@ -359,9 +359,9 @@ public class PlayState extends GameState {
                 respawnPlayer();
             }
         }
-        grenadeBounces(dt);
         //removeDeadBodies should always be last in update
         removeDeadBodies();
+        world.step(dt, 6, 2);
     }
 
     @Override
