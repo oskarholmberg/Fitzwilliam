@@ -288,7 +288,7 @@ public class PlayState extends GameState {
         for (Body b : cl.getBodiesToRemove()) {
             if (b.getUserData() instanceof SPGrenade &&
                     enemyGrenades.containsKey(((SPGrenade) b.getUserData()).getID())) {
-                enemyGrenades.remove(((SPGrenade) b.getUserData()).getID());
+                world.destroyBody(enemyGrenades.remove(((SPGrenade) b.getUserData()).getID()).getBody());
             } else if (b.getUserData() instanceof SPSprite) {
                 worldEntities.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);
