@@ -55,12 +55,14 @@ public class SPContactListener implements ContactListener {
             killingEntity = fb;
             bodiesToRemove.add(fb.getBody());
             // If a grenade touches player
-        } else if (fa.getUserData().equals(B2DVars.ID_GRENADE) && fb.getUserData().equals(B2DVars.ID_PLAYER)){
+        } else if ((fa.getUserData().equals(B2DVars.ID_GRENADE) || fa.getUserData().equals(B2DVars.ID_ENEMY_GRENADE))
+                && fb.getUserData().equals(B2DVars.ID_PLAYER)){
             killingEntity = fa;
             playerHit = true;
             bodiesToRemove.add(fa.getBody());
             // - || -
-        } else if (fb.getUserData().equals(B2DVars.ID_GRENADE) && fa.getUserData().equals(B2DVars.ID_PLAYER)){
+        } else if ((fb.getUserData().equals(B2DVars.ID_GRENADE) || fb.getUserData().equals(B2DVars.ID_ENEMY_GRENADE))
+                && fa.getUserData().equals(B2DVars.ID_PLAYER)){
             killingEntity = fb;
             playerHit = true;
             bodiesToRemove.add(fb.getBody());

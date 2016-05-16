@@ -286,7 +286,10 @@ public class PlayState extends GameState {
 
     private void removeDeadBodies() {
         for (Body b : cl.getBodiesToRemove()) {
-            if (b.getUserData() instanceof SPSprite) {
+            if (b.getUserData() instanceof SPGrenade &&
+                    enemyGrenades.containsKey(((SPGrenade) b.getUserData()).getID())) {
+                enemyGrenades.remove(((SPGrenade) b.getUserData()).getID());
+            } else if (b.getUserData() instanceof SPSprite) {
                 worldEntities.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);
             }
@@ -338,6 +341,9 @@ public class PlayState extends GameState {
         for(SPSprite sprite : worldEntities){
             sprite.update(dt);
         }
+        for(String id : enemyGrenades.keySet()){
+            enemyGrenades.get(id).update(dt);
+        }
         opponentActions();
         refreshAmmo(dt);
         if (cl.isPlayerHit()) {
@@ -371,6 +377,9 @@ public class PlayState extends GameState {
         }
         for (SPPlayer opponent : opponents) {
             opponent.render(sb);
+        }
+        for (String grenade : enemyGrenades.keySet()){
+            enemyGrenades.get(grenade).render(sb);
         }
         player.render(sb);
         hud.render(sb);
