@@ -11,9 +11,9 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-import com.game.bb.entities.SPBullet;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
+import com.sun.org.apache.xpath.internal.SourceTree;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -31,6 +31,7 @@ public class LobbyState extends GameState {
     private Array<String> servers;
     private World world;
     private Texture background = new Texture("images/spaceBackground.png");
+    private SPButton backbutton;
     private Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
     private Array<FallingBody> itRains;
     private float newFallingBody = 0f;
@@ -42,6 +43,7 @@ public class LobbyState extends GameState {
         world = new World(new Vector2(0, -9.81f), true);
         itRains = new Array<FallingBody>();
         joinButtons = new Array<SPButton>();
+        backbutton = new SPButton(new Texture("images/button/backButton.png"), B2DVars.CAM_WIDTH-100, B2DVars.CAM_HEIGHT-70, cam);
         servers = new Array<String>();
         searcher = new GameServerSearcher();
         searcher.start();
@@ -63,12 +65,20 @@ public class LobbyState extends GameState {
 
     @Override
     public void handleInput() {
+        if(backbutton.isClicked()){
+            System.out.println("Button clicked");
+            searcher.stopSearch();
+            System.out.println("Search stopped");
+            sound.play();
+            System.out.println("Returning to connect mode");
+            gsm.setState(GameStateManager.CONNECT);
+        }
         for (SPButton joinButton : joinButtons) {
             if(joinButton.isClicked()){
                 gsm.setIpAddress(joinButton.getInfo());
-                gsm.setState(GameStateManager.PLAY);
                 searcher.stopSearch();
                 sound.play();
+                gsm.setState(GameStateManager.PLAY);
             }
         }
     }
@@ -77,7 +87,8 @@ public class LobbyState extends GameState {
     public void update(float dt) {
         handleInput();
         servers = searcher.getServerList();
-        joinButtons = getButtons(servers);
+        joinButtons = getJoinButtons(servers);
+        backbutton.update(dt);
         if (newFallingBody > 1f) {
             fallingBody();
             newFallingBody = 0f;
@@ -96,12 +107,12 @@ public class LobbyState extends GameState {
         sb.begin();
         sb.draw(background, 0, 0);
         sb.end();
-
         for (FallingBody body : itRains)
             body.render(sb);
         for (SPButton button :joinButtons) {
             button.render(sb);
         }
+        backbutton.render(sb);
     }
 
     @Override
@@ -109,7 +120,7 @@ public class LobbyState extends GameState {
 
     }
 
-    private Array<SPButton> getButtons(Array<String> servers){
+    private Array<SPButton> getJoinButtons(Array<String> servers){
         Array<SPButton> buttons = new Array<SPButton>();
         int i = 0;
         for (String server : servers) {
@@ -183,11 +194,10 @@ public class LobbyState extends GameState {
         }
 
         public synchronized void stopSearch() {
-            socket.disconnect();
             socket.close();
         }
 
-        public Array<String> getServerList(){
+        public synchronized Array<String> getServerList(){
             return serverList;
         }
     }

@@ -286,7 +286,7 @@ public class PlayState extends GameState {
 
     private void grenadeBounces() {
         for (Body b : cl.getGrenadeBounces()) {
-            if ( b!=null && ((SPGrenade) b.getUserData()).finishedBouncing()){
+            if ( b.getUserData() instanceof SPGrenade && ((SPGrenade) b.getUserData()).finishedBouncing()){
                 worldEntities.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);
             }
@@ -357,7 +357,7 @@ public class PlayState extends GameState {
         hud.render(sb);
 
         //Do this last in render
-//        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         sb.setProjectionMatrix(cam.combined);
     }
 
