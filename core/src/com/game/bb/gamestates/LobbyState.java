@@ -31,6 +31,7 @@ public class LobbyState extends GameState {
     private Array<String> servers;
     private World world;
     private Texture background = new Texture("images/spaceBackground.png");
+    private Texture availableServers = new Texture("images/font/availableServers.png");
     private SPButton backbutton;
     private Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
     private Array<FallingBody> itRains;
@@ -43,7 +44,7 @@ public class LobbyState extends GameState {
         world = new World(new Vector2(0, -9.81f), true);
         itRains = new Array<FallingBody>();
         joinButtons = new Array<SPButton>();
-        backbutton = new SPButton(new Texture("images/button/backButton.png"), B2DVars.CAM_WIDTH - 100, B2DVars.CAM_HEIGHT - 70, cam);
+        backbutton = new SPButton(new Texture("images/button/backButton.png"), B2DVars.CAM_WIDTH - 100, B2DVars.CAM_HEIGHT - 100, 40f, 40f, cam);
         servers = new Array<String>();
         searcher = new GameServerSearcher();
         searcher.start();
@@ -113,6 +114,9 @@ public class LobbyState extends GameState {
             button.render(sb);
         }
         backbutton.render(sb);
+        sb.begin();
+        sb.draw(availableServers, 100, B2DVars.CAM_HEIGHT-120, 600, 30);
+        sb.end();
     }
 
     @Override
@@ -124,7 +128,7 @@ public class LobbyState extends GameState {
         Array<SPButton> buttons = new Array<SPButton>();
         int i = 0;
         for (String server : servers) {
-            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), B2DVars.CAM_WIDTH / 2, (B2DVars.CAM_HEIGHT - 200) - 50 * i, cam);
+            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), B2DVars.CAM_WIDTH/5, (B2DVars.CAM_HEIGHT - 180) - 50 * i, 200f, 20f, cam);
             button.setInfo(server);
             buttons.add(button);
             i++;

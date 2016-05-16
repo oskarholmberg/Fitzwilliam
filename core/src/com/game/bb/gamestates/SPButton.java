@@ -18,13 +18,13 @@ public class SPButton {
     private Vector3 vector3;
     private boolean clicked;
 
-    public SPButton(Texture texture, float xPos, float yPos, OrthographicCamera cam){
+    public SPButton(Texture texture, float xPos, float yPos, float width, float height, OrthographicCamera cam){
         this.texture=texture;
         this.xPos=xPos;
         this.yPos=yPos;
         this.cam=cam;
-        texWidth=texture.getWidth();
-        texHeight=texture.getHeight();
+        texWidth=width;
+        texHeight=height;
 
         vector3 = new Vector3();
 
@@ -46,7 +46,7 @@ public class SPButton {
 
     public void render(SpriteBatch sb){
         sb.begin();
-        sb.draw(texture, xPos - texWidth / 2, yPos - texHeight / 2);
+        sb.draw(texture, xPos - texWidth / 2, yPos - texHeight / 2, texWidth, texHeight);
         sb.end();
     }
 
