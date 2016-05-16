@@ -60,7 +60,6 @@ public class SPGrenade extends SPSprite {
     }
 
     public boolean lifeTimeReached(float dt) {
-        System.out.println(dt-lifetime);
         lifetime+=dt;
         if (lifetime > 5f) {
             return true;
