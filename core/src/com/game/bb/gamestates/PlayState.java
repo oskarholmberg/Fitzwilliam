@@ -20,6 +20,8 @@ import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
 import com.game.bb.net.PlayStateNetworkMonitor;
 
+import java.util.HashMap;
+
 
 /**
  * TODO LIST --
@@ -45,6 +47,7 @@ public class PlayState extends GameState {
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh, powerReload = 30f;
     private String entityID = B2DVars.MY_ID + "%0";
     private Array<SPSprite> worldEntities;
+    private HashMap<String, SPGrenade> enemyGrenades = new HashMap<String, SPGrenade>();
     private float respawnTimer = 0;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
@@ -132,7 +135,7 @@ public class PlayState extends GameState {
         long timeDiff = System.currentTimeMillis() - timeSync;
         xPos = xPos + (B2DVars.PH_GRENADE_X * timeDiff/1000) / B2DVars.PPM * dir;
         yPos = yPos + (B2DVars.PH_GRENADE_Y * timeDiff/1000) / B2DVars.PPM;
-        worldEntities.add(new SPGrenade(world, xPos, yPos, dir, true ,ID));
+        enemyGrenades.put(ID, new SPGrenade(world, xPos, yPos, dir, true, ID));
     }
 
     public void opponentShot(float xPos, float yPos, float dir, long timeSync, String bulletID) {
@@ -212,17 +215,21 @@ public class PlayState extends GameState {
             } else if (action[1].equals("GRENADE")) {
                 enemyGrenade(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]), action[8]);
             } else if (action[1].equals("UPDATE_GRENADE")){
-                updateGrenade(floats[0], floats[1], Float.valueOf(action[7]),
+                updateEnemyGrenade(floats[0], floats[1], Float.valueOf(action[7]),
                         Float.valueOf(action[8]), action[6]);
             }
         }
     }
 
     private void removeKillingEntity(String killerID){
-        for(SPSprite s : worldEntities){
-            if (s.getID().equals(killerID)) {
-                worldEntities.removeValue(s, true);
-                world.destroyBody(s.getBody());
+        if (enemyGrenades.containsKey(killerID)){
+            world.destroyBody(enemyGrenades.remove(killerID).getBody());
+        } else {
+            for (SPSprite s : worldEntities) {
+                if (s.getID().equals(killerID)) {
+                    worldEntities.removeValue(s, true);
+                    world.destroyBody(s.getBody());
+                }
             }
         }
     }
@@ -301,13 +308,9 @@ public class PlayState extends GameState {
         cl.clearGrenadeList();
     }
 
-    private void updateGrenade(float xForce, float yForce, float xPos, float yPos, String ID){
-        for (SPSprite sprite : worldEntities){
-            if (sprite instanceof SPGrenade && sprite.getID().equals(ID)){
-                sprite.getBody().setTransform(xPos, yPos, 0);
-                sprite.getBody().setLinearVelocity(xForce, yForce);
-            }
-        }
+    private void updateEnemyGrenade(float xForce, float yForce, float xPos, float yPos, String ID){
+        enemyGrenades.get(ID).getBody().setTransform(xPos, yPos, 0);
+        enemyGrenades.get(ID).getBody().setLinearVelocity(xForce, yForce);
     }
 
     private void playerHit() {
