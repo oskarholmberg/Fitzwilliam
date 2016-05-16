@@ -14,5 +14,4 @@ public class Assets {
     TEX_POWER = new Texture("images/powerUpBox.png");
     public static final Sound SOUND_RELOAD = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav")),
         SOUND_EMPTY_CLIP = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
-    public static final TiledMap MAP_MOONDOME = new TmxMapLoader().load("maps/moonWithDome.tmx");
 }
