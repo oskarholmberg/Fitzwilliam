@@ -83,7 +83,7 @@ public class MapBuilder {
                     if (layerString.equals("moonLayer")) {
                         fd.filter.categoryBits = B2DVars.BIT_GROUND;
                         fd.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BULLET | B2DVars.BIT_OPPONENT
-                                | B2DVars.BIT_GRENADE;
+                                | B2DVars.BIT_GRENADE | B2DVars.BIT_POWERUP;
                         world.createBody(bdef).createFixture(fd).setUserData(B2DVars.ID_GROUND);
                     } else if (layerString.equals("domeLayer")){
                         fd.filter.categoryBits = B2DVars.BIT_DOME;

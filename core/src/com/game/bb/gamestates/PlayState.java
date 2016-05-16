@@ -5,8 +5,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.maps.tiled.AtlasTmxMapLoader;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -15,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.entities.SPGrenade;
+import com.game.bb.entities.SPPower;
 import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
@@ -41,7 +40,7 @@ public class PlayState extends GameState {
     private SPPlayer player;
     private Array<SPPlayer> opponents;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
-    private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
+    private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh, powerReload = 30f;
     private String entityID = B2DVars.MY_ID + "%0";
     private Array<SPSprite> worldEntities;
     private float respawnTimer = 0;
@@ -77,6 +76,9 @@ public class PlayState extends GameState {
         //Players
         player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM,
                 B2DVars.CAM_HEIGHT / B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue", newEntityID());
+
+        worldEntities.add(new SPPower(world, 600 / B2DVars.PPM, 500 / B2DVars.PPM,
+                "GET_THIS_ID_FROM_SERVER"));
 
 
         // set up box2d cam
@@ -250,7 +252,7 @@ public class PlayState extends GameState {
     }
 
     private void refreshAmmo(float dt) {
-        if (bulletRefresh > 3f && clipIsEmpty) {
+        if ((powerReload < 3f || bulletRefresh > 3f) && clipIsEmpty) {
             amntBullets = B2DVars.AMOUNT_BULLET;
             clipIsEmpty = false;
             hud.setAmountBulletsLeft(amntBullets);
@@ -258,12 +260,15 @@ public class PlayState extends GameState {
         } else {
             bulletRefresh += dt;
         }
-        if (grenadeRefresh > 8f && grenadesIsEmpty) {
+        if ((powerReload < 3f || grenadeRefresh > 8f) && grenadesIsEmpty) {
             amntGrenades = B2DVars.AMOUNT_GRENADE;
             grenadesIsEmpty = false;
             hud.setAmountGrenadesLeft(amntGrenades);
         } else {
             grenadeRefresh += dt;
+        }
+        if (powerReload < 20f){
+            powerReload+=dt;
         }
     }
 
@@ -317,6 +322,9 @@ public class PlayState extends GameState {
         if (cl.isPlayerHit()) {
             playerHit();
         }
+        if (cl.powerTaken()){
+            powerReload=0f;
+        }
         if (player.isDead()) {
             respawnTimer += dt;
             if (respawnTimer >= B2DVars.RESPAWN_TIME) {
@@ -324,6 +332,7 @@ public class PlayState extends GameState {
             }
         }
         grenadeBounces();
+        //removeDeadBodies should always be last in update
         removeDeadBodies();
     }
 

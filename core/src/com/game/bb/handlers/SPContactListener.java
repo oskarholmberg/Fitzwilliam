@@ -14,9 +14,9 @@ import com.game.bb.entities.SPSprite;
  */
 public class SPContactListener implements ContactListener {
     private int footContact = 0, amntJumps = 0;
-    private boolean playerHit = false;
+    private boolean playerHit = false, playerPowerUp = false;
     private Array<Body> bodiesToRemove, grenadeBounces;
-    private Fixture killingEntity;
+    private Fixture killingEntity, lastPowerUp;
 
     public SPContactListener() {
         bodiesToRemove = new Array<Body>();
@@ -74,6 +74,16 @@ public class SPContactListener implements ContactListener {
             if (!grenadeBounces.contains(fb.getBody(), true)){
                 grenadeBounces.add(fb.getBody());
             }
+            // If a player catches a powerup
+        } else if (fa.getUserData().equals(B2DVars.ID_POWERUP) && fb.getUserData().equals(B2DVars.ID_PLAYER)){
+            lastPowerUp = fa;
+            playerPowerUp = true;
+            bodiesToRemove.add(fa.getBody());
+            // - || -
+        } else if (fb.getUserData().equals(B2DVars.ID_POWERUP) && fa.getUserData().equals(B2DVars.ID_PLAYER)){
+            lastPowerUp = fb;
+            playerPowerUp = true;
+            bodiesToRemove.add(fb.getBody());
         }
     }
 
@@ -97,6 +107,14 @@ public class SPContactListener implements ContactListener {
     public boolean isPlayerHit() {
         if (playerHit) {
             playerHit = false;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean powerTaken() {
+        if (playerPowerUp) {
+            playerPowerUp = false;
             return true;
         }
         return false;
