@@ -19,17 +19,19 @@ public class MapBuilder {
     private World world;
     private TiledMap tiledMap;
     boolean boundaries;
+    private String[] layers;
 
-    public MapBuilder(World world, TiledMap tiledMap, Vector2 cam, boolean boundaries){
+    public MapBuilder(World world, TiledMap tiledMap, Vector2 cam,  String[] layers, boolean boundaries){
         this.world=world;
         this.tiledMap=tiledMap;
         this.boundaries=boundaries;
+        this.layers=layers;
 
         if(boundaries) {
-            createBoundary(cam.x / 2, cam.y, cam.x / 2, 5); //top
-            createBoundary(cam.x / 2, 0, cam.x / 2, 5); //bottom
-            createBoundary(0, cam.y / 2, 5, cam.y / 2); // left
-            createBoundary(cam.x, cam.y / 2, 5, cam.y / 2); // right
+            createBoundary(cam.x / 2, cam.y, cam.x / 2, 1); //top
+            createBoundary(cam.x / 2, 0, cam.x / 2, 1); //bottom
+            createBoundary(0, cam.y / 2, 1, cam.y / 2); // left
+            createBoundary(cam.x, cam.y / 2, 1, cam.y / 2); // right
         }
     }
 
@@ -50,39 +52,46 @@ public class MapBuilder {
     }
 
     public OrthogonalTiledMapRenderer buildMap(){
+        for (String layerString : layers) {
+            TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get(layerString);
 
-        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("moonBlocks");
+            float ts = layer.getTileWidth();
 
-        float ts = layer.getTileWidth();
+            for (int row = 0; row < layer.getHeight(); row++) {
+                for (int col = 0; col < layer.getWidth(); col++) {
+                    // get cell
+                    TiledMapTileLayer.Cell cell = layer.getCell(col, row);
 
-        for(int row = 0; row < layer.getHeight(); row++) {
-            for(int col = 0; col < layer.getWidth(); col++) {
-                // get cell
-                TiledMapTileLayer.Cell cell = layer.getCell(col, row);
+                    // check that there is a cell
+                    if (cell == null) continue;
+                    if (cell.getTile() == null) continue;
 
-                // check that there is a cell
-                if(cell == null) continue;
-                if(cell.getTile() == null) continue;
-
-                // create body from cell
-                BodyDef bdef = new BodyDef();
-                bdef.type = BodyDef.BodyType.StaticBody;
-                bdef.position.set((col + 0.5f) * ts / B2DVars.PPM, (row + 0.5f) * ts / B2DVars.PPM);
-                ChainShape cs = new ChainShape();
-                Vector2[] v = new Vector2[5];
-                v[0] = new Vector2(-ts / 2 / B2DVars.PPM, -ts / 2 / B2DVars.PPM);
-                v[1] = new Vector2(-ts / 2 / B2DVars.PPM, ts / 2 / B2DVars.PPM);
-                v[2] = new Vector2(ts / 2 / B2DVars.PPM, ts / 2 / B2DVars.PPM);
-                v[3] = new Vector2(ts / 2 / B2DVars.PPM, -ts / 2 / B2DVars.PPM);
-                v[4] = new Vector2(-ts / 2 / B2DVars.PPM, -ts / 2 / B2DVars.PPM);
-                cs.createChain(v);
-                FixtureDef fd = new FixtureDef();
-                fd.shape = cs;
-                fd.filter.categoryBits = B2DVars.BIT_GROUND;
-                fd.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BULLET | B2DVars.BIT_OPPONENT
-                        | B2DVars.BIT_GRENADE;
-                world.createBody(bdef).createFixture(fd).setUserData(B2DVars.ID_GROUND);
-                cs.dispose();
+                    // create body from cell
+                    BodyDef bdef = new BodyDef();
+                    bdef.type = BodyDef.BodyType.StaticBody;
+                    bdef.position.set((col + 0.5f) * ts / B2DVars.PPM, (row + 0.5f) * ts / B2DVars.PPM);
+                    ChainShape cs = new ChainShape();
+                    Vector2[] v = new Vector2[5];
+                    v[0] = new Vector2(-ts / 2 / B2DVars.PPM, -ts / 2 / B2DVars.PPM);
+                    v[1] = new Vector2(-ts / 2 / B2DVars.PPM, ts / 2 / B2DVars.PPM);
+                    v[2] = new Vector2(ts / 2 / B2DVars.PPM, ts / 2 / B2DVars.PPM);
+                    v[3] = new Vector2(ts / 2 / B2DVars.PPM, -ts / 2 / B2DVars.PPM);
+                    v[4] = new Vector2(-ts / 2 / B2DVars.PPM, -ts / 2 / B2DVars.PPM);
+                    cs.createChain(v);
+                    FixtureDef fd = new FixtureDef();
+                    fd.shape = cs;
+                    if (layerString.equals("moonLayer")) {
+                        fd.filter.categoryBits = B2DVars.BIT_GROUND;
+                        fd.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BULLET | B2DVars.BIT_OPPONENT
+                                | B2DVars.BIT_GRENADE;
+                        world.createBody(bdef).createFixture(fd).setUserData(B2DVars.ID_GROUND);
+                    } else if (layerString.equals("domeLayer")){
+                        fd.filter.categoryBits = B2DVars.BIT_DOME;
+                        fd.filter.maskBits = B2DVars.BIT_BULLET | B2DVars.BIT_GRENADE;
+                        world.createBody(bdef).createFixture(fd).setUserData(B2DVars.ID_DOME);
+                    }
+                    cs.dispose();
+                }
             }
         }
         return new OrthogonalTiledMapRenderer(tiledMap);

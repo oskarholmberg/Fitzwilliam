@@ -58,6 +58,7 @@ public class PlayState extends GameState {
 
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
+        world.setContinuousPhysics(true);
 
         b2dr = new Box2DDebugRenderer();
 
@@ -67,9 +68,9 @@ public class PlayState extends GameState {
         opponents = new Array<SPPlayer>();
         // create boundaries
 
-
-        MapBuilder mb = new MapBuilder(world, new TmxMapLoader().load("maps/Moon.tmx"),
-                new Vector2(cam.viewportWidth, cam.viewportHeight), true);
+        String[] layers = {"moonLayer",  "domeLayer"};
+        MapBuilder mb = new MapBuilder(world, new TmxMapLoader().load("maps/moonWithDome.tmx"),
+                new Vector2(cam.viewportWidth, cam.viewportHeight), layers, true);
         tmr = mb.buildMap();
 
         //Players
@@ -212,7 +213,6 @@ public class PlayState extends GameState {
     private void removeKillingEntity(String killerID){
         for(SPSprite s : worldEntities){
             if (s.getID().equals(killerID)) {
-                System.out.println("removing entitiy: " + s.getID());
                 worldEntities.removeValue(s, true);
                 world.destroyBody(s.getBody());
             }

@@ -71,7 +71,7 @@ public class SPGrenade extends SPSprite {
         fdef.restitution = 1f;
         fdef.friction = 0f;
         fdef.filter.categoryBits = B2DVars.BIT_GRENADE;
-        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_PLAYER;
+        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_PLAYER | B2DVars.BIT_DOME;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.DynamicBody;

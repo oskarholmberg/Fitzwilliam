@@ -45,11 +45,13 @@ public class SPContactListener implements ContactListener {
             playerHit = true;
             bodiesToRemove.add(fa.getBody());
             // If a bullet touches ground
-        } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_GROUND)) {
+        } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && (fb.getUserData().equals(B2DVars.ID_GROUND)
+                || fb.getUserData().equals(B2DVars.ID_DOME))) {
             killingEntity = fa;
             bodiesToRemove.add(fa.getBody());
             // - || -
-        } else if (fa.getUserData().equals(B2DVars.ID_GROUND)  && fb.getUserData().equals(B2DVars.ID_BULLET)) {
+        } else if ((fa.getUserData().equals(B2DVars.ID_GROUND)  || fa.getUserData().equals(B2DVars.ID_DOME))
+                && fb.getUserData().equals(B2DVars.ID_BULLET)) {
             killingEntity = fb;
             bodiesToRemove.add(fb.getBody());
             // If a grenade touches player
@@ -105,7 +107,6 @@ public class SPContactListener implements ContactListener {
     }
 
     public SPSprite getKillingEntity() {
-        System.out.println(killingEntity.getUserData());
         return (SPSprite) killingEntity.getBody().getUserData();
     }
 
