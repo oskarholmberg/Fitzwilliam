@@ -325,10 +325,11 @@ public class PlayState extends GameState {
             SPSprite temp = (SPSprite) cl.getKillingEntity().getBody().getUserData();
             if (temp instanceof SPGrenade){
                 world.destroyBody(grenades.remove(temp.getID()).getBody());
+            } else {
+                //In this addAction add the ID of the killing bullet last
+                mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
+                        cl.getKillingEntity().getID(), Float.toString(cl.getKillingEntity().getDirection()));
             }
-            //In this addAction add the ID of the killing bullet last
-            mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
-                    cl.getKillingEntity().getID(), Float.toString(cl.getKillingEntity().getDirection()));
         }
     }
 
