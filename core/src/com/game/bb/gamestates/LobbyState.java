@@ -43,7 +43,7 @@ public class LobbyState extends GameState {
         world = new World(new Vector2(0, -9.81f), true);
         itRains = new Array<FallingBody>();
         joinButtons = new Array<SPButton>();
-        backbutton = new SPButton(new Texture("images/button/backButton.png"), B2DVars.CAM_WIDTH-100, B2DVars.CAM_HEIGHT-70, cam);
+        backbutton = new SPButton(new Texture("images/button/backButton.png"), B2DVars.CAM_WIDTH - 100, B2DVars.CAM_HEIGHT - 70, cam);
         servers = new Array<String>();
         searcher = new GameServerSearcher();
         searcher.start();
@@ -65,7 +65,7 @@ public class LobbyState extends GameState {
 
     @Override
     public void handleInput() {
-        if(backbutton.isClicked()){
+        if (backbutton.isClicked()) {
             System.out.println("Button clicked");
             searcher.stopSearch();
             System.out.println("Search stopped");
@@ -74,7 +74,7 @@ public class LobbyState extends GameState {
             gsm.setState(GameStateManager.CONNECT);
         }
         for (SPButton joinButton : joinButtons) {
-            if(joinButton.isClicked()){
+            if (joinButton.isClicked()) {
                 gsm.setIpAddress(joinButton.getInfo());
                 searcher.stopSearch();
                 sound.play();
@@ -96,7 +96,7 @@ public class LobbyState extends GameState {
             newFallingBody += dt;
         }
         world.step(dt, 6, 2);
-        for (SPButton button :joinButtons) {
+        for (SPButton button : joinButtons) {
             button.update(dt);
         }
     }
@@ -109,7 +109,7 @@ public class LobbyState extends GameState {
         sb.end();
         for (FallingBody body : itRains)
             body.render(sb);
-        for (SPButton button :joinButtons) {
+        for (SPButton button : joinButtons) {
             button.render(sb);
         }
         backbutton.render(sb);
@@ -120,11 +120,11 @@ public class LobbyState extends GameState {
 
     }
 
-    private Array<SPButton> getJoinButtons(Array<String> servers){
+    private Array<SPButton> getJoinButtons(Array<String> servers) {
         Array<SPButton> buttons = new Array<SPButton>();
         int i = 0;
         for (String server : servers) {
-            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), B2DVars.CAM_WIDTH/2, (B2DVars.CAM_HEIGHT-200)-50*i, cam);
+            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), B2DVars.CAM_WIDTH / 2, (B2DVars.CAM_HEIGHT - 200) - 50 * i, cam);
             button.setInfo(server);
             buttons.add(button);
             i++;
@@ -152,12 +152,14 @@ public class LobbyState extends GameState {
         private DatagramSocket socket;
         private String serverAddress;
         private Array<String> serverList;
+        private GameServerProbe probe;
 
         private GameServerSearcher() {
             serverList = new Array<String>();
             try {
                 socket = new DatagramSocket();
-                new GameServerProbe(socket);
+                probe = new GameServerProbe(socket);
+                probe.start();
             } catch (SocketException e) {
                 e.printStackTrace();
             }
@@ -166,9 +168,6 @@ public class LobbyState extends GameState {
         public void run() {
             while (!socket.isClosed()) {
                 try {
-                    byte[] hello = "HELLO".getBytes();
-                    DatagramPacket packet = new DatagramPacket(hello, hello.length, InetAddress.getByName("224.0.13.37"), 8081);
-                    socket.send(packet);
                     byte[] serverInfo = new byte[1024];
                     DatagramPacket received = new DatagramPacket(serverInfo, serverInfo.length);
                     socket.receive(received);
@@ -195,14 +194,34 @@ public class LobbyState extends GameState {
             System.out.println("Server search stopped, socket closed.");
         }
 
-        public synchronized Array<String> getServerList(){
+        public synchronized Array<String> getServerList() {
             return serverList;
         }
     }
 
-    private class GameServerProbe extends Thread{
-        private GameServerProbe(DatagramSocket socket){
-            
+    private class GameServerProbe extends Thread {
+
+        private DatagramSocket socket;
+
+        private GameServerProbe(DatagramSocket socket) {
+            this.socket = socket;
+        }
+
+        public void run() {
+            while (!socket.isClosed()) {
+                try {
+                    byte[] hello = "HELLO".getBytes();
+                    DatagramPacket packet = new DatagramPacket(hello, hello.length, InetAddress.getByName("224.0.13.37"), 8081);
+                    socket.send(packet);
+                    sleep(2000);
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
