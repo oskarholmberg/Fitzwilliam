@@ -64,16 +64,6 @@ public class SPContactListener implements ContactListener {
             killingEntity = fb;
             playerHit = true;
             bodiesToRemove.add(fb.getBody());
-            // If a grenade bounces
-        } else if (fa.getUserData().equals(B2DVars.ID_GRENADE)){
-            if (!grenadeBounces.contains(fa.getBody(), true)){
-                grenadeBounces.add(fa.getBody());
-            }
-            // - || -
-        } else if (fb.getUserData().equals(B2DVars.ID_GRENADE)){
-            if (!grenadeBounces.contains(fb.getBody(), true)){
-                grenadeBounces.add(fb.getBody());
-            }
             // If a player catches a powerup
         } else if (fa.getUserData().equals(B2DVars.ID_POWERUP) && fb.getUserData().equals(B2DVars.ID_PLAYER)){
             lastPowerUp = fa;
@@ -92,8 +82,18 @@ public class SPContactListener implements ContactListener {
         Fixture fa = contact.getFixtureA();
         Fixture fb = contact.getFixtureB();
 
-        if (fa.getUserData().equals(B2DVars.ID_FOOT) || fb.getUserData().equals(B2DVars.ID_FOOT))
+        if (fa.getUserData().equals(B2DVars.ID_FOOT) || fb.getUserData().equals(B2DVars.ID_FOOT)) {
             footContact--;
+        }else if (fa.getUserData().equals(B2DVars.ID_GRENADE) && fb.getUserData().equals(B2DVars.ID_GROUND)){
+            if (!grenadeBounces.contains(fa.getBody(), true)){
+                grenadeBounces.add(fa.getBody());
+            }
+            // - || -
+        } else if (fb.getUserData().equals(B2DVars.ID_GRENADE) && fa.getUserData().equals(B2DVars.ID_GROUND)) {
+            if (!grenadeBounces.contains(fb.getBody(), true)) {
+                grenadeBounces.add(fb.getBody());
+            }
+        }
     }
 
     public Array<Body> getGrenadeBounces(){

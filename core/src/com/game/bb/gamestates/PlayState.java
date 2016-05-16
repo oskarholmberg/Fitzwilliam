@@ -211,6 +211,9 @@ public class PlayState extends GameState {
                 }
             } else if (action[1].equals("GRENADE")) {
                 enemyGrenade(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]), action[8]);
+            } else if (action[1].equals("UPDATE_GRENADE")){
+                updateGrenade(floats[2], floats[3], Float.valueOf(action[7]),
+                        Float.valueOf(action[8]), action[6]);
             }
         }
     }
@@ -286,12 +289,25 @@ public class PlayState extends GameState {
 
     private void grenadeBounces() {
         for (Body b : cl.getGrenadeBounces()) {
-            if ( b!=null && ((SPGrenade) b.getUserData()).finishedBouncing()){
+            if ( b.getUserData() instanceof SPGrenade && ((SPGrenade) b.getUserData()).finishedBouncing()){
                 worldEntities.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);
+            } else if (b.getUserData() instanceof  SPGrenade){
+                mon.sendPlayerAction("UPDATE_GRENADE", b.getLinearVelocity().x,
+                        b.getLinearVelocity().y, ((SPGrenade) b.getUserData()).getID() ,Float.toString(b.getPosition().x),
+                        Float.toString(b.getPosition().y));
             }
         }
         cl.clearGrenadeList();
+    }
+
+    private void updateGrenade(float xForce, float yForce, float xPos, float yPos, String ID){
+        for (SPSprite sprite : worldEntities){
+            if (sprite instanceof SPGrenade && sprite.getID().equals(ID)){
+                sprite.getBody().setTransform(xPos, yPos, 0);
+                sprite.getBody().setLinearVelocity(xForce, yForce);
+            }
+        }
     }
 
     private void playerHit() {
