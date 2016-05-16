@@ -157,6 +157,7 @@ public class LobbyState extends GameState {
             serverList = new Array<String>();
             try {
                 socket = new DatagramSocket();
+                new GameServerProbe(socket);
             } catch (SocketException e) {
                 e.printStackTrace();
             }
@@ -178,16 +179,12 @@ public class LobbyState extends GameState {
                     }
                     sleep(2000);
                 } catch (SocketException e) {
-                    e.printStackTrace();
                     stopSearch();
                 } catch (UnknownHostException e) {
-                    e.printStackTrace();
                     stopSearch();
                 } catch (IOException e) {
-                    e.printStackTrace();
                     stopSearch();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
                     stopSearch();
                 }
             }
@@ -195,10 +192,17 @@ public class LobbyState extends GameState {
 
         public synchronized void stopSearch() {
             socket.close();
+            System.out.println("Server search stopped, socket closed.");
         }
 
         public synchronized Array<String> getServerList(){
             return serverList;
+        }
+    }
+
+    private class GameServerProbe extends Thread{
+        private GameServerProbe(DatagramSocket socket){
+            
         }
     }
 }
