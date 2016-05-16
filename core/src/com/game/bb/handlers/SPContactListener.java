@@ -98,7 +98,7 @@ public class SPContactListener implements ContactListener {
         }
     }
 
-    public Array<Body> getGrenadeBounces(){
+    public Array<Body> getFriendlyGrenadeBounces(){
         return grenadeBounces;
     }
 

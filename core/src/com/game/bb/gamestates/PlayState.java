@@ -216,7 +216,7 @@ public class PlayState extends GameState {
                 enemyGrenade(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]), action[8]);
             } else if (action[1].equals("UPDATE_GRENADE")){
                 updateEnemyGrenade(floats[0], floats[1], Float.valueOf(action[7]),
-                        Float.valueOf(action[8]), action[6]);
+                        Float.valueOf(action[8]), action[6], action[9]);
             }
         }
     }
@@ -298,22 +298,31 @@ public class PlayState extends GameState {
     }
 
     private void grenadeBounces() {
-        for (Body b : cl.getGrenadeBounces()) {
+        for (Body b : cl.getFriendlyGrenadeBounces()) {
             if ( b.getUserData() instanceof SPGrenade && ((SPGrenade) b.getUserData()).finishedBouncing()){
+                mon.sendPlayerAction("UPDATE_GRENADE", b.getLinearVelocity().x,
+                        b.getLinearVelocity().y, ((SPGrenade) b.getUserData()).getID(), Float.toString(b.getPosition().x),
+                Float.toString(b.getPosition().y), "removeGrenade");
                 worldEntities.removeValue((SPSprite) b.getUserData(), true);
                 world.destroyBody(b);
             } else if (b.getUserData() instanceof  SPGrenade){
                 mon.sendPlayerAction("UPDATE_GRENADE", b.getLinearVelocity().x,
                         b.getLinearVelocity().y, ((SPGrenade) b.getUserData()).getID() ,Float.toString(b.getPosition().x),
-                        Float.toString(b.getPosition().y));
+                        Float.toString(b.getPosition().y), "stillAlive");
             }
         }
         cl.clearGrenadeList();
     }
 
-    private void updateEnemyGrenade(float xForce, float yForce, float xPos, float yPos, String ID){
-        enemyGrenades.get(ID).getBody().setTransform(xPos, yPos, 0);
-        enemyGrenades.get(ID).getBody().setLinearVelocity(xForce, yForce);
+    private void updateEnemyGrenade(float xForce, float yForce, float xPos, float yPos, String ID, String condition){
+        if (enemyGrenades.get(ID) != null) {
+            if (condition.equals("removeGrenade")) {
+                world.destroyBody(enemyGrenades.remove(ID).getBody());
+            } else {
+                enemyGrenades.get(ID).getBody().setTransform(xPos, yPos, 0);
+                enemyGrenades.get(ID).getBody().setLinearVelocity(xForce, yForce);
+            }
+        }
     }
 
     private void playerHit() {
