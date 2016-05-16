@@ -1,5 +1,6 @@
 package com.game.bb.entities;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -20,7 +21,7 @@ public class SPPower extends SPSprite{
         super(world, ID);
         createPowerBody(xPos, yPos);
 
-        animation = new SPAnimation(TextureRegion.split(Assets.TEX_POWER, 32, 32)[0], 0.2f);
+        animation = new SPAnimation(TextureRegion.split(new Texture("images/powerUpBox.png"), 32, 32)[0], 0.2f);
     }
 
     private void createPowerBody(float xPos, float yPos){

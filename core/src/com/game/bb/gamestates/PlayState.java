@@ -46,9 +46,9 @@ public class PlayState extends GameState {
     private Array<SPSprite> worldEntities;
     private float respawnTimer = 0;
     private HUD hud;
-    private Texture backGround = Assets.TEX_BACKGROUND;
-    private Sound reloadSound = Assets.SOUND_RELOAD;
-    private Sound emptyClipSound = Assets.SOUND_EMPTY_CLIP;
+    private Texture backGround = new Texture("images/spaceBackground.png");
+    private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
+    private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
     private PlayStateNetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
