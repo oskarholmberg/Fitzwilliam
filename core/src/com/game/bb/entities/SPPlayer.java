@@ -111,7 +111,11 @@ public class SPPlayer extends SPSprite {
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         fdef.filter.categoryBits = bodyCategory;
-        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET | B2DVars.BIT_GRENADE;
+        if (bodyCategory == B2DVars.BIT_PLAYER)
+            fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET | B2DVars.BIT_GRENADE
+                    | B2DVars.BIT_POWERUP;
+        else
+            fdef.filter.maskBits = B2DVars.BIT_GROUND;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.DynamicBody;

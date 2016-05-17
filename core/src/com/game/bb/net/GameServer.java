@@ -21,6 +21,7 @@ public class GameServer extends Thread {
     private HashMap<String, String> connectedClients;
     private HashMap<String, Integer> clientDeaths;
     private String ipAddress;
+    private GameServerAnnouncer announcer;
     private int port = 8080;
 
     public GameServer() {
@@ -32,7 +33,8 @@ public class GameServer extends Thread {
             System.out.println("Trying to start server on port: " + port);
             this.datagramSocket = new DatagramSocket(port);
             System.out.println("Success! Server listening on port: " + port);
-            new GameServerAnnouncer().start();
+            announcer = new GameServerAnnouncer();
+            announcer.start();
 
         } catch (SocketException e) {
             System.out.println("Server already running. Joining own game.");
@@ -42,43 +44,46 @@ public class GameServer extends Thread {
     }
 
     public void run() {
-        while (!datagramSocket.isClosed()) {
-            byte[] data = new byte[1024];
-            DatagramPacket packet = new DatagramPacket(data, data.length);
-            try {
-                datagramSocket.receive(packet);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            ipAddress = packet.getAddress().getHostAddress() + ":" + packet.getPort();
-            String content = new String(packet.getData()).trim();
-            String[] segments = content.split(":");
-            if (segments[1].equals("CONNECT")) {
-                //New client has connected, give that client info of all other clients
-                //and their location.
-                connectedClients.put(ipAddress, content);
-                clientDeaths.put(ipAddress, 0);
-                for (String id : connectedClients.keySet()) {
-                    String[] info = connectedClients.get(id).split(":");
-                    sendData((info[0] + ":CONNECT:" + info[2] + ":" + info[3] + ":" + info[4] + ":" + info[5] +
-                            ":" + B2DVars.BIT_OPPONENT + ":" + B2DVars.ID_OPPONENT + ":red" +
-                            ":" + clientDeaths.get(id) + ":SPRITE_ID").getBytes(), id);
+        try {
+            while (!datagramSocket.isClosed()) {
+                byte[] data = new byte[1024];
+                DatagramPacket packet = new DatagramPacket(data, data.length);
+                try {
+                    datagramSocket.receive(packet);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                System.out.println("CLIENT[" + ipAddress + "] connected.");
+                ipAddress = packet.getAddress().getHostAddress() + ":" + packet.getPort();
+                String content = new String(packet.getData()).trim();
+                String[] segments = content.split(":");
+                if (segments[1].equals("CONNECT")) {
+                    //New client has connected, give that client info of all other clients
+                    //and their location.
+                    connectedClients.put(ipAddress, content);
+                    clientDeaths.put(ipAddress, 0);
+                    for (String id : connectedClients.keySet()) {
+                        String[] info = connectedClients.get(id).split(":");
+                        sendData((info[0] + ":CONNECT:" + info[2] + ":" + info[3] + ":" + info[4] + ":" + info[5] +
+                                ":" + B2DVars.BIT_OPPONENT + ":" + B2DVars.ID_OPPONENT + ":red" +
+                                ":" + clientDeaths.get(id) + ":SPRITE_ID").getBytes(), id);
+                    }
+                    System.out.println("CLIENT[" + ipAddress + "] connected.");
+                }
+                if (segments[1].equals("MOVE")) {
+                    connectedClients.put(ipAddress, content);
+                }
+                if (segments[1].equals("DEATH")) {
+                    clientDeaths.put(ipAddress, clientDeaths.get(ipAddress) + 1);
+                }
+                if (segments[1].equals("DISCONNECT")) {
+                    //Client has disconnected
+                    connectedClients.remove(ipAddress);
+                    System.out.println("CLIENT[" + ipAddress + "] disconnected.");
+                }
+                System.out.println("CLIENT[" + ipAddress + "] > " + content);
+                sendData(packet.getData(), ipAddress);
             }
-            if (segments[1].equals("MOVE")) {
-                connectedClients.put(ipAddress, content);
-            }
-            if (segments[1].equals("DEATH")) {
-                clientDeaths.put(ipAddress, clientDeaths.get(ipAddress) + 1);
-            }
-            if (segments[1].equals("DISCONNECT")) {
-                //Client has disconnected
-                connectedClients.remove(ipAddress);
-                System.out.println("CLIENT[" + ipAddress + "] disconnected.");
-            }
-            System.out.println("CLIENT[" + ipAddress + "] > " + content);
-            sendData(packet.getData(), ipAddress);
+        } catch (NullPointerException e) {
         }
     }
 
@@ -118,13 +123,13 @@ public class GameServer extends Thread {
         private MulticastSocket multicastSocket;
 
         public GameServerAnnouncer() throws IOException {
-            this.multicastSocket = new MulticastSocket(port+1);
+            this.multicastSocket = new MulticastSocket(port + 1);
             InetAddress group = InetAddress.getByName("224.0.13.37");
             multicastSocket.joinGroup(group);
         }
 
         public void run() {
-            while (true) {
+            while (!multicastSocket.isClosed()) {
                 byte[] data = new byte[1024];
                 DatagramPacket packet = new DatagramPacket(data, data.length);
                 try {
@@ -148,13 +153,17 @@ public class GameServer extends Thread {
         }
 
         private void sendInfo(byte[] data, InetAddress address, int port) {
-                DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-                try {
-                    multicastSocket.send(packet);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+            try {
+                multicastSocket.send(packet);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+        }
+
+        private void stopBroadcast(){
+            multicastSocket.disconnect();
+            multicastSocket.close();
         }
 
         private InetAddress getOutboundAddress(SocketAddress remoteAddress) throws SocketException {
@@ -171,5 +180,7 @@ public class GameServer extends Thread {
 
             return localAddress;
         }
+
     }
+}
 

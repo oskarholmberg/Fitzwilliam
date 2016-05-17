@@ -20,10 +20,13 @@ public class SPGrenade extends SPSprite {
     private SPAnimation animation;
     private TextureRegion[] regions;
     private Texture grenade;
+    private boolean opponentGrenade;
+    private float lifetime = 0f;
 
     public SPGrenade(World world, float xPos, float yPos, float dir, boolean opponentGrenade, String ID) {
         super(world, ID);
         this.dir = dir;
+        this.opponentGrenade=opponentGrenade;
         createGrenadeBody(xPos + dir * getPosXoffset, yPos - posYoffset, dir);
         if(opponentGrenade){
             grenade = new Texture("images/weapons/redGrenade.png");
@@ -56,10 +59,11 @@ public class SPGrenade extends SPSprite {
         sb.end();
     }
 
-    public boolean finishedBouncing() {
-        if (amountBounces > 5)
+    public boolean lifeTimeReached(float dt) {
+        lifetime+=dt;
+        if (lifetime > 5f) {
             return true;
-        amountBounces++;
+        }
         return false;
     }
 
@@ -71,13 +75,16 @@ public class SPGrenade extends SPSprite {
         fdef.restitution = 1f;
         fdef.friction = 0f;
         fdef.filter.categoryBits = B2DVars.BIT_GRENADE;
-        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_PLAYER;
+        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_PLAYER | B2DVars.BIT_DOME;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bdef);
         body.setGravityScale(0f);
-        body.createFixture(fdef).setUserData(B2DVars.ID_GRENADE);
+        if (opponentGrenade)
+            body.createFixture(fdef).setUserData(B2DVars.ID_ENEMY_GRENADE);
+        else
+            body.createFixture(fdef).setUserData(B2DVars.ID_GRENADE);
         body.setLinearVelocity(B2DVars.PH_GRENADE_X * dir / B2DVars.PPM, B2DVars.PH_GRENADE_Y / B2DVars.PPM);
         body.setUserData(this);
     }

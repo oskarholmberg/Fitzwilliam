@@ -53,9 +53,9 @@ public class SPBullet extends SPSprite {
         fdef.shape = shape;
         fdef.filter.categoryBits = B2DVars.BIT_BULLET;
         if (harmful) {
-            fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND;
+            fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND | B2DVars.BIT_DOME;
         } else {
-            fdef.filter.maskBits =  B2DVars.BIT_GROUND;
+            fdef.filter.maskBits =  B2DVars.BIT_GROUND | B2DVars.BIT_DOME;
         }
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);

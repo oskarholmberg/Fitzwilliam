@@ -34,7 +34,7 @@ public class StartScreenState extends GameState {
 
 
         playButton = new SPButton(new Texture("images/button/playButton.png"),
-                B2DVars.CAM_WIDTH / 2, B2DVars.CAM_HEIGHT / 2, cam);
+                B2DVars.CAM_WIDTH / 2, B2DVars.CAM_HEIGHT / 2, 304f, 80f, cam);
         fallingBody();
     }
 
