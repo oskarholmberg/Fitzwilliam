@@ -36,9 +36,10 @@ public class Game extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-            gsm.update(Gdx.graphics.getDeltaTime());
-            gsm.render();
-            SPInput.update();
+        Gdx.graphics.setTitle(TITLE + " - FPS: " + Gdx.graphics.getFramesPerSecond());
+        gsm.update(Gdx.graphics.getDeltaTime());
+        gsm.render();
+        SPInput.update();
 	}
 
 	public void dispose(){
