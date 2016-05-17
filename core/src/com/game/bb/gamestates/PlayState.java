@@ -325,9 +325,9 @@ public class PlayState extends GameState {
             hud.addPlayerDeath();
             SPSprite temp = (SPSprite) cl.getKillingEntity().getBody().getUserData();
             if (temp instanceof SPGrenade){
-                world.destroyBody(grenades.removeKey(temp.getID()).getBody());
                 mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
                         cl.getKillingEntity().getID(), Float.toString(cl.getKillingEntity().getDirection()));
+                world.destroyBody(grenades.removeKey(temp.getID()).getBody());
             }
         }
     }
