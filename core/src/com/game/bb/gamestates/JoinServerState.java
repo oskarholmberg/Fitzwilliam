@@ -26,7 +26,7 @@ import java.net.UnknownHostException;
 /**
  * Created by erik on 12/05/16.
  */
-public class LobbyState extends GameState {
+public class JoinServerState extends GameState {
 
     private Array<SPButton> joinButtons;
     private Array<String> servers;
@@ -41,7 +41,7 @@ public class LobbyState extends GameState {
     private TextureRegion[] font;
 
 
-    public LobbyState(GameStateManager gsm) {
+    public JoinServerState(GameStateManager gsm) {
         super(gsm);
         world = new World(new Vector2(0, -9.81f), true);
         itRains = new Array<FallingBody>();
@@ -151,7 +151,7 @@ public class LobbyState extends GameState {
         Array<SPButton> buttons = new Array<SPButton>();
         int i = 0;
         for (String server : servers) {
-            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), B2DVars.CAM_WIDTH-350, (B2DVars.CAM_HEIGHT - 170) - 50 * i, 200f, 20f, cam);
+            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), B2DVars.CAM_WIDTH-350, (B2DVars.CAM_HEIGHT - 170) - 50 * i, 100f, 20f, cam);
             button.setInfo(server);
             buttons.add(button);
             i++;
@@ -203,14 +203,11 @@ public class LobbyState extends GameState {
                         serverList.add(serverAddress);
                         System.out.println("Server found!");
                     }
-                    sleep(2000);
                 } catch (SocketException e) {
                     stopSearch();
                 } catch (UnknownHostException e) {
                     stopSearch();
                 } catch (IOException e) {
-                    stopSearch();
-                } catch (InterruptedException e) {
                     stopSearch();
                 }
             }
