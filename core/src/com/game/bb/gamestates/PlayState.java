@@ -84,8 +84,9 @@ public class PlayState extends GameState {
         player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM,
                 B2DVars.CAM_HEIGHT / B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue", newEntityID());
 
-        worldEntities.add(new SPPower(world, 600 / B2DVars.PPM, 500 / B2DVars.PPM,
-                "GET_THIS_ID_FROM_SERVER"));
+        //remove this comment to add a powerup
+        //worldEntities.add(new SPPower(world, 600 / B2DVars.PPM, 500 / B2DVars.PPM,
+        //       "GET_THIS_ID_FROM_SERVER"));
 
 
         // set up box2d cam
@@ -393,7 +394,7 @@ public class PlayState extends GameState {
         hud.render(sb);
 
         //Do this last in render
-        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+        //b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         sb.setProjectionMatrix(cam.combined);
     }
 
