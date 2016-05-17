@@ -20,7 +20,7 @@ public class GameServerNew extends Listener {
 
     public GameServerNew(){
         kryoServer = new Server();
-        Class[] classes = {String.class, Vector2.class};
+        Class[] classes = {String.class, Vector2.class, EntityPacket.class};
         for (Class c : classes){
             kryoServer.getKryo().register(c);
         }

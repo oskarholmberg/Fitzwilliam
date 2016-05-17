@@ -13,7 +13,6 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.entities.SPGrenade;
 import com.game.bb.entities.SPPower;
@@ -196,14 +195,17 @@ public class PlayState extends GameState {
 
     }
     private void opponentActionsNew(){
-        Array<Object> packets = client.getReceivedPackets();
+        Array<Object> packets = client.getReceivedPacket();
         for (Object packet : packets){
+            System.out.println(packets.size + " packets collected");
             if (packet instanceof EntityPacket){
+                System.out.println("Entity packet found! :D ");
                 EntityPacket pkt = (EntityPacket) packet;
                 if (pkt.action.equals("CONNECT")){
                     SPPlayer newOpponent = new SPPlayer(world, pkt.myID, pkt.pos.x / B2DVars.PPM, pkt.pos.y / B2DVars.PPM
                     , B2DVars.BIT_OPPONENT, B2DVars.ID_OPPONENT, "red", pkt.entityID);
                     opponents.add(newOpponent);
+                    System.out.println("Opponent added!");
                     //hud.setOpponentDeath(action[0], action[9]);
                 }
             }
