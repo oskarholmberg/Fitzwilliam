@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -37,6 +38,7 @@ public class LobbyState extends GameState {
     private Array<FallingBody> itRains;
     private float newFallingBody = 0f;
     private GameServerSearcher searcher;
+    private TextureRegion[] font;
 
 
     public LobbyState(GameStateManager gsm) {
@@ -46,6 +48,14 @@ public class LobbyState extends GameState {
         joinButtons = new Array<SPButton>();
         backbutton = new SPButton(new Texture("images/button/backButton.png"), B2DVars.CAM_WIDTH - 100, B2DVars.CAM_HEIGHT - 100, 40f, 40f, cam);
         servers = new Array<String>();
+        font = new TextureRegion[11];
+        Texture hudTex = new Texture("images/hud.png");
+        for (int i = 0; i < 6; i++) {
+            font[i] = new TextureRegion(hudTex, 32 + i * 9, 16, 9, 9);
+        }
+        for (int i = 0; i < 5; i++) {
+            font[i + 6] = new TextureRegion(hudTex, 32 + i * 9, 25, 9, 9);
+        }
         searcher = new GameServerSearcher();
         searcher.start();
         fallingBody();
@@ -107,6 +117,7 @@ public class LobbyState extends GameState {
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         sb.draw(background, 0, 0);
+        int k = 0;
         sb.end();
         for (FallingBody body : itRains)
             body.render(sb);
@@ -115,6 +126,18 @@ public class LobbyState extends GameState {
         }
         backbutton.render(sb);
         sb.begin();
+        for(SPButton button : joinButtons){
+            int j = 0;
+            String[] ip = button.getInfo().split("\\.");
+            for (int e = 0; e < ip.length; e++) {
+                for (int i = 0; i < ip[e].length(); i++) {
+                    sb.draw(font[Integer.valueOf(ip[e].substring(i, i+1))], 100 + j * 22, (B2DVars.CAM_HEIGHT - 180) - 50 * k, 20, 20);
+                    j++;
+                }
+                j++;
+            }
+            k++;
+        }
         sb.draw(availableServers, 100, B2DVars.CAM_HEIGHT-120, 600, 30);
         sb.end();
     }
@@ -128,7 +151,7 @@ public class LobbyState extends GameState {
         Array<SPButton> buttons = new Array<SPButton>();
         int i = 0;
         for (String server : servers) {
-            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), B2DVars.CAM_WIDTH/5, (B2DVars.CAM_HEIGHT - 180) - 50 * i, 200f, 20f, cam);
+            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), B2DVars.CAM_WIDTH-350, (B2DVars.CAM_HEIGHT - 170) - 50 * i, 200f, 20f, cam);
             button.setInfo(server);
             buttons.add(button);
             i++;
@@ -195,6 +218,7 @@ public class LobbyState extends GameState {
 
         public synchronized void stopSearch() {
             socket.close();
+            probe.stopSearch();
             System.out.println("Server search stopped, socket closed.");
         }
 
@@ -206,13 +230,14 @@ public class LobbyState extends GameState {
     private class GameServerProbe extends Thread {
 
         private DatagramSocket socket;
+        private boolean search = true;
 
         private GameServerProbe(DatagramSocket socket) {
             this.socket = socket;
         }
 
         public void run() {
-            while (!socket.isClosed()) {
+            while (search) {
                 try {
                     byte[] hello = "HELLO".getBytes();
                     DatagramPacket packet = new DatagramPacket(hello, hello.length, InetAddress.getByName("224.0.13.37"), 8081);
@@ -226,6 +251,10 @@ public class LobbyState extends GameState {
                     e.printStackTrace();
                 }
             }
+        }
+
+        public void stopSearch(){
+            search = false;
         }
     }
 }
