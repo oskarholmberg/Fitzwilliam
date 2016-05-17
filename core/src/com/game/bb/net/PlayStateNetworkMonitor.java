@@ -48,6 +48,10 @@ public class PlayStateNetworkMonitor {
         client.sendData(packet.getBytes());
     }
 
+    public synchronized void sendInterpolationPoints(){
+
+    }
+
     public synchronized void addOpponentAction(String action) {
         opponentActions.add(action);
     }

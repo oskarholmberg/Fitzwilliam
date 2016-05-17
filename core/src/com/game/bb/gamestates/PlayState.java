@@ -10,9 +10,10 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ArrayMap;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.entities.SPGrenade;
 import com.game.bb.entities.SPPower;
@@ -20,8 +21,6 @@ import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
 import com.game.bb.net.PlayStateNetworkMonitor;
-
-import java.util.HashMap;
 
 
 /**
@@ -48,7 +47,8 @@ public class PlayState extends GameState {
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh, powerReload = 30f;
     private String entityID = B2DVars.MY_ID + "%0";
     private Array<SPSprite> worldEntities;
-    private HashMap<String, SPGrenade> grenades = new HashMap<String, SPGrenade>();
+    private ArrayMap<String, SPGrenade> enemyGrenades = new ArrayMap<String, SPGrenade>();
+    private ArrayMap<String, SPGrenade> myGrenades = new ArrayMap<String, SPGrenade>();
     private float respawnTimer = 0;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
@@ -58,6 +58,7 @@ public class PlayState extends GameState {
     private PlayStateNetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
     private boolean clipIsEmpty = false, grenadesIsEmpty = false;
+    private float sendNetworkInfo = 0f;
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -100,6 +101,7 @@ public class PlayState extends GameState {
             mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection),
                     Long.toString(System.currentTimeMillis()), ID);
             Vector2 pos = player.getPosition();
+            System.out.println("Player xPos: " + pos.x + " yPos: " + pos.y);
             SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false, ID);
             worldEntities.add(bullet);
             amntBullets--;
@@ -117,8 +119,10 @@ public class PlayState extends GameState {
             mon.sendPlayerAction("GRENADE", 0, 0, Float.toString(lastJumpDirection),
                     Long.toString(System.currentTimeMillis()), ID);
             Vector2 pos = player.getPosition();
-            grenades.put(ID, new SPGrenade(world, pos.x, pos.y, lastJumpDirection, false, ID));
+            myGrenades.put(ID, new SPGrenade(world, pos.x, pos.y, lastJumpDirection, false, ID));
             amntGrenades--;
+            System.out.println(TimeUtils.millis());
+            System.out.println(newEntityID().getBytes());
             hud.setAmountGrenadesLeft(amntGrenades);
             if (amntGrenades == 0) {
                 grenadesIsEmpty = true;
@@ -126,9 +130,18 @@ public class PlayState extends GameState {
             }
         }
     }
+
+    private void sendGrenadeInterpolation(){
+
+        for (String id : myGrenades.keys()){
+
+        }
+    }
+
     public String newEntityID(){
         String[] split = entityID.split("%");
         entityID = split[0] + "%" +(Integer.valueOf(split[1]) + 1);
+        System.out.println(entityID);
         return entityID;
     }
 
@@ -136,7 +149,7 @@ public class PlayState extends GameState {
         long timeDiff = System.currentTimeMillis() - timeSync;
         xPos = xPos + (B2DVars.PH_GRENADE_X * timeDiff/1000) / B2DVars.PPM * dir;
         yPos = yPos + (B2DVars.PH_GRENADE_Y * timeDiff/1000) / B2DVars.PPM;
-        grenades.put(ID, new SPGrenade(world, xPos, yPos, dir, true, ID));
+        enemyGrenades.put(ID, new SPGrenade(world, xPos, yPos, dir, true, ID));
     }
 
     public void opponentShot(float xPos, float yPos, float dir, long timeSync, String bulletID) {
@@ -223,8 +236,8 @@ public class PlayState extends GameState {
     }
 
     private void removeKillingEntity(String killerID){
-        if (grenades.containsKey(killerID)){
-            world.destroyBody(grenades.remove(killerID).getBody());
+        if (enemyGrenades.containsKey(killerID)){
+            world.destroyBody(enemyGrenades.removeKey(killerID).getBody());
         } else {
             for (SPSprite s : worldEntities) {
                 if (s.getID().equals(killerID)) {
@@ -303,18 +316,23 @@ public class PlayState extends GameState {
                         Float.toString(b.getPosition().y));
             }
         }
-        for (String s : grenades.keySet()){
-            if (grenades.get(s) != null && grenades.get(s).lifeTimeReached(dt)){
-                world.destroyBody(grenades.remove(s).getBody());
+        for (String s : enemyGrenades.keys()){
+            if (enemyGrenades.get(s) != null && enemyGrenades.get(s).lifeTimeReached(dt)){
+                world.destroyBody(enemyGrenades.removeKey(s).getBody());
+            }
+        }
+        for (String s : myGrenades.keys()){
+            if (myGrenades.get(s) != null && myGrenades.get(s).lifeTimeReached(dt)){
+                world.destroyBody(myGrenades.removeKey(s).getBody());
             }
         }
         cl.clearGrenadeList();
     }
 
     private void updateEnemyGrenade(float xForce, float yForce, float xPos, float yPos, String ID){
-        if (grenades.get(ID) != null) {
-            grenades.get(ID).getBody().setTransform(xPos, yPos, 0);
-            grenades.get(ID).getBody().setLinearVelocity(xForce, yForce);
+        if (enemyGrenades.get(ID) != null) {
+            enemyGrenades.get(ID).getBody().setTransform(xPos, yPos, 0);
+            enemyGrenades.get(ID).getBody().setLinearVelocity(xForce, yForce);
         }
     }
 
@@ -324,7 +342,11 @@ public class PlayState extends GameState {
             hud.addPlayerDeath();
             SPSprite temp = (SPSprite) cl.getKillingEntity().getBody().getUserData();
             if (temp instanceof SPGrenade){
-                world.destroyBody(grenades.remove(temp.getID()).getBody());
+                if (enemyGrenades.containsKey(temp.getID())) {
+                    world.destroyBody(enemyGrenades.removeKey(temp.getID()).getBody());
+                } else {
+                    world.destroyBody(myGrenades.removeKey(temp.getID()).getBody());
+                }
             } else {
                 //In this addAction add the ID of the killing bullet last
                 mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
@@ -348,8 +370,11 @@ public class PlayState extends GameState {
         for(SPSprite sprite : worldEntities){
             sprite.update(dt);
         }
-        for(String id : grenades.keySet()){
-            grenades.get(id).update(dt);
+        for(String id : enemyGrenades.keys()){
+            enemyGrenades.get(id).update(dt);
+        }
+        for (String id : myGrenades.keys()){
+            myGrenades.get(id).update(dt);
         }
         opponentActions();
         refreshAmmo(dt);
@@ -368,6 +393,12 @@ public class PlayState extends GameState {
         grenadeBounces(dt);
         //removeDeadBodies should always be last in update
         removeDeadBodies();
+        if (sendNetworkInfo >= 1/30f){
+            sendNetworkInfo = 0f;
+            mon.sendInterpolationPoints();
+        } else {
+            sendNetworkInfo +=dt;
+        }
     }
 
     @Override
@@ -385,8 +416,11 @@ public class PlayState extends GameState {
         for (SPPlayer opponent : opponents) {
             opponent.render(sb);
         }
-        for (String grenade : grenades.keySet()){
-            grenades.get(grenade).render(sb);
+        for (String id : enemyGrenades.keys()){
+            enemyGrenades.get(id).render(sb);
+        }
+        for (String id : myGrenades.keys()){
+            myGrenades.get(id).render(sb);
         }
         player.render(sb);
         hud.render(sb);

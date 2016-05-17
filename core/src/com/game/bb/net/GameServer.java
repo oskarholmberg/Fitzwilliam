@@ -80,7 +80,7 @@ public class GameServer extends Thread {
                     connectedClients.remove(ipAddress);
                     System.out.println("CLIENT[" + ipAddress + "] disconnected.");
                 }
-                System.out.println("CLIENT[" + ipAddress + "] > " + content);
+                //System.out.println("CLIENT[" + ipAddress + "] > " + content);
                 sendData(packet.getData(), ipAddress);
             }
         } catch (NullPointerException e) {

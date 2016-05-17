@@ -16,7 +16,8 @@ public class B2DVars {
     public final static float PH_JUMPX = 70, PH_JUMPY = 200, RESPAWN_TIME= 3f, PH_BULLET_SPEED = 200,
             PH_GRENADE_X = 300, PH_GRENADE_Y = -200;
 
-    public static final String MY_ID = Long.toString(System.currentTimeMillis());
+    private static final String ct = Long.toString(System.currentTimeMillis());
+    public static final String MY_ID = ct.substring(ct.length()-4, ct.length());
 
     // collision bits
     public static final short BIT_GROUND = 2, BIT_PLAYER = 4, BIT_OPPONENT = 8, BIT_BULLET = 16,
