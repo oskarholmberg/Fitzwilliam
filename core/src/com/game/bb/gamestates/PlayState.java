@@ -21,6 +21,8 @@ import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
 import com.game.bb.net.PlayStateNetworkMonitor;
+import com.game.bb.net.client.GameClientNew;
+import com.game.bb.net.packets.EntityPacket;
 
 
 /**
@@ -50,6 +52,7 @@ public class PlayState extends GameState {
     private ArrayMap<String, SPGrenade> enemyGrenades = new ArrayMap<String, SPGrenade>();
     private ArrayMap<String, SPGrenade> myGrenades = new ArrayMap<String, SPGrenade>();
     private float respawnTimer = 0;
+    private GameClientNew client;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
     private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
@@ -66,6 +69,8 @@ public class PlayState extends GameState {
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
 
+        client = new GameClientNew();
+
         b2dr = new Box2DDebugRenderer();
 
         hud = new HUD();
@@ -81,8 +86,16 @@ public class PlayState extends GameState {
         spawnLocations = mb.getSpawnLocations();
 
         //Players
-        player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM,
-                B2DVars.CAM_HEIGHT / B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue", newEntityID());
+        Vector2 spawn = spawnLocations.random();
+        String tempEntityID = newEntityID();
+        player = new SPPlayer(world, B2DVars.MY_ID, spawn.x / B2DVars.PPM,
+                spawn.y / B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue", tempEntityID);
+        EntityPacket packet = new EntityPacket();
+        packet.action = "CONNECT";
+        packet.pos = spawn;
+        packet.myID=B2DVars.MY_ID;
+        packet.entityID=tempEntityID;
+        client.sendUDP(packet);
 
         worldEntities.add(new SPPower(world, 600 / B2DVars.PPM, 500 / B2DVars.PPM,
                 "GET_THIS_ID_FROM_SERVER"));
@@ -185,6 +198,20 @@ public class PlayState extends GameState {
             throwGrenade();
         }
 
+    }
+    private void opponentActionsNew(){
+        Array<Object> packets = client.getReceivedPackets();
+        for (Object packet : packets){
+            if (packet instanceof EntityPacket){
+                EntityPacket pkt = (EntityPacket) packet;
+                if (pkt.action.equals("CONNECT")){
+                    SPPlayer newOpponent = new SPPlayer(world, pkt.myID, pkt.pos.x / B2DVars.PPM, pkt.pos.y / B2DVars.PPM
+                    , B2DVars.BIT_OPPONENT, B2DVars.ID_OPPONENT, "red", pkt.entityID);
+                    opponents.add(newOpponent);
+                    //hud.setOpponentDeath(action[0], action[9]);
+                }
+            }
+        }
     }
 
     private void opponentActions() {
@@ -373,6 +400,7 @@ public class PlayState extends GameState {
         for (String id : myGrenades.keys()){
             myGrenades.get(id).update(dt);
         }
+        opponentActionsNew();
         opponentActions();
         refreshAmmo(dt);
         if (cl.isPlayerHit()) {

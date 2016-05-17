@@ -8,6 +8,7 @@ import com.game.bb.main.Game;
 import com.game.bb.gamestates.GameState;
 import com.game.bb.net.GameServer;
 import com.game.bb.net.PlayStateNetworkMonitor;
+import com.game.bb.net.server.GameServerNew;
 
 import java.util.Stack;
 
@@ -19,6 +20,7 @@ public class GameStateManager {
     private Stack<GameState> states;
     private String ipAddress;
     private boolean hosting = false;
+    private GameServerNew gameServer;
     public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, LOBBY = 4;
 
 
@@ -45,12 +47,14 @@ public class GameStateManager {
         switch (state){
             case PLAY:
                 if(hosting){
-                    new GameServer().start();
+                    gameServer = new GameServerNew();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-                PlayState ps = new PlayState(this);
-                PlayStateNetworkMonitor mon = new PlayStateNetworkMonitor(ps, ipAddress);
-                ps.setNetworkMonitor(mon);
-                return ps;
+                return new PlayState(this);
             case START_SCREEN:
                 return new StartScreenState(this);
             case CONNECT:

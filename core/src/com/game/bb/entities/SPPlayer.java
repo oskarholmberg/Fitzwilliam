@@ -26,7 +26,7 @@ public class SPPlayer extends SPSprite {
     public SPPlayer(World world, String id, float xPos, float yPos, short bodyBIT,
                     String bodyType, String color, String ID) {
         super(world, ID);
-        createPlayer(xPos, yPos, bodyBIT, bodyType);
+        createPlayerBody(xPos, yPos, bodyBIT, bodyType);
         this.id = id;
         dir = 0;
         sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
@@ -105,7 +105,7 @@ public class SPPlayer extends SPSprite {
         return isDead;
     }
 
-    private void createPlayer(float xPos, float yPos, short bodyCategory, String bodyID) {
+    private void createPlayerBody(float xPos, float yPos, short bodyCategory, String bodyID) {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT);
         FixtureDef fdef = new FixtureDef();
