@@ -1,6 +1,8 @@
 package com.game.bb.net;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ArrayMap;
+import com.game.bb.entities.SPGrenade;
 import com.game.bb.gamestates.PlayState;
 import com.game.bb.handlers.B2DVars;
 
@@ -49,7 +51,10 @@ public class PlayStateNetworkMonitor {
     }
 
     public synchronized void sendInterpolationPoints(){
+        ArrayMap<String, SPGrenade>  enteties= ps.getMyEntities();
+        for (String id : enteties.keys()){
 
+        }
     }
 
     public synchronized void addOpponentAction(String action) {

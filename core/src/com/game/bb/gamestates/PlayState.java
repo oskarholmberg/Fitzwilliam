@@ -131,11 +131,8 @@ public class PlayState extends GameState {
         }
     }
 
-    private void sendGrenadeInterpolation(){
-
-        for (String id : myGrenades.keys()){
-
-        }
+    public ArrayMap<String, SPGrenade> getMyEntities(){
+        return myGrenades;
     }
 
     public String newEntityID(){

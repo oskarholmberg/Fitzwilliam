@@ -11,5 +11,6 @@ eclipse.project {
 }
 dependencies {
     compile 'com.badlogicgames.gdx:gdx-backend-lwjgl:1.9.2'
+    compile project(':kryonet-2.21-all')
 }
 
