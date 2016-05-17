@@ -328,6 +328,11 @@ public class PlayState extends GameState {
                 mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
                         cl.getKillingEntity().getID(), Float.toString(cl.getKillingEntity().getDirection()));
                 world.destroyBody(grenades.removeKey(temp.getID()).getBody());
+            } else if (temp instanceof SPBullet){
+                mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
+                        cl.getKillingEntity().getID(), Float.toString(cl.getKillingEntity().getDirection()));
+                world.destroyBody(temp.getBody());
+                worldEntities.removeValue(temp, true);
             }
         }
     }
