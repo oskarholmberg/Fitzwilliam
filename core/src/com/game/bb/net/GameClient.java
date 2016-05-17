@@ -18,7 +18,7 @@ public class GameClient extends Thread {
 
     private InetAddress ipAddress;
     private DatagramSocket socket;
-    private int port = 8080;
+    private int port = 8090;
     private PlayStateNetworkMonitor mon;
 
     public GameClient(PlayStateNetworkMonitor mon, String ipAddress) {

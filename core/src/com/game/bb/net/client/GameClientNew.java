@@ -1,34 +1,33 @@
 package com.game.bb.net.client;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import com.game.bb.net.packets.EntityPacket;
-import com.game.bb.net.packets.TCPEventPacket;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.util.List;
 
 /**
  * Created by erik on 17/05/16.
  */
 public class GameClientNew extends Listener {
-    private Client client;
+    private Client kryoClient;
     private int udpPort = 8080, tcpPort = 8081;
     private Array<Object> reveicedPackets;
 
     public GameClientNew(){
         reveicedPackets = new Array<Object>();
-        client = new Client();
-        client.getKryo().register(EntityPacket.class);
-        client.getKryo().register(TCPEventPacket.class);
-        client.addListener(this);
-        client.start();
-        Gdx.app.log("NET_CLIENT", "Game client started at " + TimeUtils.millis());
+        kryoClient = new Client();
+        Class[] classes = {String.class, Vector2.class};
+        for (Class c : classes){
+            kryoClient.getKryo().register(c);
+        }
+        kryoClient.addListener(this);
+        kryoClient.start();
+        Gdx.app.log("NET_CLIENT", "GameClient started at " + TimeUtils.millis());
 
         findLocalServer();
     }
@@ -36,9 +35,10 @@ public class GameClientNew extends Listener {
     private void findLocalServer(){
         Gdx.app.log("NET_CLIENT_CONNECT", "Addresses found: ");
         try {
-            client.connect(5000, "localhost", tcpPort, udpPort);
+            kryoClient.connect(5000, "192.168.0.194", tcpPort, udpPort);
             Gdx.app.log("NET_CLIENT_CONNECT", "Connected to host @");
         } catch (IOException e) {
+            System.out.println("No server found...");
             e.printStackTrace();
         }
     }
@@ -57,10 +57,12 @@ public class GameClientNew extends Listener {
 
 
     public void sendUDP(Object packet){
-        client.sendUDP(packet);
+        kryoClient.sendUDP(packet);
+        Gdx.app.log("NET_CLIENT_PACKET_UDP", packet.getClass().toString());
     }
 
     public void sendTCP(Object packet){
-        client.sendTCP(packet);
+        kryoClient.sendTCP(packet);
+        Gdx.app.log("NET_CLIENT_PACKET_TCP", packet.getClass().toString());
     }
 }

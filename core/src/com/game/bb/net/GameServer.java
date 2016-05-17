@@ -22,7 +22,7 @@ public class GameServer extends Thread {
     private HashMap<String, Integer> clientDeaths;
     private String ipAddress;
     private GameServerAnnouncer announcer;
-    private int port = 8080;
+    private int port = 8090;
 
     public GameServer() {
         // First String is ipAddress, second is last known action.

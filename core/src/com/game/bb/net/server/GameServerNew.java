@@ -1,16 +1,14 @@
 package com.game.bb.net.server;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.game.bb.net.packets.EntityPacket;
-import com.game.bb.net.packets.TCPEventPacket;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 /**
  * Created by erik on 17/05/16.
@@ -22,8 +20,10 @@ public class GameServerNew extends Listener {
 
     public GameServerNew(){
         kryoServer = new Server();
-        kryoServer.getKryo().register(EntityPacket.class);
-        kryoServer.getKryo().register(TCPEventPacket.class);
+        Class[] classes = {String.class, Vector2.class};
+        for (Class c : classes){
+            kryoServer.getKryo().register(c);
+        }
         try {
             kryoServer.bind(tcpPort, udpPort);
         } catch (IOException e) {

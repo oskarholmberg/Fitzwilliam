@@ -91,11 +91,11 @@ public class PlayState extends GameState {
         player = new SPPlayer(world, B2DVars.MY_ID, spawn.x,
                 spawn.y, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue", tempEntityID);
         EntityPacket packet = new EntityPacket();
-        packet.action = "CONNECT";
-        packet.pos = spawn;
+        packet.action="CONNECT";
+        packet.pos=spawn;
         packet.myID=B2DVars.MY_ID;
         packet.entityID=tempEntityID;
-        client.sendUDP(packet);
+        client.sendTCP(packet);
 
         worldEntities.add(new SPPower(world, 600 / B2DVars.PPM, 500 / B2DVars.PPM,
                 "GET_THIS_ID_FROM_SERVER"));
@@ -114,7 +114,6 @@ public class PlayState extends GameState {
             mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection),
                     Long.toString(System.currentTimeMillis()), ID);
             Vector2 pos = player.getPosition();
-            System.out.println("Player xPos: " + pos.x + " yPos: " + pos.y);
             SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false, ID);
             worldEntities.add(bullet);
             amntBullets--;
@@ -134,8 +133,6 @@ public class PlayState extends GameState {
             Vector2 pos = player.getPosition();
             myGrenades.put(ID, new SPGrenade(world, pos.x, pos.y, lastJumpDirection, false, ID));
             amntGrenades--;
-            System.out.println(TimeUtils.millis());
-            System.out.println(newEntityID().getBytes());
             hud.setAmountGrenadesLeft(amntGrenades);
             if (amntGrenades == 0) {
                 grenadesIsEmpty = true;
@@ -151,7 +148,6 @@ public class PlayState extends GameState {
     public String newEntityID(){
         String[] split = entityID.split("%");
         entityID = split[0] + "%" +(Integer.valueOf(split[1]) + 1);
-        System.out.println(entityID);
         return entityID;
     }
 
