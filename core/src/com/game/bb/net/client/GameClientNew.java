@@ -34,11 +34,11 @@ public class GameClientNew extends Listener {
     }
 
     private void findLocalServer(){
-        List<InetAddress> addresses = client.discoverHosts(tcpPort, udpPort);
-        Gdx.app.log("NET_CLIENT_CONNECT", "Addresses found: " + addresses);
+        InetAddress ip = client.discoverHost(tcpPort, udpPort);
+        Gdx.app.log("NET_CLIENT_CONNECT", "Addresses found: " + ip);
         try {
-            client.connect(5000, addresses.get(0), tcpPort, udpPort);
-            Gdx.app.log("NET_CLIENT_CONNECT", "Connected to host @" + addresses.get(0));
+            client.connect(5000, ip, tcpPort, udpPort);
+            Gdx.app.log("NET_CLIENT_CONNECT", "Connected to host @" + ip);
         } catch (IOException e) {
             e.printStackTrace();
         }
