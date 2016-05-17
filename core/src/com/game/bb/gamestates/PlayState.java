@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ArrayMap;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.entities.SPGrenade;
 import com.game.bb.entities.SPPower;
@@ -48,7 +49,7 @@ public class PlayState extends GameState {
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh, powerReload = 30f;
     private String entityID = B2DVars.MY_ID + "%0";
     private Array<SPSprite> worldEntities;
-    private HashMap<String, SPGrenade> grenades = new HashMap<String, SPGrenade>();
+    private ArrayMap<String, SPGrenade> grenades = new ArrayMap<String, SPGrenade>();
     private float respawnTimer = 0;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
@@ -82,9 +83,9 @@ public class PlayState extends GameState {
         //Players
         player = new SPPlayer(world, B2DVars.MY_ID, B2DVars.CAM_WIDTH / 2 / B2DVars.PPM,
                 B2DVars.CAM_HEIGHT / B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue", newEntityID());
-
-        worldEntities.add(new SPPower(world, 600 / B2DVars.PPM, 500 / B2DVars.PPM,
-                "GET_THIS_ID_FROM_SERVER"));
+        //remove following comment to add powerup
+        //worldEntities.add(new SPPower(world, 600 / B2DVars.PPM, 500 / B2DVars.PPM,
+        //        "GET_THIS_ID_FROM_SERVER"));
 
 
         // set up box2d cam
@@ -224,7 +225,7 @@ public class PlayState extends GameState {
 
     private void removeKillingEntity(String killerID){
         if (grenades.containsKey(killerID)){
-            world.destroyBody(grenades.remove(killerID).getBody());
+            world.destroyBody(grenades.removeKey(killerID).getBody());
         } else {
             for (SPSprite s : worldEntities) {
                 if (s.getID().equals(killerID)) {
@@ -303,9 +304,9 @@ public class PlayState extends GameState {
                         Float.toString(b.getPosition().y));
             }
         }
-        for (String s : grenades.keySet()){
+        for (String s : grenades.keys()){
             if (grenades.get(s) != null && grenades.get(s).lifeTimeReached(dt)){
-                world.destroyBody(grenades.remove(s).getBody());
+                world.destroyBody(grenades.removeKey(s).getBody());
             }
         }
         cl.clearGrenadeList();
@@ -324,7 +325,7 @@ public class PlayState extends GameState {
             hud.addPlayerDeath();
             SPSprite temp = (SPSprite) cl.getKillingEntity().getBody().getUserData();
             if (temp instanceof SPGrenade){
-                world.destroyBody(grenades.remove(temp.getID()).getBody());
+                world.destroyBody(grenades.removeKey(temp.getID()).getBody());
             } else {
                 //In this addAction add the ID of the killing bullet last
                 mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
@@ -348,7 +349,7 @@ public class PlayState extends GameState {
         for(SPSprite sprite : worldEntities){
             sprite.update(dt);
         }
-        for(String id : grenades.keySet()){
+        for(String id : grenades.keys()){
             grenades.get(id).update(dt);
         }
         opponentActions();
@@ -385,14 +386,14 @@ public class PlayState extends GameState {
         for (SPPlayer opponent : opponents) {
             opponent.render(sb);
         }
-        for (String grenade : grenades.keySet()){
+        for (String grenade : grenades.keys()){
             grenades.get(grenade).render(sb);
         }
         player.render(sb);
         hud.render(sb);
 
         //Do this last in render
-        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+        //b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         sb.setProjectionMatrix(cam.combined);
     }
 
