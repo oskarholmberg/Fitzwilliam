@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.game.bb.net.packets.EntityPacket;
 
 import java.io.IOException;
 
@@ -21,7 +22,7 @@ public class GameClientNew extends Listener {
     public GameClientNew(){
         reveicedPackets = new Array<Object>();
         kryoClient = new Client();
-        Class[] classes = {String.class, Vector2.class};
+        Class[] classes = {String.class, Vector2.class, EntityPacket.class};
         for (Class c : classes){
             kryoClient.getKryo().register(c);
         }
@@ -45,6 +46,7 @@ public class GameClientNew extends Listener {
 
     @Override
     public void received(Connection c, Object packet){
+        Gdx.app.log("NET_CLIENT_PACKET_RECEIVED", packet.getClass().toString());
         reveicedPackets.add(packet);
     }
 
