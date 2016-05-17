@@ -16,7 +16,7 @@ import com.game.bb.handlers.SPAnimation;
  */
 public class SPPower extends SPSprite{
     private SPAnimation animation;
-    private int offset = 32;
+    private int offset = 16;
     public SPPower(World world, float xPos, float yPos, String ID) {
         super(world, ID);
         createPowerBody(xPos, yPos);
@@ -26,7 +26,7 @@ public class SPPower extends SPSprite{
 
     private void createPowerBody(float xPos, float yPos){
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(32 / B2DVars.PPM, 32 / B2DVars.PPM);
+        shape.setAsBox(16 / B2DVars.PPM, 16 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         fdef.filter.categoryBits = B2DVars.BIT_POWERUP;
@@ -47,10 +47,10 @@ public class SPPower extends SPSprite{
 
     @Override
     public void render(SpriteBatch sb){
-        float x = body.getPosition().x * B2DVars.PPM - width / 2;
-        float y = body.getPosition().y * B2DVars.PPM - height / 2;
+        float x = body.getPosition().x * B2DVars.PPM-offset;
+        float y = body.getPosition().y * B2DVars.PPM-offset;
         sb.begin();
-        sb.draw(animation.getFrame(), x - offset, y - offset);
+        sb.draw(animation.getFrame(), x, y, 32, 32);
         sb.end();
     }
 }
