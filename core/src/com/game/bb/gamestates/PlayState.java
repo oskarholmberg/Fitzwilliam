@@ -88,8 +88,8 @@ public class PlayState extends GameState {
         //Players
         Vector2 spawn = spawnLocations.random();
         String tempEntityID = newEntityID();
-        player = new SPPlayer(world, B2DVars.MY_ID, spawn.x / B2DVars.PPM,
-                spawn.y / B2DVars.PPM, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue", tempEntityID);
+        player = new SPPlayer(world, B2DVars.MY_ID, spawn.x,
+                spawn.y, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue", tempEntityID);
         EntityPacket packet = new EntityPacket();
         packet.action = "CONNECT";
         packet.pos = spawn;

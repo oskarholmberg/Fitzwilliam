@@ -20,7 +20,6 @@ public class GameStateManager {
     private Stack<GameState> states;
     private String ipAddress;
     private boolean hosting = false;
-    private GameServerNew gameServer;
     public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, LOBBY = 4;
 
 
@@ -47,14 +46,13 @@ public class GameStateManager {
         switch (state){
             case PLAY:
                 if(hosting){
-                    gameServer = new GameServerNew();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    new GameServerNew();
+                    new GameServer().start();
                 }
-                return new PlayState(this);
+                PlayState ps = new PlayState(this);
+                PlayStateNetworkMonitor mon = new PlayStateNetworkMonitor(ps, ipAddress);
+                ps.setNetworkMonitor(mon);
+                return ps;
             case START_SCREEN:
                 return new StartScreenState(this);
             case CONNECT:
