@@ -9,7 +9,7 @@ import com.game.bb.handlers.SPInput;
 import com.game.bb.handlers.SPInputProcessor;
 
 public class Game extends ApplicationAdapter {
-    public final static String TITLE = "Space Pirates";
+    public final static String TITLE = "Fitzwilliam";
 
     private SpriteBatch batch;
     private OrthographicCamera cam;
