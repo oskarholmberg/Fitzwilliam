@@ -1,7 +1,5 @@
 package com.game.bb.entities;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -15,36 +13,32 @@ import com.game.bb.handlers.B2DVars;
  */
 public class SPOpponent extends SPPlayer {
 
-    private Sound sound;
-    private Texture[] textures;
-    private int xOffset = 23, yOffset = 25;
     private PolygonShape shape;
 
     public SPOpponent(World world, float xPos, float yPos, int ID) {
         super(world, xPos, yPos, ID);
         createOpponentBody(xPos, yPos);
         dir = 0;
-        sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
         loadTexture("red");
         setTexture(textures[STAND_RIGHT]);
     }
 
     /**
      * Moves the opponent to position xPos, yPos, with velocities xV, yV
-     * sets texture according to texture and plays jump sound if jump == 1.
+     * sets texture according to texture and plays sound jetpackSound if sound == 1.
      * @param xPos, x position to move to.
      * @param yPos, y position to move to.
      * @param xV, velocity in horizontal direction.
      * @param yV, velocity in vertical direction.
      * @param texture, sets the texture according to value.
-     * @param jump, if 1 will play jump sound, else nothing happens.
+     * @param sound, if sound == 1, jetpackSound will play. Else nothing happens.
      */
-    public void move(float xPos, float yPos, float xV, float yV, int texture, int jump) {
+    public void move(float xPos, float yPos, float xV, float yV, int texture, int sound) {
         body.setTransform(xPos, yPos, 0);
         body.setLinearVelocity(xV, yV);
         setTexture(textures[texture]);
-        if(jump == 1){
-            sound.play();
+        if(sound == 1){
+            jetpackSound.play();
         }
     }
 

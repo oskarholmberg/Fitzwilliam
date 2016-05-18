@@ -47,8 +47,6 @@ public class PlayState extends GameState {
     private int entityAccum = 0;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
-    private Array<SPSprite> worldEntities;
-    private ArrayMap<Integer, SPGrenade> enemyGrenades = new ArrayMap<Integer, SPGrenade>();
     private ArrayMap<Integer, SPSprite> myEntities = new ArrayMap<Integer, SPSprite>();
     private ArrayMap<Integer, SPSprite> opEntities = new ArrayMap<Integer, SPSprite>();
     private float respawnTimer = 0;
@@ -76,7 +74,6 @@ public class PlayState extends GameState {
 
         hud = new HUD();
 
-        worldEntities = new Array<SPSprite>();
         opponents = new ArrayMap<Integer, SPPlayer>();
         // create boundaries
 
@@ -90,7 +87,7 @@ public class PlayState extends GameState {
         Vector2 spawn = spawnLocations.random();
         int tempEntityID = newEntityID();
         player = new SPPlayer(world, spawn.x,
-                spawn.y, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue", tempEntityID);
+                spawn.y, tempEntityID);
         TCPEventPacket packet = new TCPEventPacket();
         packet.action = B2DVars.NET_CONNECT;
         packet.pos = spawn;
@@ -125,7 +122,6 @@ public class PlayState extends GameState {
             Vector2 pos = player.getPosition();
             SPGrenade spg = new SPGrenade(world, pos.x, pos.y, lastJumpDirection, false, ID);
             myEntities.put(ID, spg);
-            System.out.println("Grenade created: " + ID);
             amntGrenades--;
             hud.setAmountGrenadesLeft(amntGrenades);
             if (amntGrenades == 0) {
@@ -172,7 +168,7 @@ public class PlayState extends GameState {
             case B2DVars.NET_CONNECT:
                 if (!opponents.containsKey(pkt.id)) {
                     SPPlayer newOpponent = new SPPlayer(world, pkt.pos.x, pkt.pos.y
-                            , B2DVars.BIT_OPPONENT, B2DVars.ID_OPPONENT, "red", pkt.id);
+                            , pkt.id);
                     opponents.put(pkt.id, newOpponent);
                     TCPEventPacket packet = new TCPEventPacket();
                     packet.action=B2DVars.NET_CONNECT;
@@ -296,7 +292,6 @@ public class PlayState extends GameState {
                     TCPEventPacket pkt = new TCPEventPacket();
                     pkt.id = id;
                     pkt.action = B2DVars.NET_DESTROY_BODY;
-                    System.out.println("Destroy grenade: " + id);
                     client.sendTCP(pkt);
                     SPSprite grenade = myEntities.removeKey(id);
                     grenade.dispose();

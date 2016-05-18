@@ -16,11 +16,11 @@ import com.game.bb.handlers.B2DVars;
  */
 public class SPPlayer extends SPSprite {
 
-    private Sound sound;
-    private Texture[] textures;
+    protected Sound jetpackSound;
+    protected Texture[] textures;
+    protected int xOffset = 23, yOffset = 25;
     private boolean onGround = true, isDead = false;
     private float textureTimer = 0;
-    private int xOffset = 23, yOffset = 25;
     private PolygonShape shape;
     public static int STAND_RIGHT = 0, STAND_LEFT = 1, JUMP_RIGHT = 2, JUMP_LEFT = 3,
             DEAD_RIGHT = 4, DEAD_LEFT = 5;
@@ -29,7 +29,7 @@ public class SPPlayer extends SPSprite {
         super(world, ID);
         createPlayerBody(xPos, yPos);
         dir = 0;
-        sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
+        jetpackSound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
         loadTexture("blue");
         setTexture(textures[STAND_RIGHT]);
     }
@@ -46,7 +46,7 @@ public class SPPlayer extends SPSprite {
             } else {
                 setTexture(textures[JUMP_RIGHT]);
             }
-            sound.play();
+            jetpackSound.play();
         }
     }
 
