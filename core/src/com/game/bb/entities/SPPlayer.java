@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.game.bb.gamestates.PlayState;
 import com.game.bb.handlers.B2DVars;
 
 /**
@@ -42,6 +43,7 @@ public class SPPlayer extends SPSprite {
             onGround = false;
             if (xForce < 0) {
                 setTexture(inAirLeft);
+                PlayState.playState.currentTexture
             } else {
                 setTexture(inAirRight);
             }

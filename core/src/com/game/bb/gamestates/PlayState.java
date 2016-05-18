@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.entities.SPGrenade;
+import com.game.bb.entities.SPOpponent;
 import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
@@ -42,13 +43,11 @@ public class PlayState extends GameState {
     private OrthographicCamera b2dCam;
     private SPContactListener cl;
     private SPPlayer player;
-    private ArrayMap<Integer, SPPlayer> opponents;
+    private ArrayMap<Integer, SPOpponent> opponents;
     private Array<Vector2> spawnLocations;
     private int entityAccum = 0;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
-    private Array<SPSprite> worldEntities;
-    private ArrayMap<Integer, SPGrenade> enemyGrenades = new ArrayMap<Integer, SPGrenade>();
     private ArrayMap<Integer, SPSprite> myEntities = new ArrayMap<Integer, SPSprite>();
     private ArrayMap<Integer, SPSprite> opEntities = new ArrayMap<Integer, SPSprite>();
     private float respawnTimer = 0;
@@ -62,10 +61,13 @@ public class PlayState extends GameState {
     private int pktSequence = 0;
     private boolean  grenadesIsEmpty = false;
     private float sendNetworkInfo = 0f;
+    public int currentTexture = SPOpponent.STAND_LEFT;
+    public static PlayState playState;
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
 
+        playState = this;
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
 
@@ -76,8 +78,7 @@ public class PlayState extends GameState {
 
         hud = new HUD();
 
-        worldEntities = new Array<SPSprite>();
-        opponents = new ArrayMap<Integer, SPPlayer>();
+        opponents = new ArrayMap<Integer, SPOpponent>();
         // create boundaries
 
         String[] layers = {"moonBlocks", "domeBlocks"};
@@ -171,9 +172,8 @@ public class PlayState extends GameState {
         switch (pkt.action) {
             case B2DVars.NET_CONNECT:
                 if (!opponents.containsKey(pkt.id)) {
-                    SPPlayer newOpponent = new SPPlayer(world, pkt.pos.x, pkt.pos.y
-                            , B2DVars.BIT_OPPONENT, B2DVars.ID_OPPONENT, "red", pkt.id);
-                    opponents.put(pkt.id, newOpponent);
+                    SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id);
+                    opponents.put(pkt.id, opponent);
                     TCPEventPacket packet = new TCPEventPacket();
                     packet.action=B2DVars.NET_CONNECT;
                     packet.pos=player.getPosition();

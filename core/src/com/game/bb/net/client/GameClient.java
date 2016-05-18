@@ -9,6 +9,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.game.bb.net.packets.EntityCluster;
 import com.game.bb.net.packets.EntityPacket;
+import com.game.bb.net.packets.PlayerMovementPacket;
 import com.game.bb.net.packets.TCPEventPacket;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class GameClient extends Listener {
         entityClusters = new Array<EntityCluster>();
         kryoClient = new Client();
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
-                TCPEventPacket.class, EntityCluster.class, EntityPacket[].class};
+                TCPEventPacket.class, EntityCluster.class, EntityPacket[].class, PlayerMovementPacket.class};
         for (Class c : classes){
             kryoClient.getKryo().register(c);
         }
