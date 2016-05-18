@@ -260,6 +260,10 @@ public class PlayState extends GameState {
         for (int id : cl.getIdsToRemove()){
             if (myEntities.containsKey(id)){
                 //Add code to NET for others to remove this bullet
+                TCPEventPacket packet = new TCPEventPacket();
+                packet.action=B2DVars.NET_DESTROY_BODY;
+                packet.id=id;
+                client.sendUDP(packet);
                 SPSprite bullet = myEntities.removeKey(id);
                 world.destroyBody(bullet.getBody());
                 bullet.dispose();
