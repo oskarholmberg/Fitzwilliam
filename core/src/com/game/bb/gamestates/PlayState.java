@@ -304,6 +304,7 @@ public class PlayState extends GameState {
         pkt.seq = playerPktSequence++;
         pkt.sound=0;
         pkt.tex = currentTexture;
+        pkt.id=player.getID();
         client.sendUDP(pkt);
     }
 
