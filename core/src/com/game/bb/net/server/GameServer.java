@@ -47,7 +47,7 @@ public class GameServer extends Listener {
     @Override
     public void received(Connection c, Object packet){
         //Gdx.app.log("NET_SERVER_PACKET_RECEIVED", packet.getClass().toString());
-        if (packet instanceof EntityCluster) {
+        if (packet instanceof EntityCluster || packet instanceof PlayerMovementPacket) {
             for (Connection connect : kryoServer.getConnections()) {
                 if (!c.equals(connect)) {
                     connect.sendUDP(packet);
