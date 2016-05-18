@@ -189,7 +189,9 @@ public class PlayState extends GameState {
             case B2DVars.NET_DESTROY_BODY:
                 if(opEntities.containsKey(pkt.id)){
                     System.out.println("TCPEvent destroy body: " + pkt.id);
-                    world.destroyBody(opEntities.removeKey(pkt.id).getBody());
+                    SPSprite opEntity = opEntities.removeKey(pkt.id);
+                    world.destroyBody(opEntity.getBody());
+                    opEntity.dispose();
                 }
                 break;
         }
@@ -205,7 +207,9 @@ public class PlayState extends GameState {
                         b.setTransform(pkt.xp, pkt.yp, 0);
                         b.setLinearVelocity(pkt.xf, pkt.yf);
                     } else if (pkt.alive == 0) {
-                        world.destroyBody(opEntities.removeKey(pkt.id).getBody());
+                        SPSprite opEntity = opEntities.get(pkt.id);
+                        world.destroyBody(opEntity.getBody());
+                        opEntity.dispose();
                     }
                 } else {
                     if (pkt.type == B2DVars.TYPE_GRENADE) {
@@ -218,29 +222,6 @@ public class PlayState extends GameState {
                 }
             }
         }
-    }
-
-    private void removeKillingEntity(int killerID) {
-        if (enemyGrenades.containsKey(killerID)) {
-            world.destroyBody(enemyGrenades.removeKey(killerID).getBody());
-        } else {
-            for (SPSprite s : worldEntities) {
-                if (s.getID()==killerID) {
-                    worldEntities.removeValue(s, true);
-                    world.destroyBody(s.getBody());
-                }
-            }
-        }
-    }
-
-    private boolean validOpponentAction(String[] split) {
-        if (split.length >= 2 && !split[0].equals(B2DVars.MY_ID))
-            return true;
-        return false;
-    }
-
-    private SPPlayer getOpponent(int id) {
-        return opponents.get(id);
     }
 
     private void respawnPlayer() {

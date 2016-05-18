@@ -21,6 +21,7 @@ public class SPPlayer extends SPSprite {
     private boolean onGround = true, isDead = false;
     private float textureTimer = 0;
     private int xOffset = 23, yOffset = 25;
+    private PolygonShape shape;
 
     public SPPlayer(World world, float xPos, float yPos, short bodyBIT,
                     String bodyType, String color, int ID) {
@@ -100,7 +101,7 @@ public class SPPlayer extends SPSprite {
     }
 
     private void createPlayerBody(float xPos, float yPos, short bodyCategory, String bodyID) {
-        PolygonShape shape = new PolygonShape();
+        shape = new PolygonShape();
         shape.setAsBox(B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
@@ -144,5 +145,17 @@ public class SPPlayer extends SPSprite {
             deadRight = new Texture("images/player/redPlayerDeadRight.png");
             deadLeft = new Texture("images/player/redPlayerDeadLeft.png");
         }
+    }
+
+    @Override
+    public void dispose() {
+        texture.dispose();
+        onGroundRight.dispose();
+        onGroundLeft.dispose();
+        inAirLeft.dispose();
+        inAirRight.dispose();
+        deadLeft.dispose();
+        deadRight.dispose();
+        shape.dispose();
     }
 }

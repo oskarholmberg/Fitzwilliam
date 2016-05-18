@@ -15,12 +15,12 @@ import com.game.bb.handlers.SPAnimation;
  */
 public class SPGrenade extends SPSprite {
 
-    private int offset = 15, amountBounces = 0;
+    private int offset = 15;
     private float posYoffset = 5 / B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH + (20 / B2DVars.PPM);
     private SPAnimation animation;
-    private TextureRegion[] regions;
     private Texture grenade;
     private boolean opponentGrenade;
+    private CircleShape shape;
     private float lifetime = 0f;
 
     public SPGrenade(World world, float xPos, float yPos, float dir, boolean opponentGrenade, int ID) {
@@ -34,11 +34,8 @@ public class SPGrenade extends SPSprite {
         else{
             grenade = new Texture("images/weapons/blueGrenade.png");
         }
-        regions = new TextureRegion[4];
-        for (int i = 0; i < regions.length; i++) {
-            regions[i] = new TextureRegion(grenade, i * 30, 0, 30, 30);
-        }
-        animation = new SPAnimation(regions, 0.2f);
+        animation = new SPAnimation(TextureRegion.split(grenade, 30, 30)[0], 0.2f);
+
     }
 
     public float getDir() {
@@ -68,7 +65,7 @@ public class SPGrenade extends SPSprite {
     }
 
     private void createGrenadeBody(float xPos, float yPos, float dir) {
-        CircleShape shape = new CircleShape();
+        shape = new CircleShape();
         shape.setRadius(15 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
@@ -88,5 +85,13 @@ public class SPGrenade extends SPSprite {
         if (!opponentGrenade)
             body.setLinearVelocity(B2DVars.PH_GRENADE_X * dir / B2DVars.PPM, B2DVars.PH_GRENADE_Y / B2DVars.PPM);
         body.setUserData(this);
+    }
+
+    @Override
+    public void dispose() {
+        texture.dispose();
+        shape.dispose();
+        grenade.dispose();
+        animation.dispose();
     }
 }
