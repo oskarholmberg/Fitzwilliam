@@ -36,7 +36,7 @@ public class GameClientNew extends Listener {
     private void findLocalServer(){
         Gdx.app.log("NET_CLIENT_CONNECT", "Addresses found: ");
         try {
-            kryoClient.connect(5000, "192.168.0.194", tcpPort, udpPort);
+            kryoClient.connect(5000, kryoClient.discoverHost(udpPort, 5000), tcpPort, udpPort);
             Gdx.app.log("NET_CLIENT_CONNECT", "Connected to host @");
         } catch (IOException e) {
             System.out.println("No server found...");
@@ -51,7 +51,9 @@ public class GameClientNew extends Listener {
     }
 
     public Object getReceivedPacket(){
-        return receivedPackets.pop();
+        if(receivedPackets.size > 0)
+            return receivedPackets.pop();
+        return null;
     }
 
 

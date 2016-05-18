@@ -32,6 +32,7 @@ public class GameServerNew extends Listener {
         kryoServer.addListener(this);
         kryoServer.start();
         Gdx.app.log("NET_SERVER", "Game server started at " + TimeUtils.millis());
+        Gdx.app.log("NET_SERVER", "UDP port: " + udpPort + " TCP port: " + tcpPort);
     }
 
     @Override
@@ -52,5 +53,9 @@ public class GameServerNew extends Listener {
     @Override
     public void disconnected(Connection c){
         //Maybe add code here later
+    }
+
+    public static void main(String[] args){
+        new GameServerNew();
     }
 }

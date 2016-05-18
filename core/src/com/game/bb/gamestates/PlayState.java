@@ -201,7 +201,7 @@ public class PlayState extends GameState {
             System.out.println("Entity packet found! :D ");
             EntityPacket pkt = (EntityPacket) packet;
             if (pkt.action.equals("CONNECT")) {
-                SPPlayer newOpponent = new SPPlayer(world, pkt.myID, pkt.pos.x / B2DVars.PPM, pkt.pos.y / B2DVars.PPM
+                SPPlayer newOpponent = new SPPlayer(world, pkt.myID, pkt.pos.x, pkt.pos.y
                         , B2DVars.BIT_OPPONENT, B2DVars.ID_OPPONENT, "red", pkt.entityID);
                 opponents.add(newOpponent);
                 System.out.println("Opponent added!");
