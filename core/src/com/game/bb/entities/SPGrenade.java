@@ -89,7 +89,6 @@ public class SPGrenade extends SPSprite {
 
     @Override
     public void dispose() {
-        texture.dispose();
         shape.dispose();
         grenade.dispose();
         animation.dispose();

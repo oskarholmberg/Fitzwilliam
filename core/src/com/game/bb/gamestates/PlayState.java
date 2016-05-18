@@ -254,7 +254,9 @@ public class PlayState extends GameState {
         for (int id : cl.getIdsToRemove()){
             if (myEntities.containsKey(id)){
                 //Add code to NET for others to remove this bullet
-                world.destroyBody(myEntities.get(id).getBody());
+                SPSprite bullet = myEntities.removeKey(id);
+                world.destroyBody(bullet.getBody());
+                bullet.dispose();
             }
         }
         cl.clearBulletList();
@@ -296,7 +298,9 @@ public class PlayState extends GameState {
                     pkt.action = B2DVars.NET_DESTROY_BODY;
                     System.out.println("Destroy grenade: " + id);
                     client.sendTCP(pkt);
-                    world.destroyBody(myEntities.removeKey(id).getBody());
+                    SPSprite grenade = myEntities.removeKey(id);
+                    grenade.dispose();
+                    world.destroyBody(grenade.getBody());
                 }
             }
         }
