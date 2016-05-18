@@ -17,20 +17,21 @@ import com.game.bb.handlers.B2DVars;
 public class SPPlayer extends SPSprite {
 
     private Sound sound;
-    private Texture onGroundRight, inAirRight, onGroundLeft, inAirLeft, deadRight, deadLeft;
+    private Texture[] textures;
     private boolean onGround = true, isDead = false;
     private float textureTimer = 0;
     private int xOffset = 23, yOffset = 25;
     private PolygonShape shape;
+    public static int STAND_RIGHT = 0, STAND_LEFT = 1, JUMP_RIGHT = 2, JUMP_LEFT = 3,
+            DEAD_RIGHT = 4, DEAD_LEFT = 5;
 
-    public SPPlayer(World world, float xPos, float yPos, short bodyBIT,
-                    String bodyType, String color, int ID) {
+    public SPPlayer(World world, float xPos, float yPos, int ID) {
         super(world, ID);
-        createPlayerBody(xPos, yPos, bodyBIT, bodyType);
+        createPlayerBody(xPos, yPos);
         dir = 0;
         sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
-        loadTexture(color);
-        setTexture(onGroundRight);
+        loadTexture("blue");
+        setTexture(textures[STAND_RIGHT]);
     }
 
     public void jump(float xForce, float yForce, float xPos, float yPos) {
@@ -41,9 +42,9 @@ public class SPPlayer extends SPSprite {
             textureTimer = 0;
             onGround = false;
             if (xForce < 0) {
-                setTexture(inAirLeft);
+                setTexture(textures[JUMP_LEFT]);
             } else {
-                setTexture(inAirRight);
+                setTexture(textures[JUMP_RIGHT]);
             }
             sound.play();
         }
@@ -57,15 +58,15 @@ public class SPPlayer extends SPSprite {
     public void kill(float dir) {
         isDead = true;
         if (dir < 0) {
-            setTexture(deadRight);
+            setTexture(textures[DEAD_RIGHT]);
         } else {
-            setTexture(deadLeft);
+            setTexture(textures[DEAD_LEFT]);
         }
     }
 
     public void revive() {
         isDead = false;
-        setTexture(onGroundLeft);
+        setTexture(textures[STAND_RIGHT]);
     }
 
     @Override
@@ -76,11 +77,11 @@ public class SPPlayer extends SPSprite {
             float y = body.getPosition().y * B2DVars.PPM - B2DVars.PLAYER_HEIGHT;
             if (!isDead) {
                 if (textureTimer >= 0.5f && !onGround) {
-                    if (texture.equals(inAirLeft)) {
-                        setTexture(onGroundLeft);
+                    if (texture.equals(textures[JUMP_LEFT])) {
+                        setTexture(textures[STAND_LEFT]);
                         xOffset = 30;
                     } else {
-                        setTexture(onGroundRight);
+                        setTexture(textures[STAND_RIGHT]);
                         xOffset = 23;
                     }
                     onGround = true;
@@ -100,62 +101,52 @@ public class SPPlayer extends SPSprite {
         return isDead;
     }
 
-    private void createPlayerBody(float xPos, float yPos, short bodyCategory, String bodyID) {
+    private void createPlayerBody(float xPos, float yPos) {
         shape = new PolygonShape();
         shape.setAsBox(B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
-        fdef.filter.categoryBits = bodyCategory;
-        if (bodyCategory == B2DVars.BIT_PLAYER)
-            fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET | B2DVars.BIT_GRENADE
-                    | B2DVars.BIT_POWERUP;
-        else
-            fdef.filter.maskBits = B2DVars.BIT_GROUND;
+        fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
+        fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET | B2DVars.BIT_GRENADE
+                | B2DVars.BIT_POWERUP;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bdef);
-        body.createFixture(fdef).setUserData(bodyID);
+        body.createFixture(fdef).setUserData(B2DVars.ID_PLAYER);
         body.setUserData(this);
 
         //add foot
-        if (bodyID.equals(B2DVars.ID_PLAYER)) {
-            shape.setAsBox(B2DVars.PLAYER_WIDTH - 2 / B2DVars.PPM, 2 / B2DVars.PPM, new Vector2(0, -B2DVars.PLAYER_HEIGHT), 0);
-            fdef.shape = shape;
-            fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
-            fdef.filter.maskBits = B2DVars.BIT_GROUND;
-            fdef.isSensor = true;
-            body.createFixture(fdef).setUserData(B2DVars.ID_FOOT);
-        }
+        shape.setAsBox(B2DVars.PLAYER_WIDTH - 2 / B2DVars.PPM, 2 / B2DVars.PPM, new Vector2(0, -B2DVars.PLAYER_HEIGHT), 0);
+        fdef.shape = shape;
+        fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
+        fdef.filter.maskBits = B2DVars.BIT_GROUND;
+        fdef.isSensor = true;
+        body.createFixture(fdef).setUserData(B2DVars.ID_FOOT);
     }
 
-    private void loadTexture(String color) {
+    public void loadTexture(String color) {
+        textures = new Texture[6];
         if (color.equals("blue")) {
-            onGroundRight = new Texture("images/player/bluePlayerStandRight.png");
-            inAirRight = new Texture("images/player/bluePlayerJumpRight.png");
-            onGroundLeft = new Texture("images/player/bluePlayerStandLeft.png");
-            inAirLeft = new Texture("images/player/bluePlayerJumpLeft.png");
-            deadRight = new Texture("images/player/bluePlayerDeadRight.png");
-            deadLeft = new Texture("images/player/bluePlayerDeadLeft.png");
+            textures[STAND_RIGHT] = new Texture("images/player/bluePlayerStandRight.png");
+            textures[STAND_LEFT] = new Texture("images/player/bluePlayerStandLeft.png");
+            textures[JUMP_RIGHT] = new Texture("images/player/bluePlayerJumpRight.png");
+            textures[JUMP_LEFT] = new Texture("images/player/bluePlayerJumpLeft.png");
+            textures[DEAD_RIGHT] = new Texture("images/player/bluePlayerDeadRight.png");
+            textures[DEAD_LEFT] = new Texture("images/player/bluePlayerDeadLeft.png");
         } else {
-            onGroundRight = new Texture("images/player/redPlayerStandRight.png");
-            inAirRight = new Texture("images/player/redPlayerJumpRight.png");
-            onGroundLeft = new Texture("images/player/redPlayerStandLeft.png");
-            inAirLeft = new Texture("images/player/redPlayerJumpLeft.png");
-            deadRight = new Texture("images/player/redPlayerDeadRight.png");
-            deadLeft = new Texture("images/player/redPlayerDeadLeft.png");
+            textures[STAND_RIGHT] = new Texture("images/player/redPlayerStandRight.png");
+            textures[STAND_LEFT] = new Texture("images/player/redPlayerStandLeft.png");
+            textures[JUMP_RIGHT] = new Texture("images/player/redPlayerJumpRight.png");
+            textures[JUMP_LEFT] = new Texture("images/player/redPlayerJumpLeft.png");
+            textures[DEAD_RIGHT] = new Texture("images/player/redPlayerDeadRight.png");
+            textures[DEAD_LEFT] = new Texture("images/player/redPlayerDeadLeft.png");
         }
     }
 
     @Override
     public void dispose() {
         texture.dispose();
-        onGroundRight.dispose();
-        onGroundLeft.dispose();
-        inAirLeft.dispose();
-        inAirRight.dispose();
-        deadLeft.dispose();
-        deadRight.dispose();
         shape.dispose();
     }
 }
