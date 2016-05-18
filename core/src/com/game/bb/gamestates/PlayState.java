@@ -347,7 +347,7 @@ public class PlayState extends GameState {
                 respawnPlayer();
             }
         }
-        if (sendNetworkInfo > 1/20f){
+        if (sendNetworkInfo > 1/5f){
             sendNetworkInfo=0f;
             sendEntityEvents();
         } else {
