@@ -7,6 +7,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.game.bb.handlers.B2DVars;
+import com.game.bb.net.packets.EntityCluster;
 import com.game.bb.net.packets.EntityPacket;
 import com.game.bb.net.packets.TCPEventPacket;
 
@@ -21,9 +22,9 @@ public class GameServerNew extends Listener {
     private Server kryoServer;
 
     public GameServerNew(){
-        kryoServer = new Server();
+        kryoServer = new Server(250000, 12000);
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
-            TCPEventPacket.class};
+            TCPEventPacket.class, EntityCluster.class, EntityPacket[].class};
         for (Class c : classes){
             kryoServer.getKryo().register(c);
         }
@@ -45,7 +46,7 @@ public class GameServerNew extends Listener {
     @Override
     public void received(Connection c, Object packet){
         //Gdx.app.log("NET_SERVER_PACKET_RECEIVED", packet.getClass().toString());
-        if (packet instanceof EntityPacket) {
+        if (packet instanceof EntityCluster) {
             for (Connection connect : kryoServer.getConnections()) {
                 if (!c.equals(connect)) {
                     connect.sendUDP(packet);

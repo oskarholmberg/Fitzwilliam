@@ -30,7 +30,7 @@ public class B2DVars {
     ID_POWERUP = "powerup", ID_ENEMY_GRENADE = "enemygrenade";
 
     public static final int NET_CONNECT = 1, NET_RESPAWN = 2, NET_DEATH = 3, NET_SHOOT = 4,
-    NET_GRENADE = 5, NET_DISCONNECT = 6, NET_NEW_CONNECTION=7;
+    NET_GRENADE = 5, NET_DISCONNECT = 6, NET_NEW_CONNECTION=7, NET_DESTROY_BODY = 8;
 
     public static final int TYPE_BULLET = 1, TYPE_GRENADE = 2;
 }

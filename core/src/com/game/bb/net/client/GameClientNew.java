@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.game.bb.net.packets.EntityCluster;
 import com.game.bb.net.packets.EntityPacket;
 import com.game.bb.net.packets.TCPEventPacket;
 
@@ -21,15 +22,15 @@ public class GameClientNew extends Listener {
     private Client kryoClient;
     private int udpPort = 8080, tcpPort = 8081;
     private Array<TCPEventPacket> tcpPackets;
-    private Array<EntityPacket> entityPackets;
+    private Array<EntityCluster> entityClusters;
     private List<InetAddress> addresses;
 
     public GameClientNew(){
         tcpPackets = new Array<TCPEventPacket>();
-        entityPackets = new Array<EntityPacket>();
-        kryoClient = new Client();
+        entityClusters = new Array<EntityCluster>();
+        kryoClient = new Client(250000, 12000);
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
-                TCPEventPacket.class};
+                TCPEventPacket.class, EntityCluster.class, EntityPacket[].class};
         for (Class c : classes){
             kryoClient.getKryo().register(c);
         }
@@ -59,11 +60,11 @@ public class GameClientNew extends Listener {
     @Override
     public void received(Connection c, Object packet){
         if(packet instanceof TCPEventPacket){
-            //Gdx.app.log("NET_CLIENT_TCP_RECEIVED", packet.toString());
+            Gdx.app.log("NET_CLIENT_TCP_RECEIVED", packet.toString());
             tcpPackets.add((TCPEventPacket) packet);
-        } else if (packet instanceof EntityPacket) {
-            //Gdx.app.log("NET_CLIENT_UDP_RECEIVED", packet.toString());
-            entityPackets.add((EntityPacket) packet);
+        } else if (packet instanceof EntityCluster) {
+            Gdx.app.log("NET_CLIENT_UDP_RECEIVED", packet.toString());
+            entityClusters.add((EntityCluster) packet);
         }
     }
 
@@ -77,10 +78,10 @@ public class GameClientNew extends Listener {
 
     }
 
-    public Array<EntityPacket> getEntityPackets(){
-        Array<EntityPacket> temp = new Array<EntityPacket>();
-        temp.addAll(entityPackets);
-        entityPackets.clear();
+    public Array<EntityCluster> getEntityClusters(){
+        Array<EntityCluster> temp = new Array<EntityCluster>();
+        temp.addAll(entityClusters);
+        entityClusters.clear();
         return temp;
     }
 
@@ -93,6 +94,6 @@ public class GameClientNew extends Listener {
 
     public void sendTCP(Object packet){
         kryoClient.sendTCP(packet);
-        //Gdx.app.log("NET_CLIENT_SEND_TCP", packet.getClass().toString());
+        Gdx.app.log("NET_CLIENT_SEND_TCP", packet.getClass().toString());
     }
 }

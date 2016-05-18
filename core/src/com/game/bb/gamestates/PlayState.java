@@ -20,10 +20,9 @@ import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
 import com.game.bb.net.PlayStateNetworkMonitor;
 import com.game.bb.net.client.GameClientNew;
+import com.game.bb.net.packets.EntityCluster;
 import com.game.bb.net.packets.EntityPacket;
 import com.game.bb.net.packets.TCPEventPacket;
-
-import java.text.DecimalFormat;
 
 
 /**
@@ -62,6 +61,7 @@ public class PlayState extends GameState {
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
     private PlayStateNetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
+    private int pktSequence = 0;
     private boolean clipIsEmpty = false, grenadesIsEmpty = false;
     private float sendNetworkInfo = 0f;
 
@@ -126,14 +126,9 @@ public class PlayState extends GameState {
         if (amntGrenades > 0 && !player.isDead()) {
             int ID = newEntityID();
             Vector2 pos = player.getPosition();
-            myGrenades.put(ID, new SPGrenade(world, pos.x, pos.y, lastJumpDirection, false, ID));
-            EntityPacket pkt = new EntityPacket();
-            pkt.xPos = pos.x;
-            pkt.yPos = pos.y;
-            pkt.id =ID;
-            pkt.alive=1;
-            pkt.type=B2DVars.TYPE_GRENADE;
-            client.sendUDP(pkt);
+            SPGrenade spg = new SPGrenade(world, pos.x, pos.y, lastJumpDirection, false, ID);
+            myGrenades.put(ID, spg);
+            System.out.println("Grenade created: " + ID);
             amntGrenades--;
             hud.setAmountGrenadesLeft(amntGrenades);
             if (amntGrenades == 0) {
@@ -151,20 +146,6 @@ public class PlayState extends GameState {
         entityAccum++;
         String temp = B2DVars.MY_ID + entityAccum;
         return Integer.valueOf(temp);
-    }
-
-    private void enemyGrenade(float xPos, float yPos, float dir, long timeSync, int ID) {
-        long timeDiff = System.currentTimeMillis() - timeSync;
-        xPos = xPos + (B2DVars.PH_GRENADE_X * timeDiff / 1000) / B2DVars.PPM * dir;
-        yPos = yPos + (B2DVars.PH_GRENADE_Y * timeDiff / 1000) / B2DVars.PPM;
-        enemyGrenades.put(ID, new SPGrenade(world, xPos, yPos, dir, true, ID));
-    }
-
-    public void opponentShot(float xPos, float yPos, float dir, long timeSync, int bulletID) {
-        long timeDiff = System.currentTimeMillis() - timeSync;
-        xPos = xPos + (B2DVars.PH_BULLET_SPEED * timeDiff / 1000) / B2DVars.PPM * dir;
-        SPBullet bullet = new SPBullet(world, xPos, yPos, dir, true, bulletID);
-        worldEntities.add(bullet);
     }
 
     public Vector2 playerPosition() {
@@ -213,60 +194,38 @@ public class PlayState extends GameState {
                     packet.id=player.getID();
                     client.sendTCP(packet);
                 }
+                break;
+            case B2DVars.NET_DESTROY_BODY:
+                if(opEntities.containsKey(pkt.id)){
+                    System.out.println("TCPEvent destroy body: " + pkt.id);
+                    world.destroyBody(opEntities.removeKey(pkt.id).getBody());
+                }
+                break;
         }
     }
 
     private void opponentEntityEvents(){
-        Array<EntityPacket> packets = client.getEntityPackets();
-        for (EntityPacket pkt : packets) {
-            if (opEntities.containsKey(pkt.id)) {
-                if (pkt.alive == 1) {
-                    opEntities.get(pkt.id).getBody().setTransform(pkt.xPos, pkt.yPos, 0);
-                } else if (pkt.alive == 0) {
-                    world.destroyBody(opEntities.removeKey(pkt.id).getBody());
+        Array<EntityCluster> packets = client.getEntityClusters();
+        for (EntityCluster cluster : packets) {
+            for (EntityPacket pkt : cluster.pkts) {
+                if (opEntities.containsKey(pkt.id)) {
+                    Body b = opEntities.get(pkt.id).getBody();
+                    if (pkt.alive == 1) {
+                        b.setTransform(pkt.xp, pkt.yp, 0);
+                        b.setLinearVelocity(pkt.xf, pkt.yf);
+                        System.out.println("xPos: " + pkt.xp + " yPos: " + pkt.yp + " xF: " + pkt.xf + " yF: " + pkt.yf);
+                    } else if (pkt.alive == 0) {
+                        world.destroyBody(opEntities.removeKey(pkt.id).getBody());
+                    }
+                } else {
+                    if (pkt.type == B2DVars.TYPE_GRENADE) {
+                        opEntities.put(pkt.id, new SPGrenade(world, pkt.xp, pkt.yp, 0, true, pkt.id));
+                        opEntities.get(pkt.id).getBody().setLinearVelocity(pkt.xf, pkt.yf);
+                    } else if (pkt.type == B2DVars.TYPE_BULLET) {
+                        opEntities.put(pkt.id, new SPBullet(world, pkt.xp, pkt.yp, 0f, true, pkt.id));
+                        opEntities.get(pkt.id).getBody().setLinearVelocity(pkt.xf, pkt.yf);
+                    }
                 }
-            } else {
-                if (pkt.type == B2DVars.TYPE_GRENADE) {
-                    opEntities.put(pkt.id, new SPGrenade(world, pkt.xPos, pkt.yPos, -1f, true, pkt.id));
-                } else if (pkt.type == B2DVars.TYPE_BULLET) {
-                    //Add code for bullet here
-                }
-            }
-        }
-    }
-
-    private void opponentActions() {
-        String[] action = mon.getOpponentAction().split(":");
-        float[] floats = mon.getPacketFloats(action);
-        SPPlayer opponent = getOpponent(Integer.valueOf(action[0]));
-        if (validOpponentAction(action)) {
-            if (action[1].equals("MOVE") && opponent != null)
-                opponent.jump(floats[0], floats[1],
-                        floats[2], floats[3]);
-            else if (action[1].equals("SHOOT") && opponent != null)
-                opponentShot(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]),
-                        Integer.valueOf(action[8]));
-            else if (action[1].equals("DEATH") && opponent != null) {
-                hud.setOpponentDeath(action[0], action[6]);
-                opponent.kill(1);
-                removeKillingEntity(Integer.valueOf(action[7]));
-                //In order for body to fly through the air when killed.
-                opponent.getBody().applyForceToCenter(50 * Float.valueOf(action[8]), 50, true);
-            } else if (action[1].equals("RESPAWN") && opponent != null) {
-                opponent.revive();
-                opponent.jump(floats[0], floats[1],
-                        floats[2], floats[3]);
-            } else if (action[1].equals("DISCONNECT")) {
-                opponent = getOpponent(Integer.valueOf(action[0]));
-                if (opponent != null) {
-                    opponents.removeValue(opponent, false);
-                    hud.removeOpponentDeathCount(action[0]);
-                    world.destroyBody(opponent.getBody());
-                }
-            } else if (action[1].equals("GRENADE")) {
-                enemyGrenade(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]),
-                        Integer.valueOf(action[8]));
-            } else if (action[1].equals("UPDATE_GRENADE")) {
             }
         }
     }
@@ -340,32 +299,39 @@ public class PlayState extends GameState {
     }
 
     private void sendEntityEvents(){
-        EntityPacket pkt = new EntityPacket();
-        for (int id : myGrenades.keys()){
-            pkt.xPos=myGrenades.get(id).getPosition().x;
-            pkt.yPos=myGrenades.get(id).getPosition().y;
-            pkt.id=id;
-            pkt.type=B2DVars.TYPE_GRENADE;
-            client.sendUDP(pkt);
+        if (myGrenades.size>0) {
+            EntityPacket[] packets = new EntityPacket[myGrenades.size];
+            int index = 0;
+            for (int id : myGrenades.keys()) {
+                EntityPacket pkt = new EntityPacket();
+                Body b = myGrenades.get(id).getBody();
+                pkt.xp = b.getPosition().x;
+                pkt.yp = b.getPosition().y;
+                pkt.xf = b.getLinearVelocity().x;
+                pkt.yf = b.getLinearVelocity().y;
+                pkt.id = id;
+                pkt.alive = 1;
+                pkt.type = B2DVars.TYPE_GRENADE;
+                packets[index] = pkt;
+                index++;
+            }
+            EntityCluster cluster = new EntityCluster();
+            cluster.seq = pktSequence++;
+            cluster.pkts = packets;
+            client.sendUDP(cluster);
         }
     }
 
     private void grenadeStillAlive(float dt) {
         for (int id : myGrenades.keys()) {
             if (myGrenades.get(id) != null && myGrenades.get(id).lifeTimeReached(dt)) {
-                EntityPacket pkt = new EntityPacket();
+                TCPEventPacket pkt = new TCPEventPacket();
                 pkt.id=id;
-                pkt.alive=0;
-                client.sendUDP(pkt);
+                pkt.action=B2DVars.NET_DESTROY_BODY;
+                System.out.println("Destroy grenade: " + id);
+                client.sendTCP(pkt);
                 world.destroyBody(myGrenades.removeKey(id).getBody());
             }
-        }
-    }
-
-    private void updateEnemyGrenade(float xForce, float yForce, float xPos, float yPos, int ID) {
-        if (enemyGrenades.get(ID) != null) {
-            enemyGrenades.get(ID).getBody().setTransform(xPos, yPos, 0);
-            enemyGrenades.get(ID).getBody().setLinearVelocity(xForce, yForce);
         }
     }
 
@@ -416,9 +382,14 @@ public class PlayState extends GameState {
                 respawnPlayer();
             }
         }
+        if (sendNetworkInfo > 1/20f){
+            sendNetworkInfo=0f;
+            sendEntityEvents();
+        } else {
+            sendNetworkInfo+=dt;
+        }
         grenadeStillAlive(dt);
         removeDeadBodies();
-        sendEntityEvents();
     }
 
     @Override
