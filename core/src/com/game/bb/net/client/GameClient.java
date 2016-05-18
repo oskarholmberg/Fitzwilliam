@@ -66,6 +66,7 @@ public class GameClient extends Listener {
             tcpPackets.add((TCPEventPacket) packet);
         } else if (packet instanceof EntityCluster) {
             entityClusters.add((EntityCluster) packet);
+            System.out.println("Blah blah");
         }
     }
 

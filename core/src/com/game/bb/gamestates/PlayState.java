@@ -259,6 +259,7 @@ public class PlayState extends GameState {
     private void refreshAmmo(float dt) {
         if ((powerReload < 3f || bulletRefresh > 3f) && amntBullets==0) {
             amntBullets = B2DVars.AMOUNT_BULLET;
+            bulletRefresh = 0;
             hud.setAmountBulletsLeft(amntBullets);
             reloadSound.play();
         } else if (amntBullets == 0){
