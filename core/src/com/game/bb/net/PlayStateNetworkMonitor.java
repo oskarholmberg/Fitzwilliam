@@ -46,8 +46,8 @@ public class PlayStateNetworkMonitor {
     }
 
     public synchronized void sendInterpolationPoints(){
-        ArrayMap<String, SPGrenade>  enteties= ps.getMyEntities();
-        for (String id : enteties.keys()){
+        ArrayMap<Integer, SPGrenade>  enteties= ps.getMyEntities();
+        for (int id : enteties.keys()){
 
         }
     }

@@ -20,7 +20,7 @@ public class SPBullet extends SPSprite {
     private int offset = 0, ID;
     private float posYoffset = 5/B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
 
-    public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful, String ID) {
+    public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful, int ID) {
         super(world, ID);
         this.dir=dir;
         createBullet(xPos+dir*getPosXoffset, yPos-posYoffset, dir, harmful);
