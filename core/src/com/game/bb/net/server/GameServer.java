@@ -15,12 +15,12 @@ import java.io.IOException;
 /**
  * Created by erik on 17/05/16.
  */
-public class GameServerNew extends Listener {
+public class GameServer extends Listener {
 
     private int udpPort = 8080, tcpPort = 8081;
     private Server kryoServer;
 
-    public GameServerNew(){
+    public GameServer(){
         kryoServer = new Server(250000, 12000);
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
             TCPEventPacket.class, EntityCluster.class, EntityPacket[].class};
@@ -67,6 +67,6 @@ public class GameServerNew extends Listener {
     }
 
     public static void main(String[] args){
-        new GameServerNew();
+        new GameServer();
     }
 }

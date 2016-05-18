@@ -18,8 +18,7 @@ import com.game.bb.entities.SPGrenade;
 import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
-import com.game.bb.net.PlayStateNetworkMonitor;
-import com.game.bb.net.client.GameClientNew;
+import com.game.bb.net.client.GameClient;
 import com.game.bb.net.packets.EntityCluster;
 import com.game.bb.net.packets.EntityPacket;
 import com.game.bb.net.packets.TCPEventPacket;
@@ -47,19 +46,18 @@ public class PlayState extends GameState {
     private Array<Vector2> spawnLocations;
     private int entityAccum = 0;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
-    private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh, powerReload = 30f;
+    private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
     private Array<SPSprite> worldEntities;
     private ArrayMap<Integer, SPGrenade> enemyGrenades = new ArrayMap<Integer, SPGrenade>();
     private ArrayMap<Integer, SPSprite> myEntities = new ArrayMap<Integer, SPSprite>();
     private ArrayMap<Integer, SPSprite> opEntities = new ArrayMap<Integer, SPSprite>();
     private float respawnTimer = 0;
-    private GameClientNew client;
+    private GameClient client;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
     private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
     private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
-    private PlayStateNetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
     private int pktSequence = 0;
     private boolean  grenadesIsEmpty = false;
@@ -71,7 +69,7 @@ public class PlayState extends GameState {
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
 
-        client = new GameClientNew();
+        client = new GameClient();
         client.connectToServer(0);
 
         b2dr = new Box2DDebugRenderer();
@@ -143,22 +141,16 @@ public class PlayState extends GameState {
         return Integer.valueOf(temp);
     }
 
-    public Vector2 playerPosition() {
-        return player.getPosition();
-    }
-
 
     public void handleInput() {
         if (SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x > touchNbrs[1] && cl.canJump()) {
             SPInput.down = false;
-            mon.sendPlayerAction("MOVE", B2DVars.PH_JUMPX, B2DVars.PH_JUMPY);
             player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
             lastJumpDirection = 1;
         } else if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x < touchNbrs[0] && cl.canJump()) {
             SPInput.down = false;
-            mon.sendPlayerAction("MOVE", -B2DVars.PH_JUMPX, B2DVars.PH_JUMPY);
             player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
             lastJumpDirection = -1;
         }
@@ -171,7 +163,6 @@ public class PlayState extends GameState {
 
             throwGrenade();
         }
-
     }
 
     private void opponentTCPEvents() {
@@ -224,35 +215,11 @@ public class PlayState extends GameState {
         }
     }
 
-    private void removeKillingEntity(int killerID) {
-        if (enemyGrenades.containsKey(killerID)) {
-            world.destroyBody(enemyGrenades.removeKey(killerID).getBody());
-        } else {
-            for (SPSprite s : worldEntities) {
-                if (s.getID()==killerID) {
-                    worldEntities.removeValue(s, true);
-                    world.destroyBody(s.getBody());
-                }
-            }
-        }
-    }
-
-    private boolean validOpponentAction(String[] split) {
-        if (split.length >= 2 && !split[0].equals(B2DVars.MY_ID))
-            return true;
-        return false;
-    }
-
-    private SPPlayer getOpponent(int id) {
-        return opponents.get(id);
-    }
-
     private void respawnPlayer() {
         Vector2 spawnLoc = spawnLocations.random();
         respawnTimer = 0;
         player.revive();
         player.jump(0, 0, spawnLoc.x, spawnLoc.y);
-        mon.sendPlayerAction("RESPAWN", 0, 0);
         amntBullets = B2DVars.AMOUNT_BULLET;
         amntGrenades = B2DVars.AMOUNT_GRENADE;
         hud.setAmountBulletsLeft(amntBullets);
@@ -262,30 +229,28 @@ public class PlayState extends GameState {
     }
 
     private void refreshAmmo(float dt) {
-        if ((powerReload < 3f || bulletRefresh > 3f) && amntBullets==0) {
+        if (bulletRefresh > 3f && amntBullets==0) {
             amntBullets = B2DVars.AMOUNT_BULLET;
+            bulletRefresh = 0;
             hud.setAmountBulletsLeft(amntBullets);
             reloadSound.play();
         } else if (amntBullets == 0){
             bulletRefresh += dt;
         }
-        if ((powerReload < 3f || grenadeRefresh > 8f) && grenadesIsEmpty) {
+        if (grenadeRefresh > 8f && grenadesIsEmpty) {
             amntGrenades = B2DVars.AMOUNT_GRENADE;
             grenadesIsEmpty = false;
             hud.setAmountGrenadesLeft(amntGrenades);
-        } else {
+        } else if (amntGrenades == 0){
             grenadeRefresh += dt;
-        }
-        if (powerReload < 20f) {
-            powerReload += dt;
         }
     }
 
-    private void removeDeadBodies() {
-        for (Body b : cl.getBodiesToRemove()) {
-            if (b.getUserData() instanceof SPSprite) {
-                worldEntities.removeValue((SPSprite) b.getUserData(), true);
-                world.destroyBody(b);
+    private void bulletsHittingWall() {
+        for (int id : cl.getIdsToRemove()){
+            if (myEntities.containsKey(id)){
+                //Add code to NET for others to remove this bullet
+                world.destroyBody(myEntities.get(id).getBody());
             }
         }
         cl.clearBulletList();
@@ -318,7 +283,7 @@ public class PlayState extends GameState {
         }
     }
 
-    private void grenadeStillAlive(float dt) {
+    private void checkGrenadeTimer(float dt) {
         for (int id : myEntities.keys()) {
             if (myEntities.get(id) instanceof SPGrenade) {
                 if (myEntities.get(id) != null && ((SPGrenade) myEntities.get(id)).lifeTimeReached(dt)) {
@@ -335,23 +300,17 @@ public class PlayState extends GameState {
 
     private void playerHit() {
         if (!player.isDead()) {
+            int id = cl.getKillingEntityID();
             player.kill(1);
             hud.addPlayerDeath();
-            SPSprite temp = (SPSprite) cl.getKillingEntity().getBody().getUserData();
-            if (temp instanceof SPGrenade) {
-                if (enemyGrenades.containsKey(temp.getID())) {
-                    world.destroyBody(enemyGrenades.removeKey(temp.getID()).getBody());
-                } else {
-                    world.destroyBody(myEntities.removeKey(temp.getID()).getBody());
-                }
-            } else {
-                //In this addAction add the ID of the killing bullet last
+            if (myEntities.containsKey(id)){
+                //Add code to NET remove entity
+                world.destroyBody(myEntities.get(id).getBody());
+            } else if (opEntities.containsKey(id)){
+                //add code to NET remove entity
+                world.destroyBody(opEntities.get(id).getBody());
             }
         }
-    }
-
-    public void setNetworkMonitor(PlayStateNetworkMonitor mon) {
-        this.mon = mon;
     }
 
     @Override
@@ -386,8 +345,8 @@ public class PlayState extends GameState {
         } else {
             sendNetworkInfo+=dt;
         }
-        grenadeStillAlive(dt);
-        removeDeadBodies();
+        checkGrenadeTimer(dt);
+        bulletsHittingWall();
     }
 
     @Override
@@ -399,15 +358,6 @@ public class PlayState extends GameState {
         sb.end();
         tmr.setView(cam);
         tmr.render();
-        for (SPSprite b : worldEntities) {
-            b.render(sb);
-        }
-        for (int id : opponents.keys()) {
-            opponents.get(id).render(sb);
-        }
-        for (int id : enemyGrenades.keys()) {
-            enemyGrenades.get(id).render(sb);
-        }
         for (int id : myEntities.keys()) {
             myEntities.get(id).render(sb);
         }

@@ -18,14 +18,14 @@ import java.util.List;
 /**
  * Created by erik on 17/05/16.
  */
-public class GameClientNew extends Listener {
+public class GameClient extends Listener {
     private Client kryoClient;
     private int udpPort = 8080, tcpPort = 8081;
     private Array<TCPEventPacket> tcpPackets;
     private Array<EntityCluster> entityClusters;
     private List<InetAddress> addresses;
 
-    public GameClientNew() {
+    public GameClient() {
         tcpPackets = new Array<TCPEventPacket>();
         entityClusters = new Array<EntityCluster>();
         kryoClient = new Client(250000, 12000);
