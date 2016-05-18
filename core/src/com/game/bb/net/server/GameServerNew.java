@@ -6,7 +6,9 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import com.game.bb.handlers.B2DVars;
 import com.game.bb.net.packets.EntityPacket;
+import com.game.bb.net.packets.TCPEventPacket;
 
 import java.io.IOException;
 
@@ -20,7 +22,8 @@ public class GameServerNew extends Listener {
 
     public GameServerNew(){
         kryoServer = new Server();
-        Class[] classes = {String.class, Vector2.class, EntityPacket.class};
+        Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
+            TCPEventPacket.class};
         for (Class c : classes){
             kryoServer.getKryo().register(c);
         }
@@ -37,15 +40,23 @@ public class GameServerNew extends Listener {
 
     @Override
     public void connected(Connection c){
-        Gdx.app.log("NET_CONNECTION", "Client @" + c.getRemoteAddressUDP().getAddress() + " connected.");
+        Gdx.app.log("NET_SERVER_CONNECTION", "Client @" + c.getRemoteAddressUDP().getAddress() + " connected.");
     }
 
     @Override
     public void received(Connection c, Object packet){
-        Gdx.app.log("NET_SERVER_PACKET_RECEIVED", packet.getClass().toString());
-        for (Connection connection : kryoServer.getConnections()){
-            if (!c.equals(connection)){
-                connection.sendUDP(packet);
+        //Gdx.app.log("NET_SERVER_PACKET_RECEIVED", packet.getClass().toString());
+        if (packet instanceof EntityPacket) {
+            for (Connection connect : kryoServer.getConnections()) {
+                if (!c.equals(connect)) {
+                    connect.sendUDP(packet);
+                }
+            }
+        } else if (packet instanceof TCPEventPacket){
+            for (Connection connect : kryoServer.getConnections()) {
+                if (!c.equals(connect)) {
+                    connect.sendTCP(packet);
+                }
             }
         }
     }

@@ -17,7 +17,7 @@ import com.game.bb.handlers.SPAnimation;
 public class SPPower extends SPSprite{
     private SPAnimation animation;
     private int offset = 32;
-    public SPPower(World world, float xPos, float yPos, String ID) {
+    public SPPower(World world, float xPos, float yPos, int ID) {
         super(world, ID);
         createPowerBody(xPos, yPos);
 

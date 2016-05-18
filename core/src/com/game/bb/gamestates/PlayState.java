@@ -15,13 +15,15 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.entities.SPGrenade;
-import com.game.bb.entities.SPPower;
 import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
 import com.game.bb.net.PlayStateNetworkMonitor;
 import com.game.bb.net.client.GameClientNew;
 import com.game.bb.net.packets.EntityPacket;
+import com.game.bb.net.packets.TCPEventPacket;
+
+import java.text.DecimalFormat;
 
 
 /**
@@ -42,14 +44,15 @@ public class PlayState extends GameState {
     private OrthographicCamera b2dCam;
     private SPContactListener cl;
     private SPPlayer player;
-    private Array<SPPlayer> opponents;
+    private ArrayMap<Integer, SPPlayer> opponents;
     private Array<Vector2> spawnLocations;
+    private int entityAccum = 0;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh, powerReload = 30f;
-    private String entityID = B2DVars.MY_ID + "%0";
     private Array<SPSprite> worldEntities;
-    private ArrayMap<String, SPGrenade> enemyGrenades = new ArrayMap<String, SPGrenade>();
-    private ArrayMap<String, SPGrenade> myGrenades = new ArrayMap<String, SPGrenade>();
+    private ArrayMap<Integer, SPGrenade> enemyGrenades = new ArrayMap<Integer, SPGrenade>();
+    private ArrayMap<Integer, SPGrenade> myGrenades = new ArrayMap<Integer, SPGrenade>();
+    private ArrayMap<Integer, SPSprite> opEntities = new ArrayMap<Integer, SPSprite>();
     private float respawnTimer = 0;
     private GameClientNew client;
     private HUD hud;
@@ -69,13 +72,14 @@ public class PlayState extends GameState {
         world.setContactListener(cl = new SPContactListener());
 
         client = new GameClientNew();
+        client.connectToServer(0);
 
         b2dr = new Box2DDebugRenderer();
 
         hud = new HUD();
 
         worldEntities = new Array<SPSprite>();
-        opponents = new Array<SPPlayer>();
+        opponents = new ArrayMap<Integer, SPPlayer>();
         // create boundaries
 
         String[] layers = {"moonBlocks", "domeBlocks"};
@@ -86,18 +90,14 @@ public class PlayState extends GameState {
 
         //Players
         Vector2 spawn = spawnLocations.random();
-        String tempEntityID = newEntityID();
-        player = new SPPlayer(world, B2DVars.MY_ID, spawn.x,
+        int tempEntityID = newEntityID();
+        player = new SPPlayer(world, spawn.x,
                 spawn.y, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue", tempEntityID);
-        EntityPacket packet = new EntityPacket();
-        packet.action = "CONNECT";
+        TCPEventPacket packet = new TCPEventPacket();
+        packet.action = B2DVars.NET_CONNECT;
         packet.pos = spawn;
-        packet.myID = B2DVars.MY_ID;
-        packet.entityID = tempEntityID;
+        packet.id = tempEntityID;
         client.sendTCP(packet);
-
-        worldEntities.add(new SPPower(world, 600 / B2DVars.PPM, 500 / B2DVars.PPM,
-                "GET_THIS_ID_FROM_SERVER"));
 
 
         // set up box2d cam
@@ -109,9 +109,7 @@ public class PlayState extends GameState {
         if (clipIsEmpty)
             emptyClipSound.play();
         if (amntBullets > 0 && !player.isDead()) {
-            String ID = newEntityID();
-            mon.sendPlayerAction("SHOOT", 0, 0, Float.toString(lastJumpDirection),
-                    Long.toString(System.currentTimeMillis()), ID);
+            int ID = newEntityID();
             Vector2 pos = player.getPosition();
             SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false, ID);
             worldEntities.add(bullet);
@@ -126,11 +124,16 @@ public class PlayState extends GameState {
 
     private void throwGrenade() {
         if (amntGrenades > 0 && !player.isDead()) {
-            String ID = newEntityID();
-            mon.sendPlayerAction("GRENADE", 0, 0, Float.toString(lastJumpDirection),
-                    Long.toString(System.currentTimeMillis()), ID);
+            int ID = newEntityID();
             Vector2 pos = player.getPosition();
             myGrenades.put(ID, new SPGrenade(world, pos.x, pos.y, lastJumpDirection, false, ID));
+            EntityPacket pkt = new EntityPacket();
+            pkt.xPos = pos.x;
+            pkt.yPos = pos.y;
+            pkt.id =ID;
+            pkt.alive=1;
+            pkt.type=B2DVars.TYPE_GRENADE;
+            client.sendUDP(pkt);
             amntGrenades--;
             hud.setAmountGrenadesLeft(amntGrenades);
             if (amntGrenades == 0) {
@@ -140,24 +143,24 @@ public class PlayState extends GameState {
         }
     }
 
-    public ArrayMap<String, SPGrenade> getMyEntities() {
+    public ArrayMap<Integer, SPGrenade> getMyEntities() {
         return myGrenades;
     }
 
-    public String newEntityID() {
-        String[] split = entityID.split("%");
-        entityID = split[0] + "%" + (Integer.valueOf(split[1]) + 1);
-        return entityID;
+    public int newEntityID() {
+        entityAccum++;
+        String temp = B2DVars.MY_ID + entityAccum;
+        return Integer.valueOf(temp);
     }
 
-    private void enemyGrenade(float xPos, float yPos, float dir, long timeSync, String ID) {
+    private void enemyGrenade(float xPos, float yPos, float dir, long timeSync, int ID) {
         long timeDiff = System.currentTimeMillis() - timeSync;
         xPos = xPos + (B2DVars.PH_GRENADE_X * timeDiff / 1000) / B2DVars.PPM * dir;
         yPos = yPos + (B2DVars.PH_GRENADE_Y * timeDiff / 1000) / B2DVars.PPM;
         enemyGrenades.put(ID, new SPGrenade(world, xPos, yPos, dir, true, ID));
     }
 
-    public void opponentShot(float xPos, float yPos, float dir, long timeSync, String bulletID) {
+    public void opponentShot(float xPos, float yPos, float dir, long timeSync, int bulletID) {
         long timeDiff = System.currentTimeMillis() - timeSync;
         xPos = xPos + (B2DVars.PH_BULLET_SPEED * timeDiff / 1000) / B2DVars.PPM * dir;
         SPBullet bullet = new SPBullet(world, xPos, yPos, dir, true, bulletID);
@@ -195,73 +198,86 @@ public class PlayState extends GameState {
 
     }
 
-    private void opponentActionsNew() {
-        Object packet = client.getReceivedPacket();
-        if (packet instanceof EntityPacket) {
-            System.out.println("Entity packet found! :D ");
-            EntityPacket pkt = (EntityPacket) packet;
-            if (pkt.action.equals("CONNECT")) {
-                SPPlayer newOpponent = new SPPlayer(world, pkt.myID, pkt.pos.x, pkt.pos.y
-                        , B2DVars.BIT_OPPONENT, B2DVars.ID_OPPONENT, "red", pkt.entityID);
-                opponents.add(newOpponent);
-                System.out.println("Opponent added!");
-                //hud.setOpponentDeath(action[0], action[9]);
+    private void opponentTCPEvents() {
+        TCPEventPacket pkt = client.getTCPEventPackets();
+        if (pkt==null) return;
+        switch (pkt.action) {
+            case B2DVars.NET_CONNECT:
+                if (!opponents.containsKey(pkt.id)) {
+                    SPPlayer newOpponent = new SPPlayer(world, pkt.pos.x, pkt.pos.y
+                            , B2DVars.BIT_OPPONENT, B2DVars.ID_OPPONENT, "red", pkt.id);
+                    opponents.put(pkt.id, newOpponent);
+                    TCPEventPacket packet = new TCPEventPacket();
+                    packet.action=B2DVars.NET_CONNECT;
+                    packet.pos=player.getPosition();
+                    packet.id=player.getID();
+                    client.sendTCP(packet);
+                }
+                break;
+        }
+    }
+
+    private void opponentEntityEvents(){
+        Array<EntityPacket> packets = client.getEntityPackets();
+        for (EntityPacket pkt : packets) {
+            if (opEntities.containsKey(pkt.id)) {
+                if (pkt.alive == 1) {
+                    opEntities.get(pkt.id).getBody().setTransform(pkt.xPos, pkt.yPos, 0);
+                } else if (pkt.alive == 0) {
+                    world.destroyBody(opEntities.removeKey(pkt.id).getBody());
+                }
+            } else {
+                if (pkt.type == B2DVars.TYPE_GRENADE) {
+                    opEntities.put(pkt.id, new SPGrenade(world, pkt.xPos, pkt.yPos, -1f, true, pkt.id));
+                } else if (pkt.type == B2DVars.TYPE_BULLET) {
+                    //Add code for bullet here
+                }
             }
         }
-
     }
 
     private void opponentActions() {
         String[] action = mon.getOpponentAction().split(":");
         float[] floats = mon.getPacketFloats(action);
-        SPPlayer opponent = getOpponent(action[0]);
+        SPPlayer opponent = getOpponent(Integer.valueOf(action[0]));
         if (validOpponentAction(action)) {
             if (action[1].equals("MOVE") && opponent != null)
                 opponent.jump(floats[0], floats[1],
                         floats[2], floats[3]);
             else if (action[1].equals("SHOOT") && opponent != null)
                 opponentShot(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]),
-                        action[8]);
+                        Integer.valueOf(action[8]));
             else if (action[1].equals("DEATH") && opponent != null) {
                 hud.setOpponentDeath(action[0], action[6]);
                 opponent.kill(1);
-                removeKillingEntity(action[7]);
+                removeKillingEntity(Integer.valueOf(action[7]));
                 //In order for body to fly through the air when killed.
                 opponent.getBody().applyForceToCenter(50 * Float.valueOf(action[8]), 50, true);
             } else if (action[1].equals("RESPAWN") && opponent != null) {
                 opponent.revive();
                 opponent.jump(floats[0], floats[1],
                         floats[2], floats[3]);
-            } else if (action[1].equals("CONNECT")) {
-                if (getOpponent(action[0]) == null) {
-                    SPPlayer newOpponent = new SPPlayer(world, action[0], floats[2], floats[3],
-                            Short.valueOf(action[6]), action[7], action[8], action[10]);
-                    opponents.add(newOpponent);
-                    hud.setOpponentDeath(action[0], action[9]);
-                    newOpponent.jump(floats[0], floats[1], floats[2], floats[3]);
-                }
             } else if (action[1].equals("DISCONNECT")) {
-                opponent = getOpponent(action[0]);
+                opponent = getOpponent(Integer.valueOf(action[0]));
                 if (opponent != null) {
                     opponents.removeValue(opponent, false);
                     hud.removeOpponentDeathCount(action[0]);
                     world.destroyBody(opponent.getBody());
                 }
             } else if (action[1].equals("GRENADE")) {
-                enemyGrenade(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]), action[8]);
+                enemyGrenade(floats[2], floats[3], Float.valueOf(action[6]), Long.valueOf(action[7]),
+                        Integer.valueOf(action[8]));
             } else if (action[1].equals("UPDATE_GRENADE")) {
-                updateEnemyGrenade(floats[0], floats[1], Float.valueOf(action[7]),
-                        Float.valueOf(action[8]), action[6]);
             }
         }
     }
 
-    private void removeKillingEntity(String killerID) {
+    private void removeKillingEntity(int killerID) {
         if (enemyGrenades.containsKey(killerID)) {
             world.destroyBody(enemyGrenades.removeKey(killerID).getBody());
         } else {
             for (SPSprite s : worldEntities) {
-                if (s.getID().equals(killerID)) {
+                if (s.getID()==killerID) {
                     worldEntities.removeValue(s, true);
                     world.destroyBody(s.getBody());
                 }
@@ -275,13 +291,8 @@ public class PlayState extends GameState {
         return false;
     }
 
-    private SPPlayer getOpponent(String id) {
-        for (SPPlayer player : opponents) {
-            if (player.getId().equals(id)) {
-                return player;
-            }
-        }
-        return null;
+    private SPPlayer getOpponent(int id) {
+        return opponents.get(id);
     }
 
     private void respawnPlayer() {
@@ -329,28 +340,30 @@ public class PlayState extends GameState {
         cl.clearBulletList();
     }
 
-    private void grenadeBounces(float dt) {
-        for (Body b : cl.getFriendlyGrenadeBounces()) {
-            if (b.getUserData() instanceof SPGrenade) {
-                mon.sendPlayerAction("UPDATE_GRENADE", b.getLinearVelocity().x,
-                        b.getLinearVelocity().y, ((SPGrenade) b.getUserData()).getID(), Float.toString(b.getPosition().x),
-                        Float.toString(b.getPosition().y));
-            }
+    private void sendEntityEvents(){
+        EntityPacket pkt = new EntityPacket();
+        for (int id : myGrenades.keys()){
+            pkt.xPos=myGrenades.get(id).getPosition().x;
+            pkt.yPos=myGrenades.get(id).getPosition().y;
+            pkt.id=id;
+            pkt.type=B2DVars.TYPE_GRENADE;
+            client.sendUDP(pkt);
         }
-        for (String s : enemyGrenades.keys()) {
-            if (enemyGrenades.get(s) != null && enemyGrenades.get(s).lifeTimeReached(dt)) {
-                world.destroyBody(enemyGrenades.removeKey(s).getBody());
-            }
-        }
-        for (String s : myGrenades.keys()) {
-            if (myGrenades.get(s) != null && myGrenades.get(s).lifeTimeReached(dt)) {
-                world.destroyBody(myGrenades.removeKey(s).getBody());
-            }
-        }
-        cl.clearGrenadeList();
     }
 
-    private void updateEnemyGrenade(float xForce, float yForce, float xPos, float yPos, String ID) {
+    private void grenadeStillAlive(float dt) {
+        for (int id : myGrenades.keys()) {
+            if (myGrenades.get(id) != null && myGrenades.get(id).lifeTimeReached(dt)) {
+                EntityPacket pkt = new EntityPacket();
+                pkt.id=id;
+                pkt.alive=0;
+                client.sendUDP(pkt);
+                world.destroyBody(myGrenades.removeKey(id).getBody());
+            }
+        }
+    }
+
+    private void updateEnemyGrenade(float xForce, float yForce, float xPos, float yPos, int ID) {
         if (enemyGrenades.get(ID) != null) {
             enemyGrenades.get(ID).getBody().setTransform(xPos, yPos, 0);
             enemyGrenades.get(ID).getBody().setLinearVelocity(xForce, yForce);
@@ -370,8 +383,6 @@ public class PlayState extends GameState {
                 }
             } else {
                 //In this addAction add the ID of the killing bullet last
-                mon.sendPlayerAction("DEATH", 0, 0, hud.getDeathCount(),
-                        cl.getKillingEntity().getID(), Float.toString(cl.getKillingEntity().getDirection()));
             }
         }
     }
@@ -385,42 +396,30 @@ public class PlayState extends GameState {
         handleInput();
         world.step(dt, 6, 2);
         player.update(dt);
-        for (SPPlayer player : opponents) {
-            player.update(dt);
+        for (int id : opponents.keys()) {
+            opponents.get(id).update(dt);
         }
-        for (SPSprite sprite : worldEntities) {
-            sprite.update(dt);
-        }
-        for (String id : enemyGrenades.keys()) {
-            enemyGrenades.get(id).update(dt);
-        }
-        for (String id : myGrenades.keys()) {
+        for (int id : myGrenades.keys()) {
             myGrenades.get(id).update(dt);
         }
-        opponentActionsNew();
-        opponentActions();
+        for (int id : opEntities.keys()){
+            opEntities.get(id).update(dt);
+        }
+        opponentTCPEvents();
+        opponentEntityEvents();
         refreshAmmo(dt);
-        if (cl.isPlayerHit()) {
-            playerHit();
-        }
-        if (cl.powerTaken()) {
-            powerReload = 0f;
-        }
+        //if (cl.isPlayerHit()) {
+        //    playerHit();
+        //}
         if (player.isDead()) {
             respawnTimer += dt;
             if (respawnTimer >= B2DVars.RESPAWN_TIME) {
                 respawnPlayer();
             }
         }
-        grenadeBounces(dt);
-        //removeDeadBodies should always be last in update
+        grenadeStillAlive(dt);
         removeDeadBodies();
-        if (sendNetworkInfo >= 1 / 30f) {
-            sendNetworkInfo = 0f;
-            mon.sendInterpolationPoints();
-        } else {
-            sendNetworkInfo += dt;
-        }
+        sendEntityEvents();
     }
 
     @Override
@@ -435,14 +434,17 @@ public class PlayState extends GameState {
         for (SPSprite b : worldEntities) {
             b.render(sb);
         }
-        for (SPPlayer opponent : opponents) {
-            opponent.render(sb);
+        for (int id : opponents.keys()) {
+            opponents.get(id).render(sb);
         }
-        for (String id : enemyGrenades.keys()) {
+        for (int id : enemyGrenades.keys()) {
             enemyGrenades.get(id).render(sb);
         }
-        for (String id : myGrenades.keys()) {
+        for (int id : myGrenades.keys()) {
             myGrenades.get(id).render(sb);
+        }
+        for (int id : opEntities.keys()){
+            opEntities.get(id).render(sb);
         }
         player.render(sb);
         hud.render(sb);

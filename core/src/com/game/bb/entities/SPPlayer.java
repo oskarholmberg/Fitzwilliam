@@ -20,14 +20,12 @@ public class SPPlayer extends SPSprite {
     private Texture onGroundRight, inAirRight, onGroundLeft, inAirLeft, deadRight, deadLeft;
     private boolean onGround = true, isDead = false;
     private float textureTimer = 0;
-    private String id;
     private int xOffset = 23, yOffset = 25;
 
-    public SPPlayer(World world, String id, float xPos, float yPos, short bodyBIT,
-                    String bodyType, String color, String ID) {
+    public SPPlayer(World world, float xPos, float yPos, short bodyBIT,
+                    String bodyType, String color, int ID) {
         super(world, ID);
         createPlayerBody(xPos, yPos, bodyBIT, bodyType);
-        this.id = id;
         dir = 0;
         sound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
         loadTexture(color);
@@ -67,10 +65,6 @@ public class SPPlayer extends SPSprite {
     public void revive() {
         isDead = false;
         setTexture(onGroundLeft);
-    }
-
-    public String getId() {
-        return id;
     }
 
     @Override

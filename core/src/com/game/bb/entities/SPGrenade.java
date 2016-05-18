@@ -23,7 +23,7 @@ public class SPGrenade extends SPSprite {
     private boolean opponentGrenade;
     private float lifetime = 0f;
 
-    public SPGrenade(World world, float xPos, float yPos, float dir, boolean opponentGrenade, String ID) {
+    public SPGrenade(World world, float xPos, float yPos, float dir, boolean opponentGrenade, int ID) {
         super(world, ID);
         this.dir = dir;
         this.opponentGrenade=opponentGrenade;
@@ -85,7 +85,8 @@ public class SPGrenade extends SPSprite {
             body.createFixture(fdef).setUserData(B2DVars.ID_ENEMY_GRENADE);
         else
             body.createFixture(fdef).setUserData(B2DVars.ID_GRENADE);
-        body.setLinearVelocity(B2DVars.PH_GRENADE_X * dir / B2DVars.PPM, B2DVars.PH_GRENADE_Y / B2DVars.PPM);
+        if (!opponentGrenade)
+            body.setLinearVelocity(B2DVars.PH_GRENADE_X * dir / B2DVars.PPM, B2DVars.PH_GRENADE_Y / B2DVars.PPM);
         body.setUserData(this);
     }
 }
