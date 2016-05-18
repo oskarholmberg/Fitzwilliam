@@ -221,6 +221,7 @@ public class PlayState extends GameState {
     private void opponentMovementEvents(){
         Array<PlayerMovementPacket> packets = client.getOpponentMovements();
         for (PlayerMovementPacket pkt : packets){
+            if(opponents.containsKey(pkt.id))
             opponents.get(pkt.id).move(pkt.xp, pkt.yp, pkt.xv, pkt.yv, pkt.tex, pkt.sound);
         }
     }
