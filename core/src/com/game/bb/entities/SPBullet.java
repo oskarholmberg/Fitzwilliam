@@ -19,6 +19,7 @@ public class SPBullet extends SPSprite {
 
     private int offset = 0, ID;
     private float posYoffset = 5/B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
+    private PolygonShape shape;
 
     public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful, int ID) {
         super(world, ID);
@@ -47,7 +48,7 @@ public class SPBullet extends SPSprite {
     }
 
     private void createBullet(float xPos, float yPos, float dir, boolean harmful){
-        PolygonShape shape = new PolygonShape();
+        shape = new PolygonShape();
         shape.setAsBox(8 / B2DVars.PPM, 4 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
@@ -65,5 +66,11 @@ public class SPBullet extends SPSprite {
         body.createFixture(fdef).setUserData(B2DVars.ID_BULLET);
         body.setLinearVelocity(B2DVars.PH_BULLET_SPEED * dir / B2DVars.PPM, 0);
         body.setUserData(this);
+    }
+
+    @Override
+    public void dispose() {
+        texture.dispose();
+        shape.dispose();
     }
 }

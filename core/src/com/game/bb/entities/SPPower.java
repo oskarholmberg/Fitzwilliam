@@ -16,6 +16,8 @@ import com.game.bb.handlers.SPAnimation;
 public class SPPower extends SPSprite{
     private SPAnimation animation;
     private int offset = 32;
+    private PolygonShape shape;
+
     public SPPower(World world, float xPos, float yPos, int ID) {
         super(world, ID);
         createPowerBody(xPos, yPos);
@@ -24,7 +26,7 @@ public class SPPower extends SPSprite{
     }
 
     private void createPowerBody(float xPos, float yPos){
-        PolygonShape shape = new PolygonShape();
+        shape = new PolygonShape();
         shape.setAsBox(32 / B2DVars.PPM, 32 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
@@ -51,5 +53,11 @@ public class SPPower extends SPSprite{
         sb.begin();
         sb.draw(animation.getFrame(), x - offset, y - offset);
         sb.end();
+    }
+
+    @Override
+    public void dispose() {
+        animation.dispose();
+        shape.dispose();
     }
 }

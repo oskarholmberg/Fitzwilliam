@@ -184,7 +184,9 @@ public class PlayState extends GameState {
             case B2DVars.NET_DESTROY_BODY:
                 if(opEntities.containsKey(pkt.id)){
                     System.out.println("TCPEvent destroy body: " + pkt.id);
-                    world.destroyBody(opEntities.removeKey(pkt.id).getBody());
+                    SPSprite opEntity = opEntities.removeKey(pkt.id);
+                    world.destroyBody(opEntity.getBody());
+                    opEntity.dispose();
                 }
                 break;
         }
@@ -200,7 +202,9 @@ public class PlayState extends GameState {
                         b.setTransform(pkt.xp, pkt.yp, 0);
                         b.setLinearVelocity(pkt.xf, pkt.yf);
                     } else if (pkt.alive == 0) {
-                        world.destroyBody(opEntities.removeKey(pkt.id).getBody());
+                        SPSprite opEntity = opEntities.get(pkt.id);
+                        world.destroyBody(opEntity.getBody());
+                        opEntity.dispose();
                     }
                 } else {
                     if (pkt.type == B2DVars.TYPE_GRENADE) {
