@@ -5,5 +5,5 @@ package com.game.bb.net.packets;
  */
 public class PlayerMovementPacket {
     public float xp, yp, xv, yv;
-    public int tex, sound, seq;
+    public int tex, sound, seq, id;
 }

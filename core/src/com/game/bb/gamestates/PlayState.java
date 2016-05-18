@@ -22,6 +22,7 @@ import com.game.bb.entities.SPPlayer;
 import com.game.bb.net.client.GameClient;
 import com.game.bb.net.packets.EntityCluster;
 import com.game.bb.net.packets.EntityPacket;
+import com.game.bb.net.packets.PlayerMovementPacket;
 import com.game.bb.net.packets.TCPEventPacket;
 
 
@@ -58,9 +59,9 @@ public class PlayState extends GameState {
     private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
     private OrthogonalTiledMapRenderer tmr;
-    private int pktSequence = 0;
+    private int entityPktSequence = 0, playerPktSequence = 0;
     private boolean  grenadesIsEmpty = false;
-    private float sendNetworkInfo = 0f;
+    private float sendNetworkInfo = 0f, sendPlayerInfo = 0f;
     public int currentTexture = SPOpponent.STAND_LEFT;
     public static PlayState playState;
 
@@ -90,8 +91,7 @@ public class PlayState extends GameState {
         //Players
         Vector2 spawn = spawnLocations.random();
         int tempEntityID = newEntityID();
-        player = new SPPlayer(world, spawn.x,
-                spawn.y, B2DVars.BIT_PLAYER, B2DVars.ID_PLAYER, "blue", tempEntityID);
+        player = new SPPlayer(world, spawn.x, spawn.y, tempEntityID);
         TCPEventPacket packet = new TCPEventPacket();
         packet.action = B2DVars.NET_CONNECT;
         packet.pos = spawn;
@@ -219,6 +219,13 @@ public class PlayState extends GameState {
         }
     }
 
+    private void opponentMovementEvents(){
+        Array<PlayerMovementPacket> packets = client.getOpponentMovements();
+        for (PlayerMovementPacket pkt : packets){
+            opponents.get(pkt.id).move(pkt.xp, pkt.yp, pkt.xv, pkt.yv, pkt.tex, pkt.sound);
+        }
+    }
+
     private void respawnPlayer() {
         Vector2 spawnLoc = spawnLocations.random();
         respawnTimer = 0;
@@ -283,10 +290,22 @@ public class PlayState extends GameState {
                 index++;
             }
             EntityCluster cluster = new EntityCluster();
-            cluster.seq = pktSequence++;
+            cluster.seq = entityPktSequence++;
             cluster.pkts = packets;
             client.sendUDP(cluster);
         }
+    }
+
+    private void sendPlayerInfo(){
+        PlayerMovementPacket pkt = new PlayerMovementPacket();
+        pkt.xp = player.getPosition().x;
+        pkt.yp = player.getPosition().y;
+        pkt.xv = player.getBody().getLinearVelocity().x;
+        pkt.yv = player.getBody().getLinearVelocity().y;
+        pkt.seq = playerPktSequence++;
+        pkt.sound=0;
+        pkt.tex = currentTexture;
+        client.sendUDP(pkt);
     }
 
     private void checkGrenadeTimer(float dt) {
@@ -337,6 +356,7 @@ public class PlayState extends GameState {
         }
         opponentTCPEvents();
         opponentEntityEvents();
+        opponentMovementEvents();
         refreshAmmo(dt);
         //if (cl.isPlayerHit()) {
         //    playerHit();
@@ -352,6 +372,12 @@ public class PlayState extends GameState {
             sendEntityEvents();
         } else {
             sendNetworkInfo+=dt;
+        }
+        if (sendPlayerInfo > 1/30f){
+            sendPlayerInfo = 0f;
+            sendPlayerInfo();
+        } else {
+            sendPlayerInfo+=dt;
         }
         checkGrenadeTimer(dt);
         bulletsHittingWall();
@@ -371,6 +397,9 @@ public class PlayState extends GameState {
         }
         for (int id : opEntities.keys()){
             opEntities.get(id).render(sb);
+        }
+        for (int id : opponents.keys()){
+            opponents.get(id).render(sb);
         }
         player.render(sb);
         hud.render(sb);
