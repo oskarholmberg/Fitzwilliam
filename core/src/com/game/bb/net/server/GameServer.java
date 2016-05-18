@@ -21,7 +21,7 @@ public class GameServer extends Listener {
     private Server kryoServer;
 
     public GameServer(){
-        kryoServer = new Server(250000, 12000);
+        kryoServer = new Server();
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
             TCPEventPacket.class, EntityCluster.class, EntityPacket[].class};
         for (Class c : classes){
