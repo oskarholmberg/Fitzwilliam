@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.game.bb.gamestates.PlayState;
 import com.game.bb.handlers.B2DVars;
 
 /**
@@ -43,8 +44,10 @@ public class SPPlayer extends SPSprite {
             onGround = false;
             if (xForce < 0) {
                 setTexture(textures[JUMP_LEFT]);
+                PlayState.playState.currentTexture=JUMP_LEFT;
             } else {
                 setTexture(textures[JUMP_RIGHT]);
+                PlayState.playState.currentTexture=JUMP_RIGHT;
             }
             jetpackSound.play();
         }
@@ -59,14 +62,17 @@ public class SPPlayer extends SPSprite {
         isDead = true;
         if (dir < 0) {
             setTexture(textures[DEAD_RIGHT]);
+            PlayState.playState.currentTexture=DEAD_RIGHT;
         } else {
             setTexture(textures[DEAD_LEFT]);
+            PlayState.playState.currentTexture=DEAD_LEFT;
         }
     }
 
     public void revive() {
         isDead = false;
         setTexture(textures[STAND_RIGHT]);
+        PlayState.playState.currentTexture=STAND_RIGHT;
     }
 
     @Override
@@ -79,9 +85,11 @@ public class SPPlayer extends SPSprite {
                 if (textureTimer >= 0.5f && !onGround) {
                     if (texture.equals(textures[JUMP_LEFT])) {
                         setTexture(textures[STAND_LEFT]);
+                        PlayState.playState.currentTexture=STAND_LEFT;
                         xOffset = 30;
                     } else {
                         setTexture(textures[STAND_RIGHT]);
+                        PlayState.playState.currentTexture=STAND_RIGHT;
                         xOffset = 23;
                     }
                     onGround = true;

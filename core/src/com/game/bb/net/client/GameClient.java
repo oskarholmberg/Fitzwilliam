@@ -9,6 +9,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.game.bb.net.packets.EntityCluster;
 import com.game.bb.net.packets.EntityPacket;
+import com.game.bb.net.packets.PlayerMovementPacket;
 import com.game.bb.net.packets.TCPEventPacket;
 
 import java.io.IOException;
@@ -23,14 +24,18 @@ public class GameClient extends Listener {
     private int udpPort = 8080, tcpPort = 8081;
     private Array<TCPEventPacket> tcpPackets;
     private Array<EntityCluster> entityClusters;
+    private Array<PlayerMovementPacket> movementPackets;
     private List<InetAddress> addresses;
+    private int lastEntitySeq = 0;
+    private int lastMovementSeq = 0;
 
     public GameClient() {
         tcpPackets = new Array<TCPEventPacket>();
         entityClusters = new Array<EntityCluster>();
+        movementPackets = new Array<PlayerMovementPacket>();
         kryoClient = new Client();
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
-                TCPEventPacket.class, EntityCluster.class, EntityPacket[].class};
+                TCPEventPacket.class, EntityCluster.class, EntityPacket[].class, PlayerMovementPacket.class};
         for (Class c : classes){
             kryoClient.getKryo().register(c);
         }
@@ -65,8 +70,15 @@ public class GameClient extends Listener {
             Gdx.app.log("NET_CLIENT_TCP_RECEIVED", packet.toString());
             tcpPackets.add((TCPEventPacket) packet);
         } else if (packet instanceof EntityCluster) {
-            entityClusters.add((EntityCluster) packet);
-            System.out.println("Blah blah");
+            if (((EntityCluster) packet).seq > lastEntitySeq){
+                lastEntitySeq = ((EntityCluster) packet).seq;
+                entityClusters.add((EntityCluster) packet);
+            }
+        } else if (packet instanceof PlayerMovementPacket){
+            if (((PlayerMovementPacket) packet).seq > lastMovementSeq){
+                lastMovementSeq = ((PlayerMovementPacket) packet).seq;
+                movementPackets.add((PlayerMovementPacket) packet);
+            }
         }
     }
 
@@ -78,6 +90,13 @@ public class GameClient extends Listener {
         //temp.addAll(tcpPackets);
         return null;
 
+    }
+
+    public Array<PlayerMovementPacket> getOpponentMovements(){
+        Array<PlayerMovementPacket> temp = new Array<PlayerMovementPacket>();
+        temp.addAll(movementPackets);
+        movementPackets.clear();
+        return temp;
     }
 
     public Array<EntityCluster> getEntityClusters(){

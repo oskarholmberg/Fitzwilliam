@@ -15,12 +15,14 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.entities.SPGrenade;
+import com.game.bb.entities.SPOpponent;
 import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
 import com.game.bb.net.client.GameClient;
 import com.game.bb.net.packets.EntityCluster;
 import com.game.bb.net.packets.EntityPacket;
+import com.game.bb.net.packets.PlayerMovementPacket;
 import com.game.bb.net.packets.TCPEventPacket;
 
 
@@ -42,7 +44,7 @@ public class PlayState extends GameState {
     private OrthographicCamera b2dCam;
     private SPContactListener cl;
     private SPPlayer player;
-    private ArrayMap<Integer, SPPlayer> opponents;
+    private ArrayMap<Integer, SPOpponent> opponents;
     private Array<Vector2> spawnLocations;
     private int entityAccum = 0;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
@@ -57,13 +59,16 @@ public class PlayState extends GameState {
     private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
     private OrthogonalTiledMapRenderer tmr;
-    private int pktSequence = 0;
+    private int entityPktSequence = 0, playerPktSequence = 0;
     private boolean  grenadesIsEmpty = false;
-    private float sendNetworkInfo = 0f;
+    private float sendNetworkInfo = 0f, sendPlayerInfo = 0f;
+    public int currentTexture = SPOpponent.STAND_LEFT;
+    public static PlayState playState;
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
 
+        playState = this;
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
 
@@ -73,8 +78,8 @@ public class PlayState extends GameState {
         b2dr = new Box2DDebugRenderer();
 
         hud = new HUD();
-
-        opponents = new ArrayMap<Integer, SPPlayer>();
+        
+        opponents = new ArrayMap<Integer, SPOpponent>();
         // create boundaries
 
         String[] layers = {"moonBlocks", "domeBlocks"};
@@ -86,8 +91,7 @@ public class PlayState extends GameState {
         //Players
         Vector2 spawn = spawnLocations.random();
         int tempEntityID = newEntityID();
-        player = new SPPlayer(world, spawn.x,
-                spawn.y, tempEntityID);
+        player = new SPPlayer(world, spawn.x, spawn.y, tempEntityID);
         TCPEventPacket packet = new TCPEventPacket();
         packet.action = B2DVars.NET_CONNECT;
         packet.pos = spawn;
@@ -167,9 +171,8 @@ public class PlayState extends GameState {
         switch (pkt.action) {
             case B2DVars.NET_CONNECT:
                 if (!opponents.containsKey(pkt.id)) {
-                    SPPlayer newOpponent = new SPPlayer(world, pkt.pos.x, pkt.pos.y
-                            , pkt.id);
-                    opponents.put(pkt.id, newOpponent);
+                    SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id);
+                    opponents.put(pkt.id, opponent);
                     TCPEventPacket packet = new TCPEventPacket();
                     packet.action=B2DVars.NET_CONNECT;
                     packet.pos=player.getPosition();
@@ -212,6 +215,13 @@ public class PlayState extends GameState {
                     }
                 }
             }
+        }
+    }
+
+    private void opponentMovementEvents(){
+        Array<PlayerMovementPacket> packets = client.getOpponentMovements();
+        for (PlayerMovementPacket pkt : packets){
+            opponents.get(pkt.id).move(pkt.xp, pkt.yp, pkt.xv, pkt.yv, pkt.tex, pkt.sound);
         }
     }
 
@@ -279,10 +289,22 @@ public class PlayState extends GameState {
                 index++;
             }
             EntityCluster cluster = new EntityCluster();
-            cluster.seq = pktSequence++;
+            cluster.seq = entityPktSequence++;
             cluster.pkts = packets;
             client.sendUDP(cluster);
         }
+    }
+
+    private void sendPlayerInfo(){
+        PlayerMovementPacket pkt = new PlayerMovementPacket();
+        pkt.xp = player.getPosition().x;
+        pkt.yp = player.getPosition().y;
+        pkt.xv = player.getBody().getLinearVelocity().x;
+        pkt.yv = player.getBody().getLinearVelocity().y;
+        pkt.seq = playerPktSequence++;
+        pkt.sound=0;
+        pkt.tex = currentTexture;
+        client.sendUDP(pkt);
     }
 
     private void checkGrenadeTimer(float dt) {
@@ -332,6 +354,7 @@ public class PlayState extends GameState {
         }
         opponentTCPEvents();
         opponentEntityEvents();
+        opponentMovementEvents();
         refreshAmmo(dt);
         //if (cl.isPlayerHit()) {
         //    playerHit();
@@ -347,6 +370,12 @@ public class PlayState extends GameState {
             sendEntityEvents();
         } else {
             sendNetworkInfo+=dt;
+        }
+        if (sendPlayerInfo > 1/30f){
+            sendPlayerInfo = 0f;
+            sendPlayerInfo();
+        } else {
+            sendPlayerInfo+=dt;
         }
         checkGrenadeTimer(dt);
         bulletsHittingWall();
@@ -366,6 +395,9 @@ public class PlayState extends GameState {
         }
         for (int id : opEntities.keys()){
             opEntities.get(id).render(sb);
+        }
+        for (int id : opponents.keys()){
+            opponents.get(id).render(sb);
         }
         player.render(sb);
         hud.render(sb);
