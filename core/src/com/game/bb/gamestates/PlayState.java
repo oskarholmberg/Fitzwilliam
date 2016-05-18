@@ -50,7 +50,7 @@ public class PlayState extends GameState {
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh, powerReload = 30f;
     private Array<SPSprite> worldEntities;
     private ArrayMap<Integer, SPGrenade> enemyGrenades = new ArrayMap<Integer, SPGrenade>();
-    private ArrayMap<Integer, SPGrenade> myGrenades = new ArrayMap<Integer, SPGrenade>();
+    private ArrayMap<Integer, SPSprite> myEntities = new ArrayMap<Integer, SPSprite>();
     private ArrayMap<Integer, SPSprite> opEntities = new ArrayMap<Integer, SPSprite>();
     private float respawnTimer = 0;
     private GameClientNew client;
@@ -62,7 +62,7 @@ public class PlayState extends GameState {
     private PlayStateNetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
     private int pktSequence = 0;
-    private boolean clipIsEmpty = false, grenadesIsEmpty = false;
+    private boolean  grenadesIsEmpty = false;
     private float sendNetworkInfo = 0f;
 
     public PlayState(GameStateManager gsm) {
@@ -105,19 +105,18 @@ public class PlayState extends GameState {
         b2dCam.setToOrtho(false, B2DVars.CAM_WIDTH / B2DVars.PPM, B2DVars.CAM_HEIGHT / B2DVars.PPM);
     }
 
-    public void shoot() {
-        if (clipIsEmpty)
-            emptyClipSound.play();
-        if (amntBullets > 0 && !player.isDead()) {
-            int ID = newEntityID();
-            Vector2 pos = player.getPosition();
-            SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false, ID);
-            worldEntities.add(bullet);
-            amntBullets--;
-            hud.setAmountBulletsLeft(amntBullets);
-            if (amntBullets == 0) {
-                clipIsEmpty = true;
-                bulletRefresh = 0;
+
+    public void shoot(){
+        if(!player.isDead()){
+            if(amntBullets==0){
+                emptyClipSound.play();
+            } else {
+                int id = newEntityID();
+                Vector2 pos = player.getPosition();
+                SPBullet bullet = new SPBullet(world, pos.x, pos.y, lastJumpDirection, false, id);
+                myEntities.put(id, bullet);
+                amntBullets--;
+                hud.setAmountBulletsLeft(amntBullets);
             }
         }
     }
@@ -127,7 +126,7 @@ public class PlayState extends GameState {
             int ID = newEntityID();
             Vector2 pos = player.getPosition();
             SPGrenade spg = new SPGrenade(world, pos.x, pos.y, lastJumpDirection, false, ID);
-            myGrenades.put(ID, spg);
+            myEntities.put(ID, spg);
             System.out.println("Grenade created: " + ID);
             amntGrenades--;
             hud.setAmountGrenadesLeft(amntGrenades);
@@ -136,10 +135,6 @@ public class PlayState extends GameState {
                 grenadeRefresh = 0;
             }
         }
-    }
-
-    public ArrayMap<Integer, SPGrenade> getMyEntities() {
-        return myGrenades;
     }
 
     public int newEntityID() {
@@ -268,12 +263,11 @@ public class PlayState extends GameState {
     }
 
     private void refreshAmmo(float dt) {
-        if ((powerReload < 3f || bulletRefresh > 3f) && clipIsEmpty) {
+        if ((powerReload < 3f || bulletRefresh > 3f) && amntBullets==0) {
             amntBullets = B2DVars.AMOUNT_BULLET;
-            clipIsEmpty = false;
             hud.setAmountBulletsLeft(amntBullets);
             reloadSound.play();
-        } else {
+        } else if (amntBullets == 0){
             bulletRefresh += dt;
         }
         if ((powerReload < 3f || grenadeRefresh > 8f) && grenadesIsEmpty) {
@@ -299,19 +293,22 @@ public class PlayState extends GameState {
     }
 
     private void sendEntityEvents(){
-        if (myGrenades.size>0) {
-            EntityPacket[] packets = new EntityPacket[myGrenades.size];
+        if (myEntities.size>0) {
+            EntityPacket[] packets = new EntityPacket[myEntities.size];
             int index = 0;
-            for (int id : myGrenades.keys()) {
+            for (int id : myEntities.keys()) {
                 EntityPacket pkt = new EntityPacket();
-                Body b = myGrenades.get(id).getBody();
+                Body b = myEntities.get(id).getBody();
                 pkt.xp = b.getPosition().x;
                 pkt.yp = b.getPosition().y;
                 pkt.xf = b.getLinearVelocity().x;
                 pkt.yf = b.getLinearVelocity().y;
                 pkt.id = id;
                 pkt.alive = 1;
-                pkt.type = B2DVars.TYPE_GRENADE;
+                if (myEntities.get(id) instanceof SPGrenade)
+                    pkt.type = B2DVars.TYPE_GRENADE;
+                else if (myEntities.get(id) instanceof SPBullet)
+                    pkt.type = B2DVars.TYPE_BULLET;
                 packets[index] = pkt;
                 index++;
             }
@@ -323,14 +320,16 @@ public class PlayState extends GameState {
     }
 
     private void grenadeStillAlive(float dt) {
-        for (int id : myGrenades.keys()) {
-            if (myGrenades.get(id) != null && myGrenades.get(id).lifeTimeReached(dt)) {
-                TCPEventPacket pkt = new TCPEventPacket();
-                pkt.id=id;
-                pkt.action=B2DVars.NET_DESTROY_BODY;
-                System.out.println("Destroy grenade: " + id);
-                client.sendTCP(pkt);
-                world.destroyBody(myGrenades.removeKey(id).getBody());
+        for (int id : myEntities.keys()) {
+            if (myEntities.get(id) instanceof SPGrenade) {
+                if (myEntities.get(id) != null && ((SPGrenade) myEntities.get(id)).lifeTimeReached(dt)) {
+                    TCPEventPacket pkt = new TCPEventPacket();
+                    pkt.id = id;
+                    pkt.action = B2DVars.NET_DESTROY_BODY;
+                    System.out.println("Destroy grenade: " + id);
+                    client.sendTCP(pkt);
+                    world.destroyBody(myEntities.removeKey(id).getBody());
+                }
             }
         }
     }
@@ -344,7 +343,7 @@ public class PlayState extends GameState {
                 if (enemyGrenades.containsKey(temp.getID())) {
                     world.destroyBody(enemyGrenades.removeKey(temp.getID()).getBody());
                 } else {
-                    world.destroyBody(myGrenades.removeKey(temp.getID()).getBody());
+                    world.destroyBody(myEntities.removeKey(temp.getID()).getBody());
                 }
             } else {
                 //In this addAction add the ID of the killing bullet last
@@ -364,8 +363,8 @@ public class PlayState extends GameState {
         for (int id : opponents.keys()) {
             opponents.get(id).update(dt);
         }
-        for (int id : myGrenades.keys()) {
-            myGrenades.get(id).update(dt);
+        for (int id : myEntities.keys()) {
+            myEntities.get(id).update(dt);
         }
         for (int id : opEntities.keys()){
             opEntities.get(id).update(dt);
@@ -410,8 +409,8 @@ public class PlayState extends GameState {
         for (int id : enemyGrenades.keys()) {
             enemyGrenades.get(id).render(sb);
         }
-        for (int id : myGrenades.keys()) {
-            myGrenades.get(id).render(sb);
+        for (int id : myEntities.keys()) {
+            myEntities.get(id).render(sb);
         }
         for (int id : opEntities.keys()){
             opEntities.get(id).render(sb);
