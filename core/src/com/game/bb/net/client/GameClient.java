@@ -28,7 +28,7 @@ public class GameClient extends Listener {
     public GameClient() {
         tcpPackets = new Array<TCPEventPacket>();
         entityClusters = new Array<EntityCluster>();
-        kryoClient = new Client(250000, 12000);
+        kryoClient = new Client();
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
                 TCPEventPacket.class, EntityCluster.class, EntityPacket[].class};
         for (Class c : classes){
