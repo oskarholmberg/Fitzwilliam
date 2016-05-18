@@ -208,7 +208,6 @@ public class PlayState extends GameState {
                     if (pkt.alive == 1) {
                         b.setTransform(pkt.xp, pkt.yp, 0);
                         b.setLinearVelocity(pkt.xf, pkt.yf);
-                        System.out.println("xPos: " + pkt.xp + " yPos: " + pkt.yp + " xF: " + pkt.xf + " yF: " + pkt.yf);
                     } else if (pkt.alive == 0) {
                         world.destroyBody(opEntities.removeKey(pkt.id).getBody());
                     }

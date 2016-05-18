@@ -45,13 +45,6 @@ public class PlayStateNetworkMonitor {
         client.sendData(packet.getBytes());
     }
 
-    public synchronized void sendInterpolationPoints(){
-        ArrayMap<Integer, SPGrenade>  enteties= ps.getMyEntities();
-        for (int id : enteties.keys()){
-
-        }
-    }
-
     public synchronized void addOpponentAction(String action) {
         opponentActions.add(action);
     }

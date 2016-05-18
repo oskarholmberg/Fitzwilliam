@@ -65,7 +65,6 @@ public class GameClientNew extends Listener {
             Gdx.app.log("NET_CLIENT_TCP_RECEIVED", packet.toString());
             tcpPackets.add((TCPEventPacket) packet);
         } else if (packet instanceof EntityCluster) {
-            Gdx.app.log("NET_CLIENT_UDP_RECEIVED", packet.toString());
             entityClusters.add((EntityCluster) packet);
         }
     }
