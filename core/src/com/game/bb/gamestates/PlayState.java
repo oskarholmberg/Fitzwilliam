@@ -315,7 +315,7 @@ public class PlayState extends GameState {
                     TCPEventPacket pkt = new TCPEventPacket();
                     pkt.id = id;
                     pkt.action = B2DVars.NET_DESTROY_BODY;
-                    client.sendTCP(pkt);
+                    client.sendUDP(pkt);
                     SPSprite grenade = myEntities.removeKey(id);
                     grenade.dispose();
                     world.destroyBody(grenade.getBody());
