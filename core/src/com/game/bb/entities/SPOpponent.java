@@ -1,6 +1,5 @@
 package com.game.bb.entities;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -13,12 +12,8 @@ import com.game.bb.handlers.B2DVars;
  */
 public class SPOpponent extends SPPlayer {
 
-    public SPOpponent(World world, float xPos, float yPos, int ID) {
-        super(world, xPos, yPos, ID);
-        createOpponentBody(xPos, yPos);
-        dir = 0;
-        loadTexture("red");
-        setTexture(textures[STAND_RIGHT]);
+    public SPOpponent(World world, float xPos, float yPos, int id, String color) {
+        super(world, xPos, yPos, id, color);
     }
 
     /**
@@ -51,7 +46,7 @@ public class SPOpponent extends SPPlayer {
         }
     }
 
-    private void createOpponentBody(float xPos, float yPos) {
+    protected void createPlayerBody(float xPos, float yPos) {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT);
         FixtureDef fdef = new FixtureDef();

@@ -91,7 +91,7 @@ public class PlayState extends GameState {
         //Players
         Vector2 spawn = spawnLocations.random();
         int tempEntityID = newEntityID();
-        player = new SPPlayer(world, spawn.x, spawn.y, tempEntityID);
+        player = new SPPlayer(world, spawn.x, spawn.y, tempEntityID, "blue");
         TCPEventPacket packet = new TCPEventPacket();
         packet.action = B2DVars.NET_CONNECT;
         packet.pos = spawn;
@@ -171,7 +171,7 @@ public class PlayState extends GameState {
         switch (pkt.action) {
             case B2DVars.NET_CONNECT:
                 if (!opponents.containsKey(pkt.id)) {
-                    SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id);
+                    SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id, "red");
                     opponents.put(pkt.id, opponent);
                     TCPEventPacket packet = new TCPEventPacket();
                     packet.action=B2DVars.NET_CONNECT;

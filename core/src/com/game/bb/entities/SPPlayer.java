@@ -26,12 +26,12 @@ public class SPPlayer extends SPSprite {
     public static int STAND_RIGHT = 0, STAND_LEFT = 1, JUMP_RIGHT = 2, JUMP_LEFT = 3,
             DEAD_RIGHT = 4, DEAD_LEFT = 5;
 
-    public SPPlayer(World world, float xPos, float yPos, int ID) {
-        super(world, ID);
+    public SPPlayer(World world, float xPos, float yPos, int id, String color) {
+        super(world, id);
         createPlayerBody(xPos, yPos);
         dir = 0;
         jetpackSound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
-        loadTexture("blue");
+        loadTexture(color);
         setTexture(textures[STAND_RIGHT]);
     }
 
@@ -109,7 +109,7 @@ public class SPPlayer extends SPSprite {
         return isDead;
     }
 
-    private void createPlayerBody(float xPos, float yPos) {
+    protected void createPlayerBody(float xPos, float yPos) {
         shape = new PolygonShape();
         shape.setAsBox(B2DVars.PLAYER_WIDTH, B2DVars.PLAYER_HEIGHT);
         FixtureDef fdef = new FixtureDef();
@@ -155,6 +155,9 @@ public class SPPlayer extends SPSprite {
     @Override
     public void dispose() {
         texture.dispose();
+        for (Texture texture : textures) {
+            texture.dispose();
+        }
         shape.dispose();
     }
 }
