@@ -18,8 +18,7 @@ import com.game.bb.entities.SPGrenade;
 import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
-import com.game.bb.net.PlayStateNetworkMonitor;
-import com.game.bb.net.client.GameClientNew;
+import com.game.bb.net.client.GameClient;
 import com.game.bb.net.packets.EntityCluster;
 import com.game.bb.net.packets.EntityPacket;
 import com.game.bb.net.packets.TCPEventPacket;
@@ -53,13 +52,12 @@ public class PlayState extends GameState {
     private ArrayMap<Integer, SPSprite> myEntities = new ArrayMap<Integer, SPSprite>();
     private ArrayMap<Integer, SPSprite> opEntities = new ArrayMap<Integer, SPSprite>();
     private float respawnTimer = 0;
-    private GameClientNew client;
+    private GameClient client;
     private HUD hud;
     private Texture backGround = new Texture("images/spaceBackground.png");
     private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
     private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
     private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
-    private PlayStateNetworkMonitor mon;
     private OrthogonalTiledMapRenderer tmr;
     private int pktSequence = 0;
     private boolean  grenadesIsEmpty = false;
@@ -71,7 +69,7 @@ public class PlayState extends GameState {
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
 
-        client = new GameClientNew();
+        client = new GameClient();
         client.connectToServer(0);
 
         b2dr = new Box2DDebugRenderer();
@@ -152,13 +150,11 @@ public class PlayState extends GameState {
         if (SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x > touchNbrs[1] && cl.canJump()) {
             SPInput.down = false;
-            mon.sendPlayerAction("MOVE", B2DVars.PH_JUMPX, B2DVars.PH_JUMPY);
             player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
             lastJumpDirection = 1;
         } else if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x < touchNbrs[0] && cl.canJump()) {
             SPInput.down = false;
-            mon.sendPlayerAction("MOVE", -B2DVars.PH_JUMPX, B2DVars.PH_JUMPY);
             player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
             lastJumpDirection = -1;
         }
@@ -208,7 +204,6 @@ public class PlayState extends GameState {
                     if (pkt.alive == 1) {
                         b.setTransform(pkt.xp, pkt.yp, 0);
                         b.setLinearVelocity(pkt.xf, pkt.yf);
-                        System.out.println("xPos: " + pkt.xp + " yPos: " + pkt.yp + " xF: " + pkt.xf + " yF: " + pkt.yf);
                     } else if (pkt.alive == 0) {
                         world.destroyBody(opEntities.removeKey(pkt.id).getBody());
                     }
@@ -253,7 +248,6 @@ public class PlayState extends GameState {
         respawnTimer = 0;
         player.revive();
         player.jump(0, 0, spawnLoc.x, spawnLoc.y);
-        mon.sendPlayerAction("RESPAWN", 0, 0);
         amntBullets = B2DVars.AMOUNT_BULLET;
         amntGrenades = B2DVars.AMOUNT_GRENADE;
         hud.setAmountBulletsLeft(amntBullets);
@@ -349,10 +343,6 @@ public class PlayState extends GameState {
                 //In this addAction add the ID of the killing bullet last
             }
         }
-    }
-
-    public void setNetworkMonitor(PlayStateNetworkMonitor mon) {
-        this.mon = mon;
     }
 
     @Override
