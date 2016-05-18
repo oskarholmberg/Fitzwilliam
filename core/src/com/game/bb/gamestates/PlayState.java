@@ -47,10 +47,8 @@ public class PlayState extends GameState {
     private ArrayMap<Integer, SPPlayer> opponents;
     private Array<Vector2> spawnLocations;
     private int entityAccum = 0;
-    private DecimalFormat df;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh, powerReload = 30f;
-    private String entityID = B2DVars.MY_ID + "%0";
     private Array<SPSprite> worldEntities;
     private ArrayMap<Integer, SPGrenade> enemyGrenades = new ArrayMap<Integer, SPGrenade>();
     private ArrayMap<Integer, SPGrenade> myGrenades = new ArrayMap<Integer, SPGrenade>();
@@ -77,7 +75,6 @@ public class PlayState extends GameState {
         client.connectToServer(0);
 
         b2dr = new Box2DDebugRenderer();
-        df = new DecimalFormat("##.####");
 
         hud = new HUD();
 
