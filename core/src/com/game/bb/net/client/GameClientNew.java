@@ -25,7 +25,7 @@ public class GameClientNew extends Listener {
     private Array<EntityCluster> entityClusters;
     private List<InetAddress> addresses;
 
-    public GameClientNew(){
+    public GameClientNew() {
         tcpPackets = new Array<TCPEventPacket>();
         entityClusters = new Array<EntityCluster>();
         kryoClient = new Client(250000, 12000);
@@ -41,14 +41,16 @@ public class GameClientNew extends Listener {
         findLocalServer();
     }
 
-    private void findLocalServer(){
-        addresses  = kryoClient.discoverHosts(udpPort, 2000);
+    private void findLocalServer() {
+        addresses = kryoClient.discoverHosts(udpPort, 2000);
         Gdx.app.log("NET_CLIENT_CONNECT", "Addresses found: " + addresses.toString());
     }
-    public List<InetAddress> getLocalServers(){
+
+    public List<InetAddress> getLocalServers() {
         return addresses;
     }
-    public void connectToServer(int index){
+
+    public void connectToServer(int index) {
         try {
             kryoClient.connect(5000, addresses.get(index), tcpPort, udpPort);
             Gdx.app.log("NET_CLIENT_CONNECT", "Connected to host @");
@@ -68,9 +70,9 @@ public class GameClientNew extends Listener {
         }
     }
 
-    public TCPEventPacket getTCPEventPackets(){
-        if (tcpPackets.size>0)
-        return tcpPackets.pop();
+    public TCPEventPacket getTCPEventPackets() {
+        if (tcpPackets.size > 0)
+            return tcpPackets.pop();
 
         //Array<Object> temp = new Array<Object>();
         //temp.addAll(tcpPackets);
@@ -86,13 +88,12 @@ public class GameClientNew extends Listener {
     }
 
 
-
-    public void sendUDP(Object packet){
+    public void sendUDP(Object packet) {
         kryoClient.sendUDP(packet);
         //Gdx.app.log("NET_CLIENT_SEND_UDP", packet.getClass().toString());
     }
 
-    public void sendTCP(Object packet){
+    public void sendTCP(Object packet) {
         kryoClient.sendTCP(packet);
         Gdx.app.log("NET_CLIENT_SEND_TCP", packet.getClass().toString());
     }
