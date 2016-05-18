@@ -78,7 +78,7 @@ public class PlayState extends GameState {
         b2dr = new Box2DDebugRenderer();
 
         hud = new HUD();
-        
+
         opponents = new ArrayMap<Integer, SPOpponent>();
         // create boundaries
 

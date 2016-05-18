@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -17,14 +15,14 @@ import com.game.bb.handlers.B2DVars;
  */
 public class SPBullet extends SPSprite {
 
-    private int offset = 0, ID;
-    private float posYoffset = 5/B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
+    private int offset = 0;
+    private float posYoffset = 5/B2DVars.PPM, posXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
     private PolygonShape shape;
 
     public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful, int ID) {
         super(world, ID);
         this.dir=dir;
-        createBullet(xPos+dir*getPosXoffset, yPos-posYoffset, dir, harmful);
+        createBullet(xPos+dir* posXoffset, yPos-posYoffset, dir, harmful);
         Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
         sound.play();
         if (harmful) {
