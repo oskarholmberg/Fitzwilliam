@@ -10,8 +10,8 @@ import java.util.HashMap;
  */
 public class HUD {
     private TextureRegion[] font;
-    private String playerDeaths = "0";
-    private HashMap<String, String> opponentDeaths;
+    private int playerDeaths = 0;
+    private HashMap<Integer, Integer> opponentDeaths;
     private Texture playerTexture, opponentTexture, bulletTexture;
     private TextureRegion grenadeTexture;
     private int bulletsLeft = B2DVars.AMOUNT_BULLET;
@@ -24,7 +24,7 @@ public class HUD {
         opponentTexture = new Texture("images/player/redPlayerStandRight.png");
         bulletTexture = new Texture("images/weapons/blueBullet.png");
         grenadeTexture = TextureRegion.split(new Texture("images/weapons/blueGrenade.png"), 30, 30)[0][0];
-        opponentDeaths = new HashMap<String, String>();
+        opponentDeaths = new HashMap<Integer, Integer>();
 
         font = new TextureRegion[11];
         for (int i = 0; i < 6; i++) {
@@ -36,8 +36,7 @@ public class HUD {
     }
 
     public void addPlayerDeath() {
-        int temp = Integer.valueOf(playerDeaths) + 1;
-        playerDeaths = Integer.toString(temp);
+        playerDeaths++;
     }
 
     public void setAmountBulletsLeft(int amount){
@@ -46,7 +45,7 @@ public class HUD {
 
     public void setAmountGrenadesLeft(int amount) { grenadesLeft = amount;}
 
-    public void setOpponentDeath(String id,String deaths) {
+    public void setOpponentDeath(int id,int deaths) {
         opponentDeaths.put(id, deaths);
     }
 
@@ -57,12 +56,13 @@ public class HUD {
     public void render(SpriteBatch sb) {
         sb.begin();
         sb.draw(playerTexture, 50, B2DVars.CAM_HEIGHT - 70, 45, 40);
-        for (int i = 0; i < playerDeaths.length(); i++) {
-            sb.draw(font[Integer.valueOf(playerDeaths.substring(i, i + 1))], 100 + i * 50, B2DVars.CAM_HEIGHT - 70, 40, 40);
+        String playerDeathString = Integer.toString(playerDeaths);
+        for (int i = 0; i < playerDeathString.length(); i++) {
+            sb.draw(font[Integer.valueOf(playerDeathString.substring(i, i + 1))], 100 + i * 50, B2DVars.CAM_HEIGHT - 70, 40, 40);
         }
         int offset=0;
-        for (String id : opponentDeaths.keySet()) {
-            String deaths = opponentDeaths.get(id);
+        for (int id : opponentDeaths.keySet()) {
+            String deaths = Integer.toString(opponentDeaths.get(id));
             for (int i = 0; i < deaths.length(); i++) {
                 sb.draw(opponentTexture, B2DVars.CAM_WIDTH - 200-offset, B2DVars.CAM_HEIGHT - 70, 45, 40);
                 sb.draw(font[Integer.valueOf(deaths.substring(i, i + 1))], B2DVars.CAM_WIDTH - (150+offset) + i * 50, B2DVars.CAM_HEIGHT - 70, 40, 40);
@@ -78,7 +78,7 @@ public class HUD {
         sb.end();
     }
 
-    public String getDeathCount() {
+    public int getPlayerDeathCount() {
         return playerDeaths;
     }
 }

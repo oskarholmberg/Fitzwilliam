@@ -188,6 +188,10 @@ public class PlayState extends GameState {
                     opEntity.dispose();
                 }
                 break;
+            case B2DVars.NET_DEATH:
+                if (opponents.containsKey(pkt.id)){
+                    hud.setOpponentDeath(pkt.id, pkt.misc);
+                }
         }
     }
 
@@ -270,7 +274,7 @@ public class PlayState extends GameState {
                 bullet.dispose();
             }
         }
-        cl.clearBulletList();
+        cl.clearIdList();
     }
 
     private void sendEntityEvents(){
@@ -334,11 +338,17 @@ public class PlayState extends GameState {
             int id = cl.getKillingEntityID();
             player.kill(1);
             hud.addPlayerDeath();
+            TCPEventPacket pkt = new TCPEventPacket();
+            pkt.action=B2DVars.NET_DESTROY_BODY;
+            pkt.id= id;
+            client.sendUDP(pkt);
+            pkt.action=B2DVars.NET_DEATH;
+            pkt.id = player.getID();
+            pkt.misc = hud.getPlayerDeathCount();
+            client.sendUDP(pkt);
             if (myEntities.containsKey(id)){
-                //Add code to NET remove entity
                 world.destroyBody(myEntities.get(id).getBody());
             } else if (opEntities.containsKey(id)){
-                //add code to NET remove entity
                 world.destroyBody(opEntities.get(id).getBody());
             }
         }
@@ -362,9 +372,9 @@ public class PlayState extends GameState {
         opponentEntityEvents();
         opponentMovementEvents();
         refreshAmmo(dt);
-        //if (cl.isPlayerHit()) {
-        //    playerHit();
-        //}
+        if (cl.isPlayerHit()) {
+            playerHit();
+        }
         if (player.isDead()) {
             respawnTimer += dt;
             if (respawnTimer >= B2DVars.RESPAWN_TIME) {

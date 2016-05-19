@@ -8,5 +8,5 @@ import com.badlogic.gdx.math.Vector2;
 public class TCPEventPacket {
     public int action;
     public Vector2 pos;
-    public int id;
+    public int id, misc;
 }

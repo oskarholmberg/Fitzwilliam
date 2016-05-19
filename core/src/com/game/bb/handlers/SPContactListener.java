@@ -133,7 +133,7 @@ public class SPContactListener implements ContactListener {
         amntJumps = 0;
     }
 
-    public void clearBulletList() {
+    public void clearIdList() {
         if (idsToRemove.size > 0)
             idsToRemove.clear();
     }
