@@ -182,10 +182,15 @@ public class PlayState extends GameState {
                 break;
             case B2DVars.NET_DESTROY_BODY:
                 if(opEntities.containsKey(pkt.id)){
-                    System.out.println("TCPEvent destroy body: " + pkt.id);
+                    System.out.println("Destroy oponent entity: " + pkt.id);
                     SPSprite opEntity = opEntities.removeKey(pkt.id);
                     world.destroyBody(opEntity.getBody());
                     opEntity.dispose();
+                } else if (myEntities.containsKey(pkt.id)){
+                    System.out.println("Destroy my entity: " + pkt.id);
+                    SPSprite myEntity = myEntities.removeKey(pkt.id);
+                    world.destroyBody(myEntity.getBody());
+                    myEntity.dispose();
                 }
                 break;
             case B2DVars.NET_DEATH:
