@@ -18,13 +18,14 @@ public class SPBullet extends SPSprite {
     private int offset = 0;
     private float posYoffset = 5/B2DVars.PPM, posXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
     private PolygonShape shape;
+    private Sound shootStound;
 
     public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful, int ID) {
         super(world, ID);
         this.dir=dir;
         createBullet(xPos+dir* posXoffset, yPos-posYoffset, dir, harmful);
-        Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
-        sound.play();
+        shootStound = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
+        shootStound.play();
         if (harmful) {
             // set enemy color texture
             setTexture(new Texture("images/weapons/redBullet.png"));
@@ -70,5 +71,6 @@ public class SPBullet extends SPSprite {
     public void dispose() {
         texture.dispose();
         shape.dispose();
+        shootStound.dispose();
     }
 }

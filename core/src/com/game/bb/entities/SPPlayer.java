@@ -159,5 +159,6 @@ public class SPPlayer extends SPSprite {
             texture.dispose();
         }
         shape.dispose();
+        jetpackSound.dispose();
     }
 }

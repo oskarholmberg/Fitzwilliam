@@ -347,9 +347,13 @@ public class PlayState extends GameState {
             pkt.misc = hud.getPlayerDeathCount();
             client.sendUDP(pkt);
             if (myEntities.containsKey(id)){
-                world.destroyBody(myEntities.get(id).getBody());
+                SPSprite entity = myEntities.get(id);
+                world.destroyBody(entity.getBody());
+                entity.dispose();
             } else if (opEntities.containsKey(id)){
-                world.destroyBody(opEntities.get(id).getBody());
+                SPSprite entity = opEntities.get(id);
+                world.destroyBody(entity.getBody());
+                entity.dispose();
             }
         }
     }
