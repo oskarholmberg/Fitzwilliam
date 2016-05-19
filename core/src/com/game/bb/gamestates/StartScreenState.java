@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
 
@@ -48,14 +49,17 @@ public class StartScreenState extends GameState {
         bdef.type= BodyDef.BodyType.DynamicBody;
         Body body = world.createBody(bdef);
         itRains.add(new FallingBody(body));
+        shape.dispose();
     }
 
 
     @Override
     public void handleInput() {
         if (playButton.isClicked()) {
+            dispose();
             Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
             sound.play();
+            sound.dispose();
             gsm.setState(GameStateManager.CONNECT);
         }
     }
@@ -86,10 +90,12 @@ public class StartScreenState extends GameState {
 
     @Override
     public void dispose() {
-
+        for (FallingBody b : itRains){
+            b.dispose();
+        }
     }
 
-    public class FallingBody{
+    public class FallingBody implements Disposable{
         private Texture texture = new Texture("images/player/bluePlayerJumpLeft.png");
         private Body body;
         public FallingBody(Body body){
@@ -100,6 +106,11 @@ public class StartScreenState extends GameState {
             sb.begin();
             sb.draw(texture, body.getPosition().x, body.getPosition().y, 50, 44);
             sb.end();
+        }
+
+        @Override
+        public void dispose() {
+            texture.dispose();
         }
     }
 }

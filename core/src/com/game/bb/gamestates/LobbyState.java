@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
 import com.sun.org.apache.xpath.internal.SourceTree;
@@ -61,6 +62,7 @@ public class LobbyState extends GameState {
         bdef.type = BodyDef.BodyType.DynamicBody;
         Body body = world.createBody(bdef);
         itRains.add(new FallingBody(body));
+        shape.dispose();
     }
 
 
@@ -76,9 +78,11 @@ public class LobbyState extends GameState {
         }
         for (SPButton joinButton : joinButtons) {
             if (joinButton.isClicked()) {
+                dispose();
                 gsm.setIpAddress(joinButton.getInfo());
                 searcher.stopSearch();
                 sound.play();
+                sound.dispose();
                 gsm.setState(GameStateManager.PLAY);
             }
         }
@@ -121,7 +125,9 @@ public class LobbyState extends GameState {
 
     @Override
     public void dispose() {
-
+        for (FallingBody b : itRains){
+            b.dispose();
+        }
     }
 
     private Array<SPButton> getJoinButtons(Array<String> servers) {
@@ -136,7 +142,7 @@ public class LobbyState extends GameState {
         return buttons;
     }
 
-    public class FallingBody {
+    public class FallingBody implements Disposable{
         private Texture texture = new Texture("images/player/redPlayerJumpLeft.png");
         private Body body;
 
@@ -148,6 +154,11 @@ public class LobbyState extends GameState {
             sb.begin();
             sb.draw(texture, body.getPosition().x, body.getPosition().y, 50, 44);
             sb.end();
+        }
+
+        @Override
+        public void dispose() {
+            texture.dispose();
         }
     }
 
