@@ -34,8 +34,8 @@ public class ConnectionState extends GameState {
         world = new World(new Vector2(0, -9.81f), true);
         itRains = new Array<FallingBody>();
 
-        hostButton = new SPButton(new Texture("images/button/hostButton.png"), B2DVars.CAM_WIDTH/2, (B2DVars.CAM_HEIGHT/2)+100, 289f, 28f, cam);
-        joinButton = new SPButton(new Texture("images/button/joinButton.png"), B2DVars.CAM_WIDTH/2, (B2DVars.CAM_HEIGHT/2), 289f, 28f, cam);
+        hostButton = new SPButton(new Texture("images/button/hostButton.png"), cam.viewportWidth/2, (cam.viewportHeight/2)+100, 289f, 28f, cam);
+        joinButton = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth/2, (cam.viewportHeight/2), 289f, 28f, cam);
         fallingBody();
     }
 
@@ -45,7 +45,7 @@ public class ConnectionState extends GameState {
         FixtureDef fdef = new FixtureDef();
         fdef.shape=shape;
         BodyDef bdef = new BodyDef();
-        bdef.position.set( (float) (B2DVars.CAM_WIDTH*Math.random()) , B2DVars.CAM_HEIGHT );
+        bdef.position.set( (float) (cam.viewportWidth*Math.random()) , cam.viewportHeight );
         bdef.type= BodyDef.BodyType.DynamicBody;
         Body body = world.createBody(bdef);
         itRains.add(new FallingBody(body));

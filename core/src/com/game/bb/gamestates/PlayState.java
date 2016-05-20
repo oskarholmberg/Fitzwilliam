@@ -57,7 +57,7 @@ public class PlayState extends GameState {
     private Texture backGround = new Texture("images/spaceBackground.png");
     private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
     private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
-    private float[] touchNbrs = {(B2DVars.CAM_WIDTH / 5), B2DVars.CAM_WIDTH * 4 / 5};
+    private float[] touchNbrs = {(cam.viewportWidth/ 5), cam.viewportWidth * 4 / 5};
     private OrthogonalTiledMapRenderer tmr;
     private int entityPktSequence = 0, playerPktSequence = 0;
     private boolean  grenadesIsEmpty = false;
@@ -101,7 +101,7 @@ public class PlayState extends GameState {
 
         // set up box2d cam
         b2dCam = new OrthographicCamera();
-        b2dCam.setToOrtho(false, B2DVars.CAM_WIDTH / B2DVars.PPM, B2DVars.CAM_HEIGHT / B2DVars.PPM);
+        b2dCam.setToOrtho(false, cam.viewportWidth / B2DVars.PPM, cam.viewportHeight / B2DVars.PPM);
     }
 
 

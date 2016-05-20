@@ -3,6 +3,8 @@ package com.game.bb.handlers;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.game.bb.gamestates.PlayState;
+
 import java.util.HashMap;
 
 /**
@@ -54,26 +56,28 @@ public class HUD {
     }
 
     public void render(SpriteBatch sb) {
+        float camHeight = PlayState.playState.cam.viewportHeight;
+        float camWidth = PlayState.playState.cam.viewportWidth;
         sb.begin();
-        sb.draw(playerTexture, 50, B2DVars.CAM_HEIGHT - 70, 45, 40);
+        sb.draw(playerTexture, 50, camHeight - 70, 45, 40);
         String playerDeathString = Integer.toString(playerDeaths);
         for (int i = 0; i < playerDeathString.length(); i++) {
-            sb.draw(font[Integer.valueOf(playerDeathString.substring(i, i + 1))], 100 + i * 50, B2DVars.CAM_HEIGHT - 70, 40, 40);
+            sb.draw(font[Integer.valueOf(playerDeathString.substring(i, i + 1))], 100 + i * 50, camHeight - 70, 40, 40);
         }
         int offset=0;
         for (int id : opponentDeaths.keySet()) {
             String deaths = Integer.toString(opponentDeaths.get(id));
             for (int i = 0; i < deaths.length(); i++) {
-                sb.draw(opponentTexture, B2DVars.CAM_WIDTH - 200-offset, B2DVars.CAM_HEIGHT - 70, 45, 40);
-                sb.draw(font[Integer.valueOf(deaths.substring(i, i + 1))], B2DVars.CAM_WIDTH - (150+offset) + i * 50, B2DVars.CAM_HEIGHT - 70, 40, 40);
+                sb.draw(opponentTexture, camWidth - 200-offset, camWidth - 70, 45, 40);
+                sb.draw(font[Integer.valueOf(deaths.substring(i, i + 1))], camHeight - (150+offset) + i * 50, camHeight - 70, 40, 40);
             }
             offset+=200;
         }
         for (int i = 0; i < bulletsLeft; i++) {
-            sb.draw(bulletTexture, 50 + i*50, B2DVars.CAM_HEIGHT-90, 25, 10);
+            sb.draw(bulletTexture, 50 + i*50, camHeight-90, 25, 10);
         }
         for (int i = 0; i < grenadesLeft; i++) {
-            sb.draw(grenadeTexture, 50 + i*50, B2DVars.CAM_HEIGHT-120, 20, 20);
+            sb.draw(grenadeTexture, 50 + i*50, camHeight-120, 20, 20);
         }
         sb.end();
     }

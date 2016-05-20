@@ -35,7 +35,7 @@ public class StartScreenState extends GameState {
 
 
         playButton = new SPButton(new Texture("images/button/playButton.png"),
-                B2DVars.CAM_WIDTH / 2, B2DVars.CAM_HEIGHT / 2, 304f, 80f, cam);
+                cam.viewportWidth / 2, cam.viewportHeight / 2, 304f, 80f, cam);
         fallingBody();
     }
 
@@ -45,7 +45,7 @@ public class StartScreenState extends GameState {
         FixtureDef fdef = new FixtureDef();
         fdef.shape=shape;
         BodyDef bdef = new BodyDef();
-        bdef.position.set( (float) (B2DVars.CAM_WIDTH*Math.random()) , B2DVars.CAM_HEIGHT );
+        bdef.position.set( (float) (cam.viewportWidth*Math.random()) , cam.viewportHeight);
         bdef.type= BodyDef.BodyType.DynamicBody;
         Body body = world.createBody(bdef);
         itRains.add(new FallingBody(body));

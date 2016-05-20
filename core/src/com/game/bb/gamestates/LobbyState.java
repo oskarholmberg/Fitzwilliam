@@ -45,7 +45,8 @@ public class LobbyState extends GameState {
         world = new World(new Vector2(0, -9.81f), true);
         itRains = new Array<FallingBody>();
         joinButtons = new Array<SPButton>();
-        backbutton = new SPButton(new Texture("images/button/backButton.png"), B2DVars.CAM_WIDTH - 100, B2DVars.CAM_HEIGHT - 100, 40f, 40f, cam);
+        backbutton = new SPButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
+                cam.viewportHeight - 100, 40f, 40f, cam);
         servers = new Array<String>();
         searcher = new GameServerSearcher();
         searcher.start();
@@ -58,7 +59,7 @@ public class LobbyState extends GameState {
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         BodyDef bdef = new BodyDef();
-        bdef.position.set((float) (B2DVars.CAM_WIDTH * Math.random()), B2DVars.CAM_HEIGHT);
+        bdef.position.set((float) (cam.viewportWidth * Math.random()), cam.viewportHeight);
         bdef.type = BodyDef.BodyType.DynamicBody;
         Body body = world.createBody(bdef);
         itRains.add(new FallingBody(body));
@@ -119,7 +120,7 @@ public class LobbyState extends GameState {
         }
         backbutton.render(sb);
         sb.begin();
-        sb.draw(availableServers, 100, B2DVars.CAM_HEIGHT-120, 600, 30);
+        sb.draw(availableServers, 100, cam.viewportHeight-120, 600, 30);
         sb.end();
     }
 
@@ -134,7 +135,7 @@ public class LobbyState extends GameState {
         Array<SPButton> buttons = new Array<SPButton>();
         int i = 0;
         for (String server : servers) {
-            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), B2DVars.CAM_WIDTH/5, (B2DVars.CAM_HEIGHT - 180) - 50 * i, 200f, 20f, cam);
+            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth/5, (cam.viewportHeight - 180) - 50 * i, 200f, 20f, cam);
             button.setInfo(server);
             buttons.add(button);
             i++;
