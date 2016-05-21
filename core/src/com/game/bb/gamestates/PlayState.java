@@ -5,8 +5,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -54,11 +52,11 @@ public class PlayState extends GameState {
     private float respawnTimer = 0;
     private GameClient client;
     private HUD hud;
+    private MapBuilder map;
     private Texture backGround = new Texture("images/spaceBackground.png");
     private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
     private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
     private float[] touchNbrs = {(cam.viewportWidth/ 5), cam.viewportWidth * 4 / 5};
-    private OrthogonalTiledMapRenderer tmr;
     private int entityPktSequence = 0, playerPktSequence = 0;
     private boolean  grenadesIsEmpty = false;
     private float sendNetworkInfo = 0f, sendPlayerInfo = 0f;
@@ -82,11 +80,9 @@ public class PlayState extends GameState {
         opponents = new ArrayMap<Integer, SPOpponent>();
         // create boundaries
 
-        String[] layers = {"moonBlocks", "domeBlocks"};
-        MapBuilder mb = new MapBuilder(world, new TmxMapLoader().load("maps/moonSpawnDome.tmx"),
-                new Vector2(cam.viewportWidth, cam.viewportHeight), layers, true);
-        tmr = mb.buildMap();
-        spawnLocations = mb.getSpawnLocations();
+        map = new MapBuilder(world, 1);
+        map.buildMap();
+        spawnLocations = map.getSpawnLocations();
 
         //Players
         Vector2 spawn = spawnLocations.random();
@@ -413,8 +409,7 @@ public class PlayState extends GameState {
         sb.begin();
         sb.draw(backGround, 0, 0);
         sb.end();
-        tmr.setView(cam);
-        tmr.render();
+        map.render();
         for (int id : myEntities.keys()) {
             myEntities.get(id).render(sb);
         }
