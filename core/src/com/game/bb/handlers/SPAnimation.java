@@ -1,5 +1,6 @@
 package com.game.bb.handlers;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -8,15 +9,23 @@ import com.badlogic.gdx.utils.Disposable;
  */
 public class SPAnimation implements Disposable{
     private TextureRegion[] textureRegions;
+    private Texture texture;
     private float frequency;
     private float time;
     private int currentFrame;
+    private boolean noAnimation = false;
 
     public SPAnimation(TextureRegion[] textureRegions, float frequency) {
         this.textureRegions = textureRegions;
         this.frequency = frequency;
         time = 0;
         currentFrame = 0;
+    }
+
+    public SPAnimation(Texture texture){
+        textureRegions = new TextureRegion[1];
+        textureRegions[0] = new TextureRegion(texture);
+        noAnimation=true;
     }
 
     public void update(float dt) {
@@ -38,7 +47,10 @@ public class SPAnimation implements Disposable{
     }
 
     public TextureRegion getFrame(){
-        return textureRegions[currentFrame];
+        if (noAnimation)
+            return textureRegions[0];
+        else
+            return textureRegions[currentFrame];
     }
 
     @Override

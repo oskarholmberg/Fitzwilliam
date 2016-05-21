@@ -11,12 +11,16 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
+import com.game.bb.entities.EnemyBullet;
+import com.game.bb.entities.EnemyEntity;
+import com.game.bb.entities.EnemyGrenade;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.entities.SPGrenade;
 import com.game.bb.entities.SPOpponent;
 import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
+import com.game.bb.handlers.pools.Pooler;
 import com.game.bb.net.client.GameClient;
 import com.game.bb.net.packets.EntityCluster;
 import com.game.bb.net.packets.EntityPacket;
@@ -26,18 +30,11 @@ import com.game.bb.net.packets.TCPEventPacket;
 
 /**
  * TODO LIST --
- * --Remove dead bullet textures/bodies (check how big the worldEntities list gets)
- * --Add different game screens with options to host or join
- * --CLEAN UP CODE ( LOL XD )
- * --Add textures to entities
- * --Add background
- * --Improve map?
- * --Add music \o/
- * --?
+ *  - Try to manage the interpolation
+ *
  */
 public class PlayState extends GameState {
 
-    private World world;
     private Box2DDebugRenderer b2dr;
     private OrthographicCamera b2dCam;
     private SPContactListener cl;
@@ -48,7 +45,7 @@ public class PlayState extends GameState {
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
     private ArrayMap<Integer, SPSprite> myEntities = new ArrayMap<Integer, SPSprite>();
-    private ArrayMap<Integer, SPSprite> opEntities = new ArrayMap<Integer, SPSprite>();
+    private ArrayMap<Integer, EnemyEntity> opEntities = new ArrayMap<Integer, EnemyEntity>();
     private float respawnTimer = 0;
     private GameClient client;
     private HUD hud;
@@ -60,7 +57,9 @@ public class PlayState extends GameState {
     private int entityPktSequence = 0, playerPktSequence = 0;
     private boolean  grenadesIsEmpty = false;
     private float sendNetworkInfo = 0f, sendPlayerInfo = 0f;
+
     public int currentTexture = SPOpponent.STAND_LEFT;
+    public World world;
     public static PlayState playState;
 
     public PlayState(GameStateManager gsm) {
@@ -72,6 +71,8 @@ public class PlayState extends GameState {
 
         client = new GameClient();
         client.connectToServer(0);
+
+        Pooler.init();
 
         b2dr = new Box2DDebugRenderer();
 
@@ -179,9 +180,11 @@ public class PlayState extends GameState {
             case B2DVars.NET_DESTROY_BODY:
                 if(opEntities.containsKey(pkt.id)){
                     System.out.println("Destroy oponent entity: " + pkt.id);
-                    SPSprite opEntity = opEntities.removeKey(pkt.id);
-                    world.destroyBody(opEntity.getBody());
-                    opEntity.dispose();
+                    EnemyEntity opEntity = opEntities.removeKey(pkt.id);
+                    if (opEntity instanceof EnemyBullet)
+                        Pooler.free((EnemyBullet) opEntity); // return it to the pool
+                    else if (opEntity instanceof EnemyGrenade)
+                        Pooler.free((EnemyGrenade) opEntity); // return it to the pool
                 } else if (myEntities.containsKey(pkt.id)){
                     System.out.println("Destroy my entity: " + pkt.id);
                     SPSprite myEntity = myEntities.removeKey(pkt.id);
@@ -202,21 +205,23 @@ public class PlayState extends GameState {
             for (EntityPacket pkt : cluster.pkts) {
                 if (opEntities.containsKey(pkt.id)) {
                     Body b = opEntities.get(pkt.id).getBody();
-                    if (pkt.alive == 1) {
-                        b.setTransform(pkt.xp, pkt.yp, 0);
-                        b.setLinearVelocity(pkt.xf, pkt.yf);
-                    } else if (pkt.alive == 0) {
-                        SPSprite opEntity = opEntities.get(pkt.id);
-                        world.destroyBody(opEntity.getBody());
-                        opEntity.dispose();
-                    }
+                    b.setTransform(pkt.xp, pkt.yp, 0);
+                    b.setLinearVelocity(pkt.xf, pkt.yf);
                 } else {
                     if (pkt.type == B2DVars.TYPE_GRENADE) {
-                        opEntities.put(pkt.id, new SPGrenade(world, pkt.xp, pkt.yp, 0, true, pkt.id));
-                        opEntities.get(pkt.id).getBody().setLinearVelocity(pkt.xf, pkt.yf);
+                        EnemyGrenade enemyGrenade = Pooler.enemyGrenade(); // get it from the pool
+                        enemyGrenade.setAnimation("red");
+                        enemyGrenade.setId(pkt.id);
+                        enemyGrenade.getBody().setTransform(pkt.xp, pkt.yp, 0);
+                        enemyGrenade.getBody().setLinearVelocity(pkt.xf, pkt.yf);
+                        opEntities.put(pkt.id, enemyGrenade);
                     } else if (pkt.type == B2DVars.TYPE_BULLET) {
-                        opEntities.put(pkt.id, new SPBullet(world, pkt.xp, pkt.yp, 0f, true, pkt.id));
-                        opEntities.get(pkt.id).getBody().setLinearVelocity(pkt.xf, pkt.yf);
+                        EnemyBullet enemyBullet = Pooler.enemyBullet(); // get it from the pool
+                        enemyBullet.setAnimation("red");
+                        enemyBullet.setId(pkt.id);
+                        enemyBullet.getBody().setTransform(pkt.xp, pkt.yp, 0);
+                        enemyBullet.getBody().setLinearVelocity(pkt.xf, pkt.yf);
+                        opEntities.put(pkt.id, enemyBullet);
                     }
                 }
             }
@@ -265,13 +270,14 @@ public class PlayState extends GameState {
     private void bulletsHittingWall() {
         for (int id : cl.getIdsToRemove()){
             if (myEntities.containsKey(id)){
-                //Add code to NET for others to remove this bullet
-                TCPEventPacket packet = new TCPEventPacket();
+                TCPEventPacket packet = Pooler.tcpEventPacket(); //grab it from the pool
                 packet.action=B2DVars.NET_DESTROY_BODY;
                 packet.id=id;
-                client.sendUDP(packet);
+                client.sendTCP(packet);
+                Pooler.free(packet); // return it to the pool
                 SPSprite bullet = myEntities.removeKey(id);
                 world.destroyBody(bullet.getBody());
+                System.out.println("Removing: EnemyBullet-wall");
                 bullet.dispose();
             }
         }
@@ -283,7 +289,7 @@ public class PlayState extends GameState {
             EntityPacket[] packets = new EntityPacket[myEntities.size];
             int index = 0;
             for (int id : myEntities.keys()) {
-                EntityPacket pkt = new EntityPacket();
+                EntityPacket pkt = Pooler.entityPacket(); // grab it from the pool
                 Body b = myEntities.get(id).getBody();
                 pkt.xp = b.getPosition().x;
                 pkt.yp = b.getPosition().y;
@@ -298,15 +304,17 @@ public class PlayState extends GameState {
                 packets[index] = pkt;
                 index++;
             }
-            EntityCluster cluster = new EntityCluster();
+            EntityCluster cluster = Pooler.entityCluster(); // grab it from the pool
             cluster.seq = entityPktSequence++;
             cluster.pkts = packets;
             client.sendUDP(cluster);
+            Pooler.free(packets); //return them to the pool
+            Pooler.free(cluster);
         }
     }
 
     private void sendPlayerInfo(){
-        PlayerMovementPacket pkt = new PlayerMovementPacket();
+        PlayerMovementPacket pkt = Pooler.playerMovementPacket(); //grab it from the pool
         pkt.xp = player.getPosition().x;
         pkt.yp = player.getPosition().y;
         pkt.xv = player.getBody().getLinearVelocity().x;
@@ -316,18 +324,21 @@ public class PlayState extends GameState {
         pkt.tex = currentTexture;
         pkt.id=player.getID();
         client.sendUDP(pkt);
+        Pooler.free(pkt); //return it to the pool
     }
 
     private void checkGrenadeTimer(float dt) {
         for (int id : myEntities.keys()) {
             if (myEntities.get(id) instanceof SPGrenade) {
                 if (myEntities.get(id) != null && ((SPGrenade) myEntities.get(id)).lifeTimeReached(dt)) {
-                    TCPEventPacket pkt = new TCPEventPacket();
+                    TCPEventPacket pkt = Pooler.tcpEventPacket(); // grab it from the pool
                     pkt.id = id;
                     pkt.action = B2DVars.NET_DESTROY_BODY;
-                    client.sendUDP(pkt);
+                    client.sendTCP(pkt);
+                    Pooler.free(pkt); // return it to the pool
                     SPSprite grenade = myEntities.removeKey(id);
                     grenade.dispose();
+                    System.out.println("Removing: grenade-timer");
                     world.destroyBody(grenade.getBody());
                 }
             }
@@ -339,22 +350,26 @@ public class PlayState extends GameState {
             int id = cl.getKillingEntityID();
             player.kill(1);
             hud.addPlayerDeath();
-            TCPEventPacket pkt = new TCPEventPacket();
+            TCPEventPacket pkt = Pooler.tcpEventPacket(); // grab it from the pool
             pkt.action=B2DVars.NET_DESTROY_BODY;
             pkt.id= id;
-            client.sendUDP(pkt);
+            client.sendTCP(pkt);
             pkt.action=B2DVars.NET_DEATH;
             pkt.id = player.getID();
             pkt.misc = hud.getPlayerDeathCount();
-            client.sendUDP(pkt);
+            client.sendTCP(pkt);
+            Pooler.free(pkt); //return it to the pool
             if (myEntities.containsKey(id)){
-                SPSprite entity = myEntities.get(id);
+                SPSprite entity = myEntities.removeKey(id);
                 world.destroyBody(entity.getBody());
                 entity.dispose();
+                System.out.println("Removing: entity - hit");
             } else if (opEntities.containsKey(id)){
-                SPSprite entity = opEntities.get(id);
-                world.destroyBody(entity.getBody());
-                entity.dispose();
+                EnemyEntity entity = opEntities.get(id);
+                if (entity instanceof EnemyGrenade)
+                    Pooler.free((EnemyGrenade) entity);
+                else if (entity instanceof EnemyBullet)
+                    Pooler.free((EnemyBullet) entity);
             }
         }
     }

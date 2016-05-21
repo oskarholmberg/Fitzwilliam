@@ -71,8 +71,6 @@ public class MapBuilder {
             bdef.type = BodyDef.BodyType.StaticBody;
             bdef.position.set(rect.getX() / ppm + rect.getWidth() / 2 / ppm, rect.getY() / ppm + rect.getHeight() / 2 / ppm);
             shape.setAsBox(rect.getWidth() / 2 / ppm, rect.getHeight() / 2 / ppm);
-            System.out.println("The position: x:" + bdef.position.x + " y:" + bdef.position.y);
-            System.out.println("The size: width:"  + rect.getWidth() / 2 / ppm + " height:" + rect.getHeight()/2/ppm);
             fdef.shape=shape;
             fdef.filter.categoryBits = B2DVars.BIT_GROUND;
             fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BULLET | B2DVars.BIT_OPPONENT
