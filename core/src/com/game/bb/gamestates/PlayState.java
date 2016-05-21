@@ -10,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ArrayMap;
+import com.badlogic.gdx.utils.IntMap;
 import com.game.bb.entities.EnemyBullet;
 import com.game.bb.entities.EnemyEntity;
 import com.game.bb.entities.EnemyGrenade;
@@ -39,13 +39,13 @@ public class PlayState extends GameState {
     private OrthographicCamera b2dCam;
     private SPContactListener cl;
     private SPPlayer player;
-    private ArrayMap<Integer, SPOpponent> opponents;
+    private IntMap<SPOpponent> opponents;
     private Array<Vector2> spawnLocations;
     private int entityAccum = 0;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
-    private ArrayMap<Integer, SPSprite> myEntities = new ArrayMap<Integer, SPSprite>();
-    private ArrayMap<Integer, EnemyEntity> opEntities = new ArrayMap<Integer, EnemyEntity>();
+    private IntMap<SPSprite> myEntities = new IntMap<SPSprite>();
+    private IntMap<EnemyEntity> opEntities = new IntMap<EnemyEntity>();
     private float respawnTimer = 0;
     private GameClient client;
     private HUD hud;
@@ -78,7 +78,7 @@ public class PlayState extends GameState {
 
         hud = new HUD();
 
-        opponents = new ArrayMap<Integer, SPOpponent>();
+        opponents = new IntMap<SPOpponent>();
         // create boundaries
 
         map = new MapBuilder(world, 1);
@@ -180,14 +180,14 @@ public class PlayState extends GameState {
             case B2DVars.NET_DESTROY_BODY:
                 if(opEntities.containsKey(pkt.id)){
                     System.out.println("Destroy oponent entity: " + pkt.id);
-                    EnemyEntity opEntity = opEntities.removeKey(pkt.id);
+                    EnemyEntity opEntity = opEntities.remove(pkt.id);
                     if (opEntity instanceof EnemyBullet)
                         Pooler.free((EnemyBullet) opEntity); // return it to the pool
                     else if (opEntity instanceof EnemyGrenade)
                         Pooler.free((EnemyGrenade) opEntity); // return it to the pool
                 } else if (myEntities.containsKey(pkt.id)){
                     System.out.println("Destroy my entity: " + pkt.id);
-                    SPSprite myEntity = myEntities.removeKey(pkt.id);
+                    SPSprite myEntity = myEntities.remove(pkt.id);
                     world.destroyBody(myEntity.getBody());
                     myEntity.dispose();
                 }
@@ -275,7 +275,7 @@ public class PlayState extends GameState {
                 packet.id=id;
                 client.sendTCP(packet);
                 Pooler.free(packet); // return it to the pool
-                SPSprite bullet = myEntities.removeKey(id);
+                SPSprite bullet = myEntities.remove(id);
                 world.destroyBody(bullet.getBody());
                 System.out.println("Removing: EnemyBullet-wall");
                 bullet.dispose();
@@ -288,7 +288,8 @@ public class PlayState extends GameState {
         if (myEntities.size>0) {
             EntityPacket[] packets = new EntityPacket[myEntities.size];
             int index = 0;
-            for (int id : myEntities.keys()) {
+            for (IntMap.Keys it = myEntities.keys(); it.hasNext;) {
+                int id = it.next();
                 EntityPacket pkt = Pooler.entityPacket(); // grab it from the pool
                 Body b = myEntities.get(id).getBody();
                 pkt.xp = b.getPosition().x;
@@ -328,7 +329,8 @@ public class PlayState extends GameState {
     }
 
     private void checkGrenadeTimer(float dt) {
-        for (int id : myEntities.keys()) {
+        for (IntMap.Keys it = myEntities.keys(); it.hasNext;) {
+            int id = it.next();
             if (myEntities.get(id) instanceof SPGrenade) {
                 if (myEntities.get(id) != null && ((SPGrenade) myEntities.get(id)).lifeTimeReached(dt)) {
                     TCPEventPacket pkt = Pooler.tcpEventPacket(); // grab it from the pool
@@ -336,7 +338,7 @@ public class PlayState extends GameState {
                     pkt.action = B2DVars.NET_DESTROY_BODY;
                     client.sendTCP(pkt);
                     Pooler.free(pkt); // return it to the pool
-                    SPSprite grenade = myEntities.removeKey(id);
+                    SPSprite grenade = myEntities.remove(id);
                     grenade.dispose();
                     System.out.println("Removing: grenade-timer");
                     world.destroyBody(grenade.getBody());
@@ -360,7 +362,7 @@ public class PlayState extends GameState {
             client.sendTCP(pkt);
             Pooler.free(pkt); //return it to the pool
             if (myEntities.containsKey(id)){
-                SPSprite entity = myEntities.removeKey(id);
+                SPSprite entity = myEntities.remove(id);
                 world.destroyBody(entity.getBody());
                 entity.dispose();
                 System.out.println("Removing: entity - hit");
@@ -379,14 +381,14 @@ public class PlayState extends GameState {
         handleInput();
         world.step(dt, 6, 2);
         player.update(dt);
-        for (int id : opponents.keys()) {
-            opponents.get(id).update(dt);
+        for (IntMap.Keys it = opponents.keys(); it.hasNext;) {
+            opponents.get(it.next()).update(dt);
         }
-        for (int id : myEntities.keys()) {
-            myEntities.get(id).update(dt);
+        for (IntMap.Keys it = myEntities.keys(); it.hasNext;) {
+            myEntities.get(it.next()).update(dt);
         }
-        for (int id : opEntities.keys()){
-            opEntities.get(id).update(dt);
+        for (IntMap.Keys it = opEntities.keys(); it.hasNext;){
+            opEntities.get(it.next()).update(dt);
         }
         opponentTCPEvents();
         opponentEntityEvents();
@@ -425,14 +427,14 @@ public class PlayState extends GameState {
         sb.draw(backGround, 0, 0);
         sb.end();
         map.render();
-        for (int id : myEntities.keys()) {
-            myEntities.get(id).render(sb);
+        for (IntMap.Keys it = myEntities.keys(); it.hasNext;) {
+            myEntities.get(it.next()).render(sb);
         }
-        for (int id : opEntities.keys()){
-            opEntities.get(id).render(sb);
+        for (IntMap.Keys it = opEntities.keys(); it.hasNext;){
+            opEntities.get(it.next()).render(sb);
         }
-        for (int id : opponents.keys()){
-            opponents.get(id).render(sb);
+        for (IntMap.Keys it = opponents.keys(); it.hasNext;){
+            opponents.get(it.next()).render(sb);
         }
         player.render(sb);
         hud.render(sb);
