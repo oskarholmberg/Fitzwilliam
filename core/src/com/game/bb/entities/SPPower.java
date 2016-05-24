@@ -33,7 +33,7 @@ public class SPPower extends SPSprite{
 
     private void createPowerBody(float xPos, float yPos){
         shape = new PolygonShape();
-        shape.setAsBox(32 / B2DVars.PPM, 32 / B2DVars.PPM);
+        shape.setAsBox(8 / B2DVars.PPM, 8 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         fdef.filter.categoryBits = B2DVars.BIT_ENEMY_ENTITY;
