@@ -10,7 +10,9 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.game.bb.entities.EnemyBullet;
 import com.game.bb.entities.EnemyEntity;
 import com.game.bb.entities.EnemyGrenade;
@@ -50,13 +52,14 @@ public class PlayState extends GameState {
     private GameClient client;
     private HUD hud;
     private MapBuilder map;
+    private IntArray removedIds;
     private Texture backGround = new Texture("images/spaceBackground.png");
     private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
     private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
     private float[] touchNbrs = {(cam.viewportWidth/ 5), cam.viewportWidth * 4 / 5};
     private int entityPktSequence = 0, playerPktSequence = 0;
-    private boolean  grenadesIsEmpty = false;
-    private float sendNetworkInfo = 0f, sendPlayerInfo = 0f;
+    private boolean  grenadesIsEmpty = false, debugClick = false;
+    private float sendEntityInfo = 0f, sendPlayerInfo = 0f;
 
     public int currentTexture = SPOpponent.STAND_LEFT;
     public World world;
@@ -79,7 +82,7 @@ public class PlayState extends GameState {
         hud = new HUD();
 
         opponents = new IntMap<SPOpponent>();
-        // create boundaries
+        removedIds = new IntArray();
 
         map = new MapBuilder(world, 1);
         map.buildMap();
@@ -99,6 +102,7 @@ public class PlayState extends GameState {
         // set up box2d cam
         b2dCam = new OrthographicCamera();
         b2dCam.setToOrtho(false, cam.viewportWidth / B2DVars.PPM, cam.viewportHeight / B2DVars.PPM);
+
     }
 
 
@@ -160,6 +164,10 @@ public class PlayState extends GameState {
 
             throwGrenade();
         }
+        if (SPInput.isPressed(SPInput.BUTTON_Y)) {
+            System.out.println("Debug is clicked! printing the next debug event.");
+            debugClick = true;
+        }
     }
 
     private void opponentTCPEvents() {
@@ -180,6 +188,7 @@ public class PlayState extends GameState {
             case B2DVars.NET_DESTROY_BODY:
                 if(opEntities.containsKey(pkt.id)){
                     System.out.println("Destroy oponent entity: " + pkt.id);
+                    removedIds.add(pkt.id);
                     EnemyEntity opEntity = opEntities.remove(pkt.id);
                     if (opEntity instanceof EnemyBullet)
                         Pooler.free((EnemyBullet) opEntity); // return it to the pool
@@ -202,18 +211,23 @@ public class PlayState extends GameState {
     private void opponentEntityEvents(){
         Array<EntityCluster> packets = client.getEntityClusters();
         for (EntityCluster cluster : packets) {
+            float timeDiff = TimeUtils.millis() - cluster.time;
+            if (debugClick){
+                debugClick=false;
+                System.out.println("The delay between the packets are: " + (TimeUtils.millis() - cluster.time) + " timeDiff: " + timeDiff);
+            }
             for (EntityPacket pkt : cluster.pkts) {
                 if (opEntities.containsKey(pkt.id)) {
-                    Body b = opEntities.get(pkt.id).getBody();
-                    b.setTransform(pkt.xp, pkt.yp, 0);
-                    b.setLinearVelocity(pkt.xf, pkt.yf);
-                } else {
+                    opEntities.get(pkt.id).applyInterpolation(pkt);
+                } else if (!removedIds.contains(pkt.id)){
+                    System.out.println("New enemy entity grabbed from pool id: " + pkt.id);
                     if (pkt.type == B2DVars.TYPE_GRENADE) {
                         EnemyGrenade enemyGrenade = Pooler.enemyGrenade(); // get it from the pool
                         enemyGrenade.setAnimation("red");
                         enemyGrenade.setId(pkt.id);
                         enemyGrenade.getBody().setTransform(pkt.xp, pkt.yp, 0);
                         enemyGrenade.getBody().setLinearVelocity(pkt.xf, pkt.yf);
+                        enemyGrenade.initInterpolator();
                         opEntities.put(pkt.id, enemyGrenade);
                     } else if (pkt.type == B2DVars.TYPE_BULLET) {
                         EnemyBullet enemyBullet = Pooler.enemyBullet(); // get it from the pool
@@ -221,6 +235,7 @@ public class PlayState extends GameState {
                         enemyBullet.setId(pkt.id);
                         enemyBullet.getBody().setTransform(pkt.xp, pkt.yp, 0);
                         enemyBullet.getBody().setLinearVelocity(pkt.xf, pkt.yf);
+                        enemyBullet.initInterpolator();
                         opEntities.put(pkt.id, enemyBullet);
                     }
                 }
@@ -270,15 +285,16 @@ public class PlayState extends GameState {
     private void bulletsHittingWall() {
         for (int id : cl.getIdsToRemove()){
             if (myEntities.containsKey(id)){
-                TCPEventPacket packet = Pooler.tcpEventPacket(); //grab it from the pool
-                packet.action=B2DVars.NET_DESTROY_BODY;
-                packet.id=id;
-                client.sendTCP(packet);
-                Pooler.free(packet); // return it to the pool
+                TCPEventPacket pkt = Pooler.tcpEventPacket();
+                pkt.id=id;
+                pkt.action=B2DVars.NET_DESTROY_BODY;
+                client.sendTCP(pkt);
+                Pooler.free(pkt);
                 SPSprite bullet = myEntities.remove(id);
                 world.destroyBody(bullet.getBody());
-                System.out.println("Removing: EnemyBullet-wall");
                 bullet.dispose();
+            } else if (opEntities.containsKey(id)){
+                Pooler.free((EnemyBullet) opEntities.remove(id));
             }
         }
         cl.clearIdList();
@@ -308,6 +324,7 @@ public class PlayState extends GameState {
             EntityCluster cluster = Pooler.entityCluster(); // grab it from the pool
             cluster.seq = entityPktSequence++;
             cluster.pkts = packets;
+            cluster.time = TimeUtils.millis();
             client.sendUDP(cluster);
             Pooler.free(packets); //return them to the pool
             Pooler.free(cluster);
@@ -324,6 +341,7 @@ public class PlayState extends GameState {
         pkt.sound=0;
         pkt.tex = currentTexture;
         pkt.id=player.getID();
+        pkt.time = TimeUtils.millis();
         client.sendUDP(pkt);
         Pooler.free(pkt); //return it to the pool
     }
@@ -393,6 +411,7 @@ public class PlayState extends GameState {
         opponentTCPEvents();
         opponentEntityEvents();
         opponentMovementEvents();
+
         refreshAmmo(dt);
         if (cl.isPlayerHit()) {
             playerHit();
@@ -403,13 +422,13 @@ public class PlayState extends GameState {
                 respawnPlayer();
             }
         }
-        if (sendNetworkInfo > 1/5f){
-            sendNetworkInfo=0f;
+        if (sendEntityInfo > B2DVars.ENTITY_UPDATE_FREQ){
+            sendEntityInfo =0f;
             sendEntityEvents();
         } else {
-            sendNetworkInfo+=dt;
+            sendEntityInfo +=dt;
         }
-        if (sendPlayerInfo > 1/30f){
+        if (sendPlayerInfo > B2DVars.MOVEMENT_UPDATE_FREQ){
             sendPlayerInfo = 0f;
             sendPlayerInfo();
         } else {

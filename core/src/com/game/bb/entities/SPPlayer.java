@@ -116,7 +116,7 @@ public class SPPlayer extends SPSprite {
         fdef.shape = shape;
         fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
         fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET | B2DVars.BIT_GRENADE
-                | B2DVars.BIT_POWERUP;
+                | B2DVars.BIT_ENEMY_ENTITY;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.DynamicBody;

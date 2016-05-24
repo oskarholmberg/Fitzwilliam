@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Array;
+import com.game.bb.entities.EnemyEntity;
 import com.game.bb.entities.SPSprite;
 
 /**
@@ -69,6 +70,13 @@ public class SPContactListener implements ContactListener {
         } else if (fb.getUserData().equals(B2DVars.ID_POWERUP) && fa.getUserData().equals(B2DVars.ID_PLAYER)){
             //lastPowerUp = fb;
             //playerPowerUp = true;
+        } else if ((fa.getUserData().equals(B2DVars.ID_PLAYER) || fb.getUserData().equals(B2DVars.ID_PLAYER)) &&
+                (fa.getUserData().equals(B2DVars.ID_ENEMY_ENTITY) || fb.getUserData().equals(B2DVars.ID_ENEMY_ENTITY))){
+            if (fa.getUserData().equals(B2DVars.ID_ENEMY_ENTITY))
+                killingEntityID = ((EnemyEntity) fa.getBody().getUserData()).getId();
+            else if (fb.getUserData().equals(B2DVars.ID_ENEMY_ENTITY))
+                killingEntityID = ((EnemyEntity) fb.getBody().getUserData()).getId();
+            playerHit = true;
         }
     }
 

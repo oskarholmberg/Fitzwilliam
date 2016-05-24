@@ -9,13 +9,12 @@ import com.game.bb.gamestates.PlayState;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.SPAnimation;
 
-/**
- * Created by erik on 21/05/16.
- */
+
 public class EnemyBullet extends EnemyEntity {
 
 
     public EnemyBullet(){
+        super();
         createBulletBody();
     }
 
@@ -39,13 +38,13 @@ public class EnemyBullet extends EnemyEntity {
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         fdef.filter.categoryBits = B2DVars.BIT_BULLET;
-        fdef.filter.maskBits = B2DVars.BIT_PLAYER;
+        fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND;
         BodyDef bdef = new BodyDef();
         bdef.position.set(B2DVars.VOID_X, B2DVars.VOID_Y);
         bdef.type = BodyDef.BodyType.DynamicBody; // Should be dynamic
         body = PlayState.playState.world.createBody(bdef);
         body.setGravityScale(0f);
-        body.createFixture(fdef).setUserData(B2DVars.ID_BULLET);
+        body.createFixture(fdef).setUserData(B2DVars.ID_ENEMY_ENTITY);
         body.setUserData(this);
         shape.dispose();
     }

@@ -6,17 +6,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.game.bb.gamestates.PlayState;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.SPAnimation;
 
-/**
- * Created by erik on 21/05/16.
- */
+
 public class EnemyGrenade extends EnemyEntity{
 
     public EnemyGrenade(){
+        super();
         createGrenadeBody();
     }
 
@@ -38,13 +36,15 @@ public class EnemyGrenade extends EnemyEntity{
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         fdef.filter.categoryBits = B2DVars.BIT_GRENADE;
-        fdef.filter.maskBits = B2DVars.BIT_PLAYER;
+        fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND;
+        fdef.restitution = 1f;
+        fdef.friction = 0f;
         BodyDef bdef = new BodyDef();
         bdef.position.set(B2DVars.VOID_X, B2DVars.VOID_Y);
         bdef.type = BodyDef.BodyType.DynamicBody; // Should be dynamic
         body = PlayState.playState.world.createBody(bdef);
         body.setGravityScale(0f);
-        body.createFixture(fdef).setUserData(B2DVars.ID_BULLET);
+        body.createFixture(fdef).setUserData(B2DVars.ID_ENEMY_ENTITY);
         body.setUserData(this);
         shape.dispose();
     }

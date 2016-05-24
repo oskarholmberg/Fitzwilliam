@@ -25,7 +25,10 @@ public class GameStateManager {
         this.game = game;
         states = new Stack<GameState>();
         pushState(START_SCREEN);
-        //pushState(PLAY); //remove this later
+    }
+
+    public boolean isHosting(){
+        return hosting;
     }
 
     public Game game() {

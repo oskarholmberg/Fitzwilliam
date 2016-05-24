@@ -30,7 +30,7 @@ public class SPPower extends SPSprite{
         shape.setAsBox(32 / B2DVars.PPM, 32 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
-        fdef.filter.categoryBits = B2DVars.BIT_POWERUP;
+        fdef.filter.categoryBits = B2DVars.BIT_ENEMY_ENTITY;
         fdef.filter.maskBits =  B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);

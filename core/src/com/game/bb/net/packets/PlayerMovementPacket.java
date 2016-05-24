@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Pool;
 public class PlayerMovementPacket implements Pool.Poolable{
     public float xp, yp, xv, yv;
     public int tex, sound, seq, id;
+    public long time;
 
     @Override
     public void reset() {

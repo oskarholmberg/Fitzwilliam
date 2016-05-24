@@ -74,7 +74,7 @@ public class MapBuilder {
             fdef.shape=shape;
             fdef.filter.categoryBits = B2DVars.BIT_GROUND;
             fdef.filter.maskBits = B2DVars.BIT_PLAYER | B2DVars.BIT_BULLET | B2DVars.BIT_OPPONENT
-                    | B2DVars.BIT_GRENADE | B2DVars.BIT_POWERUP;
+                    | B2DVars.BIT_GRENADE | B2DVars.BIT_ENEMY_ENTITY;
             world.createBody(bdef).createFixture(fdef).setUserData(B2DVars.ID_GROUND);
         }
         for (MapObject obj : tiledMap.getLayers().get("dome").getObjects().getByType(RectangleMapObject.class)){

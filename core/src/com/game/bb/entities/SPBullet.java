@@ -10,9 +10,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.game.bb.handlers.B2DVars;
 
-/**
- * Created by erik on 11/05/16.
- */
+
 public class SPBullet extends SPSprite {
 
     private int offset = 0;
