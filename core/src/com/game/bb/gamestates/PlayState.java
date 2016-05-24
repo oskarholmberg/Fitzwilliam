@@ -12,7 +12,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.game.bb.entities.EnemyBullet;
 import com.game.bb.entities.EnemyEntity;
@@ -46,6 +45,7 @@ public class PlayState extends GameState {
     private IntMap<SPOpponent> opponents;
     private Array<Vector2> spawnLocations;
     private PowerupSpawner powerupSpawner;
+    private IntMap<SPPower> powerups;
     private int entityAccum = 0;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
@@ -83,6 +83,8 @@ public class PlayState extends GameState {
         b2dr = new Box2DDebugRenderer();
 
         hud = new HUD();
+
+        powerups = new IntMap<SPPower>();
 
         if (gsm.isHosting()){
             hosting=true;
@@ -217,6 +219,11 @@ public class PlayState extends GameState {
                     SPSprite myEntity = myEntities.remove(pkt.id);
                     world.destroyBody(myEntity.getBody());
                     myEntity.dispose();
+                } else if (powerups.containsKey(pkt.id)){
+                    System.out.println("Destroy my entity: " + pkt.id);
+                    SPPower powerup = powerups.remove(pkt.id);
+                    world.destroyBody(powerup.getBody());
+                    powerup.dispose();
                 }
                 break;
             case B2DVars.NET_DEATH:
@@ -225,7 +232,7 @@ public class PlayState extends GameState {
                 }
                 break;
             case B2DVars.NET_POWER:
-                myEntities.put(pkt.id, new SPPower(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.misc));
+                powerups.put(pkt.id, new SPPower(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.misc));
         }
     }
 
@@ -423,16 +430,18 @@ public class PlayState extends GameState {
         }
     }
 
-    private void powerUpTaken(){
+    private void powerupTaken(){
         if (cl.powerTaken()){
-            SPSprite power = myEntities.remove(cl.getLastPowerTaken().getID());
-            int powerType = ((SPPower) power).getPowerType();
+            SPPower power = powerups.remove(cl.getLastPowerTaken().getID());
+            int powerType = power.getPowerType();
             world.destroyBody(power.getBody());
             power.dispose();
 
             TCPEventPacket pkt = Pooler.tcpEventPacket();
             pkt.action = B2DVars.NET_DESTROY_BODY;
             pkt.id = power.getID();
+            client.sendTCP(pkt);
+            Pooler.free(pkt);
 
             if (powerType ==  B2DVars.POWER_AMMO){
                 unlimitedAmmo = 0f;
@@ -441,7 +450,7 @@ public class PlayState extends GameState {
     }
 
     public void addPowerup(SPPower power, int id){
-        myEntities.put(id, power);
+        powerups.put(id, power);
     }
 
     @Override
@@ -486,7 +495,7 @@ public class PlayState extends GameState {
         }
         checkGrenadeTimer(dt);
         bulletsHittingWall();
-        powerUpTaken();
+        powerupTaken();
         if (hosting){
             powerupSpawner.update(dt);
         }
