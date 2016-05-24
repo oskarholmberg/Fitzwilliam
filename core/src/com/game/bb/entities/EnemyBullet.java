@@ -18,10 +18,6 @@ public class EnemyBullet extends EnemyEntity {
         createBulletBody();
     }
 
-    public void setId(int id){
-        this.id = id;
-    }
-
     public void setAnimation(String color){
         if (color.equals("red")){
             Texture bullet = new Texture("images/weapons/redBullet.png");

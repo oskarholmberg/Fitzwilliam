@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.game.bb.entities.EnemyEntity;
 import com.game.bb.net.packets.EntityPacket;
+import com.game.bb.net.packets.PlayerMovementPacket;
 
 
 public class EntityInterpolator {
@@ -35,7 +36,14 @@ public class EntityInterpolator {
 
 
 
-    public Vector2 getTargetVelocity(EntityPacket pkt){
+    public Vector2 getPosition(EntityPacket pkt){
+        currentPos.set(body.getPosition());
+        targetPos.set(pkt.xp, pkt.yp);
+        velocity.set(currentPos).lerp(targetPos, getAlpha());
+        return velocity;
+    }
+
+    public Vector2 getPlayerPosition(PlayerMovementPacket pkt){
         currentPos.set(body.getPosition());
         targetPos.set(pkt.xp, pkt.yp);
         velocity.set(currentPos).lerp(targetPos, getAlpha());

@@ -18,10 +18,6 @@ public class EnemyGrenade extends EnemyEntity{
         createGrenadeBody();
     }
 
-    public void setId(int id){
-        this.id = id;
-    }
-
     public void setAnimation(String color){
         if (color.equals("red")){
             animation = new SPAnimation(TextureRegion.split(new Texture("images/weapons/redGrenade.png"),

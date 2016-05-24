@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.Disposable;
  */
 public class SPAnimation implements Disposable{
     private TextureRegion[] textureRegions;
-    private Texture texture;
     private float frequency;
     private float time;
     private int currentFrame;
@@ -51,6 +50,10 @@ public class SPAnimation implements Disposable{
             return textureRegions[0];
         else
             return textureRegions[currentFrame];
+    }
+
+    public TextureRegion getOpponentPlayerFrame(int textureIndex){
+        return textureRegions[textureIndex];
     }
 
     @Override

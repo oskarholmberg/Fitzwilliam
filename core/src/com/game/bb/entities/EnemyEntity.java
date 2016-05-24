@@ -24,13 +24,18 @@ public abstract class EnemyEntity implements Disposable, Pool.Poolable{
     }
 
     public void applyInterpolation(EntityPacket pkt){
-        body.setTransform(interpolator.getTargetVelocity(pkt), 0);
+        body.setTransform(interpolator.getPosition(pkt), 0);
+    }
+
+    public void setId(int id){
+        this.id = id;
     }
 
     public void initInterpolator(){
         interpolator.init();
     }
 
+    public abstract void setAnimation(String color);
     public abstract void render(SpriteBatch sb);
     public abstract void update(float dt);
 

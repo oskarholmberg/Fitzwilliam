@@ -226,7 +226,6 @@ public class PlayState extends GameState {
                         enemyGrenade.setAnimation("red");
                         enemyGrenade.setId(pkt.id);
                         enemyGrenade.getBody().setTransform(pkt.xp, pkt.yp, 0);
-                        enemyGrenade.getBody().setLinearVelocity(pkt.xf, pkt.yf);
                         enemyGrenade.initInterpolator();
                         opEntities.put(pkt.id, enemyGrenade);
                     } else if (pkt.type == B2DVars.TYPE_BULLET) {
@@ -234,7 +233,6 @@ public class PlayState extends GameState {
                         enemyBullet.setAnimation("red");
                         enemyBullet.setId(pkt.id);
                         enemyBullet.getBody().setTransform(pkt.xp, pkt.yp, 0);
-                        enemyBullet.getBody().setLinearVelocity(pkt.xf, pkt.yf);
                         enemyBullet.initInterpolator();
                         opEntities.put(pkt.id, enemyBullet);
                     }
