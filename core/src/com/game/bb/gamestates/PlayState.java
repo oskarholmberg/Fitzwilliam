@@ -43,6 +43,7 @@ public class PlayState extends GameState {
     private SPPlayer player;
     private IntMap<SPOpponent> opponents;
     private Array<Vector2> spawnLocations;
+    private PowerupSpawner powerupSpawner;
     private int entityAccum = 0;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
@@ -58,8 +59,8 @@ public class PlayState extends GameState {
     private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
     private float[] touchNbrs = {(cam.viewportWidth/ 5), cam.viewportWidth * 4 / 5};
     private int entityPktSequence = 0, playerPktSequence = 0;
-    private boolean  grenadesIsEmpty = false, debugClick = false;
-    private float sendEntityInfo = 0f, sendPlayerInfo = 0f;
+    private boolean  grenadesIsEmpty = false, debugClick = false, hosting = false;
+    private float sendEntityInfo = 0f, sendPlayerInfo = 0f, unlimitedAmmo = 50f;
 
     public int currentTexture = SPOpponent.STAND_LEFT;
     public World world;
@@ -81,12 +82,18 @@ public class PlayState extends GameState {
 
         hud = new HUD();
 
+        if (gsm.isHosting()){
+            hosting=true;
+            powerupSpawner = new PowerupSpawner(world, client);
+        }
+
         opponents = new IntMap<SPOpponent>();
         removedIds = new IntArray();
 
         map = new MapBuilder(world, 1);
         map.buildMap();
         spawnLocations = map.getSpawnLocations();
+
 
         //Players
         Vector2 spawn = spawnLocations.random();
@@ -281,6 +288,10 @@ public class PlayState extends GameState {
         } else if (amntGrenades == 0){
             grenadeRefresh += dt;
         }
+
+        if (unlimitedAmmo < 10f){
+            unlimitedAmmo += dt;
+        }
     }
 
     private void bulletsHittingWall() {
@@ -395,6 +406,15 @@ public class PlayState extends GameState {
         }
     }
 
+    private void powerUpTaken(){
+        if (cl.powerTaken()){
+            int powerType = cl.getLastPowerTaken().getPowerType();
+            if (powerType ==  B2DVars.POWER_AMMO){
+                unlimitedAmmo = 0f;
+            }
+        }
+    }
+
     @Override
     public void update(float dt) {
         handleInput();
@@ -437,6 +457,10 @@ public class PlayState extends GameState {
         }
         checkGrenadeTimer(dt);
         bulletsHittingWall();
+        powerUpTaken();
+        if (hosting){
+            powerupSpawner.update(dt);
+        }
     }
 
     @Override

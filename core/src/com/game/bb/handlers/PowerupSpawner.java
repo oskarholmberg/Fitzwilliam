@@ -1,6 +1,7 @@
 package com.game.bb.handlers;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.game.bb.net.client.GameClient;
 
@@ -19,6 +20,7 @@ public class PowerupSpawner {
     }
 
     public void generatePowerup(){
+        Vector2 powerPos = new Vector2(MathUtils.random(10f, 950f), 630);
 
     }
 

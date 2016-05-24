@@ -17,12 +17,18 @@ public class SPPower extends SPSprite{
     private SPAnimation animation;
     private int offset = 32;
     private PolygonShape shape;
+    private int powerType;
 
-    public SPPower(World world, float xPos, float yPos, int ID) {
+    public SPPower(World world, float xPos, float yPos, int ID, int powerType) {
         super(world, ID);
         createPowerBody(xPos, yPos);
+        this.powerType = powerType;
 
         animation = new SPAnimation(TextureRegion.split(new Texture("images/powerUpBox.png"), 32, 32)[0], 0.2f);
+    }
+
+    public int getPowerType(){
+        return powerType;
     }
 
     private void createPowerBody(float xPos, float yPos){
