@@ -51,7 +51,7 @@ public class HUD {
         opponentDeaths.put(id, deaths);
     }
 
-    public void removeOpponentDeathCount(String id){
+    public void removeOpponentDeathCount(int id){
         opponentDeaths.remove(id);
     }
 

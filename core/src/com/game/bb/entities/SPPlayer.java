@@ -131,6 +131,7 @@ public class SPPlayer extends SPSprite {
         fdef.filter.maskBits = B2DVars.BIT_GROUND;
         fdef.isSensor = true;
         body.createFixture(fdef).setUserData(B2DVars.ID_FOOT);
+        shape.dispose();
     }
 
     public void loadTexture(String color) {
@@ -158,7 +159,6 @@ public class SPPlayer extends SPSprite {
         for (Texture texture : textures) {
             texture.dispose();
         }
-        shape.dispose();
         jetpackSound.dispose();
     }
 }

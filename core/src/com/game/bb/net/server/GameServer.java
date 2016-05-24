@@ -2,16 +2,20 @@ package com.game.bb.net.server;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import com.game.bb.handlers.B2DVars;
 import com.game.bb.net.packets.EntityCluster;
 import com.game.bb.net.packets.EntityPacket;
 import com.game.bb.net.packets.PlayerMovementPacket;
 import com.game.bb.net.packets.TCPEventPacket;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.util.HashMap;
 
 /**
  * Created by erik on 17/05/16.
@@ -20,9 +24,13 @@ public class GameServer extends Listener {
 
     private int udpPort = 8080, tcpPort = 8081;
     private Server kryoServer;
+    private HashMap<Connection, String> connections;
+    private HashMap<Connection, Integer> playerIds;
 
     public GameServer(){
         kryoServer = new Server();
+        connections = new HashMap<Connection, String>();
+        playerIds = new HashMap<Connection, Integer>();
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
             TCPEventPacket.class, EntityCluster.class, EntityPacket[].class, PlayerMovementPacket.class};
         for (Class c : classes){
@@ -41,7 +49,8 @@ public class GameServer extends Listener {
 
     @Override
     public void connected(Connection c){
-        Gdx.app.log("NET_SERVER_CONNECTION", "Client @" + c.getRemoteAddressUDP().getAddress() + " connected.");
+        Gdx.app.log("NET_SERVER_CONNECTION", "Client @" + c.getRemoteAddressUDP().getAddress().toString().substring(1) + " connected.");
+        connections.put(c, c.getRemoteAddressTCP().getAddress().toString().substring(1) + ":" + c.getRemoteAddressTCP().getPort());
     }
 
     @Override
@@ -54,6 +63,11 @@ public class GameServer extends Listener {
                 }
             }
         } else if (packet instanceof TCPEventPacket){
+            if(((TCPEventPacket) packet).action == B2DVars.NET_CONNECT){
+                if(!playerIds.containsKey(c)){
+                    playerIds.put(c, ((TCPEventPacket) packet).id);
+                }
+            }
             for (Connection connect : kryoServer.getConnections()) {
                 if (!c.equals(connect)) {
                     connect.sendTCP(packet);
@@ -64,7 +78,15 @@ public class GameServer extends Listener {
 
     @Override
     public void disconnected(Connection c){
-        //Maybe add code here later
+        Gdx.app.log("NET_SERVER_DISCONNECTION", "Client @" + connections.get(c) + " disconnected.");
+        TCPEventPacket packet = new TCPEventPacket();
+        packet.action = B2DVars.NET_DISCONNECT;
+        packet.id = playerIds.get(c);
+        playerIds.remove(c);
+        connections.remove(c);
+        for (Connection connection : kryoServer.getConnections()){
+            connection.sendTCP(packet);
+        }
     }
 
     public static void main(String[] args){
