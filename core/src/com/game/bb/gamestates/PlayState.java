@@ -193,6 +193,14 @@ public class PlayState extends GameState {
                     client.sendTCP(packet);
                 }
                 break;
+            case B2DVars.NET_DISCONNECT:
+                if(opponents.containsKey(pkt.id)){
+                    SPOpponent opponent = opponents.get(pkt.id);
+                    world.destroyBody(opponent.getBody());
+                    opponent.dispose();
+                    hud.removeOpponentDeathCount(pkt.id);
+                }
+                break;
             case B2DVars.NET_DESTROY_BODY:
                 if(opEntities.containsKey(pkt.id)){
                     System.out.println("Destroy oponent entity: " + pkt.id);
