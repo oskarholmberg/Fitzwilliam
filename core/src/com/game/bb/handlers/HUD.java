@@ -68,8 +68,8 @@ public class HUD {
         for (int id : opponentDeaths.keySet()) {
             String deaths = Integer.toString(opponentDeaths.get(id));
             for (int i = 0; i < deaths.length(); i++) {
-                sb.draw(opponentTexture, camWidth - 200-offset, camWidth - 70, 45, 40);
-                sb.draw(font[Integer.valueOf(deaths.substring(i, i + 1))], camHeight - (150+offset) + i * 50, camHeight - 70, 40, 40);
+                sb.draw(opponentTexture, camWidth - 200-offset, camHeight - 70, 45, 40);
+                sb.draw(font[Integer.valueOf(deaths.substring(i, i + 1))], camWidth - (150+offset) + i * 50, camHeight - 70, 40, 40);
             }
             offset+=200;
         }
