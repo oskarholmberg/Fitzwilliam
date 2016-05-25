@@ -483,6 +483,9 @@ public class PlayState extends GameState {
         for (IntMap.Keys it = opEntities.keys(); it.hasNext;){
             opEntities.get(it.next()).update(dt);
         }
+        for (IntMap.Keys it = powerups.keys(); it.hasNext;){
+            powerups.get(it.next()).update(dt);
+        }
         opponentTCPEvents();
         opponentEntityEvents();
         opponentMovementEvents();
@@ -534,6 +537,10 @@ public class PlayState extends GameState {
         }
         for (IntMap.Keys it = opponents.keys(); it.hasNext;){
             opponents.get(it.next()).render(sb);
+        }
+        for (IntMap.Keys it = powerups.keys(); it.hasNext;){
+            powerups.get(it.next()).render(sb)
+            ;
         }
         player.render(sb);
         hud.render(sb);
