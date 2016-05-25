@@ -473,7 +473,6 @@ public class PlayState extends GameState {
 
     @Override
     public void update(float dt) {
-        handleInput();
         world.step(dt, 6, 2);
         player.update(dt);
         for (IntMap.Keys it = opponents.keys(); it.hasNext;) {
@@ -521,6 +520,7 @@ public class PlayState extends GameState {
         if (hosting){
             powerupSpawner.update(dt);
         }
+        handleInput();
     }
 
     @Override
