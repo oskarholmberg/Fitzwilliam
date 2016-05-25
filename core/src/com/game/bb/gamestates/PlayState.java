@@ -247,7 +247,6 @@ public class PlayState extends GameState {
                 break;
             case B2DVars.NET_DESTROY_BODY:
                 if(opEntities.containsKey(pkt.id)){
-                    System.out.println("Destroy oponent entity: " + pkt.id);
                     removedIds.add(pkt.id);
                     EnemyEntity opEntity = opEntities.remove(pkt.id);
                     if (opEntity instanceof EnemyBullet)
@@ -255,12 +254,10 @@ public class PlayState extends GameState {
                     else if (opEntity instanceof EnemyGrenade)
                         Pooler.free((EnemyGrenade) opEntity); // return it to the pool
                 } else if (myEntities.containsKey(pkt.id)){
-                    System.out.println("Destroy my entity: " + pkt.id);
                     SPSprite myEntity = myEntities.remove(pkt.id);
                     world.destroyBody(myEntity.getBody());
                     myEntity.dispose();
                 } else if (powerups.containsKey(pkt.id)){
-                    System.out.println("Destroy my entity: " + pkt.id);
                     SPPower powerup = powerups.remove(pkt.id);
                     world.destroyBody(powerup.getBody());
                     powerup.dispose();

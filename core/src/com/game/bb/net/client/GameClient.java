@@ -110,4 +110,8 @@ public class GameClient extends Listener {
         kryoClient.sendTCP(packet);
         Gdx.app.log("NET_CLIENT_SEND_TCP", packet.getClass().toString());
     }
+
+    public boolean isConnected(){
+        return kryoClient.isConnected();
+    }
 }
