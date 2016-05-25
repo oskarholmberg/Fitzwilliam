@@ -23,6 +23,7 @@ public class MapBuilder {
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer renderer;
     private float ppm = B2DVars.PPM;
+    public static int MAP_WIDTH = 0;
 
     public MapBuilder(World world, int mapIndex){
         this.world=world;

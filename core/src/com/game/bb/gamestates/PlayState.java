@@ -100,7 +100,6 @@ public class PlayState extends GameState {
         map = new MapBuilder(world, 1);
         map.buildMap();
         spawnLocations = map.getSpawnLocations();
-        cam.rotate(30f);
 
 
         //Players
@@ -474,6 +473,17 @@ public class PlayState extends GameState {
         powerups.put(id, power);
     }
 
+    private void updateCamPosition(){
+        
+        if ((player.getPosition().x * B2DVars.PPM) > (cam.position.x + 300f)) {
+            cam.position.x = cam.position.x + 2f;
+        } else if ((player.getPosition().x * B2DVars.PPM) < (cam.position.x - 300f)){
+            cam.position.x = cam.position.x - 2f;
+        }
+
+
+        cam.update();
+    }
     @Override
     public void update(float dt) {
         world.step(dt, 6, 2);
@@ -524,6 +534,7 @@ public class PlayState extends GameState {
             powerupSpawner.update(dt);
         }
         handleInput();
+        updateCamPosition();
     }
 
     @Override
@@ -531,7 +542,7 @@ public class PlayState extends GameState {
         //Clear screen
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
         sb.begin();
-        sb.draw(backGround, 0, 0);
+        sb.draw(backGround, cam.position.x - cam.viewportWidth / 2, 0);
         sb.end();
         map.render();
         for (IntMap.Keys it = myEntities.keys(); it.hasNext;) {
@@ -551,7 +562,7 @@ public class PlayState extends GameState {
         hud.render(sb);
 
         //Do this last in render
-        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+        //b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         sb.setProjectionMatrix(cam.combined);
     }
 
