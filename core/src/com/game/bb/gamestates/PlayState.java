@@ -164,7 +164,8 @@ public class PlayState extends GameState {
             SPInput.down = false;
             player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
             lastJumpDirection = 1;
-        } else if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
+        }
+         if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
                 SPInput.isPressed() && SPInput.x < touchNbrs[0] && cl.canJump()) {
             SPInput.down = false;
             player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);

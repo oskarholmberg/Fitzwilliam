@@ -21,7 +21,7 @@ public class PowerupSpawner {
     public PowerupSpawner(World world, GameClient client){
         this.world=world;
         this.client=client;
-        randomTime = MathUtils.random(20.0f, 30.0f);
+        randomTime = 30f;
         System.out.println("Time until power up spawn: " + randomTime);
         timeCheck = 0;
     }
@@ -44,7 +44,7 @@ public class PowerupSpawner {
 
     public void update(float dt){
         if (timeCheck > randomTime){
-            randomTime = MathUtils.random(20.0f, 30.0f);
+            randomTime = MathUtils.random(30.0f, 60.0f);
             System.out.println("Powerup spawned! next time: " + randomTime);
             timeCheck = 0f;
             generatePowerup();
