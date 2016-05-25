@@ -473,6 +473,9 @@ public class PlayState extends GameState {
 
     @Override
     public void update(float dt) {
+        if(!client.isConnected()){
+            gsm.setState(GameStateManager.HOST_OFFLINE);
+        }
         world.step(dt, 6, 2);
         player.update(dt);
         for (IntMap.Keys it = opponents.keys(); it.hasNext;) {
@@ -548,7 +551,7 @@ public class PlayState extends GameState {
         hud.render(sb);
 
         //Do this last in render
-        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+//        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         sb.setProjectionMatrix(cam.combined);
     }
 

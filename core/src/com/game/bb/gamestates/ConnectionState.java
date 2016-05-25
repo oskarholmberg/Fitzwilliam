@@ -67,7 +67,7 @@ public class ConnectionState extends GameState {
             sound.play();
             sound.dispose();
             gsm.hostGame(false);
-            gsm.setState(GameStateManager.LOBBY);
+            gsm.setState(GameStateManager.JOIN_SERVER);
         }
     }
 

@@ -1,7 +1,8 @@
 package com.game.bb.handlers;
 
 import com.game.bb.gamestates.ConnectionState;
-import com.game.bb.gamestates.LobbyState;
+import com.game.bb.gamestates.HostOfflineState;
+import com.game.bb.gamestates.JoinServerState;
 import com.game.bb.gamestates.StartScreenState;
 import com.game.bb.gamestates.PlayState;
 import com.game.bb.main.Game;
@@ -21,7 +22,7 @@ public class GameStateManager {
     private Stack<GameState> states;
     private GameClient client;
     private boolean hosting = false;
-    public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, LOBBY = 4;
+    public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, JOIN_SERVER = 4, HOST_OFFLINE = 5;
 
 
     public GameStateManager(Game game) {
@@ -63,8 +64,10 @@ public class GameStateManager {
                 return new StartScreenState(this);
             case CONNECT:
                 return new ConnectionState(this);
-            case LOBBY:
-                return new LobbyState(this);
+            case JOIN_SERVER:
+                return new JoinServerState(this);
+            case HOST_OFFLINE:
+                return new HostOfflineState(this);
             default:
                 return null;
         }
