@@ -50,7 +50,7 @@ public class GameClient extends Listener {
 
     public void connectToServer(InetAddress address) {
         try {
-            kryoClient.connect(1000, address, tcpPort, udpPort);
+            kryoClient.connect(3000, address, tcpPort, udpPort);
             Gdx.app.log("NET_CLIENT_CONNECT", "Connected to host @");
         } catch (IOException e) {
             e.printStackTrace();
