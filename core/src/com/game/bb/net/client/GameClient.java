@@ -46,7 +46,7 @@ public class GameClient extends Listener {
     }
 
     public List<InetAddress> getLocalServers() {
-        return kryoClient.discoverHosts(udpPort, 2000);
+        return kryoClient.discoverHosts(udpPort, 100);
     }
 
     public void connectToServer(InetAddress address) {
@@ -54,7 +54,7 @@ public class GameClient extends Listener {
             kryoClient.connect(5000, address, tcpPort, udpPort);
             Gdx.app.log("NET_CLIENT_CONNECT", "Connected to host @");
         } catch (IOException e) {
-            e.printStackTrace();
+            Gdx.app.log("NET_CLIENT", "Host went offline.");
         }
     }
 

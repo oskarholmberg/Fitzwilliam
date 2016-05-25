@@ -79,13 +79,14 @@ public class JoinServerState extends GameState {
     public void handleInput() {
         if (backbutton.isClicked()) {
             sound.play();
+            searcher.stopSearch();
             gsm.setState(GameStateManager.CONNECT);
         }
         for (InetAddress address : joinButtons.keySet()) {
             if (joinButtons.get(address).isClicked()) {
+                sound.play();
                 client.connectToServer(address);
                 gsm.setClient(client);
-                sound.play();
                 searcher.stopSearch();
                 gsm.setState(GameStateManager.PLAY);
             }
@@ -95,7 +96,7 @@ public class JoinServerState extends GameState {
     @Override
     public void update(float dt) {
         handleInput();
-        if(refresh > 2f){
+        if(refresh > 0.5f){
             joinButtons = getJoinButtons();
             refresh=0;
         }
@@ -157,7 +158,7 @@ public class JoinServerState extends GameState {
         HashMap<InetAddress, SPButton> buttons = new HashMap<InetAddress, SPButton>();
         int i = 0;
         for (InetAddress server : searcher.getServers()) {
-            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth-350, (cam.viewportHeight - 120) - 50 * i, 100f, 20f, cam);
+            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth-350, (cam.viewportHeight - 170) - (50 * i), 100, 20, cam);
             button.setInfo(server.getHostAddress());
             buttons.put(server, button);
             i++;
@@ -198,7 +199,7 @@ public class JoinServerState extends GameState {
             while(searching){
                 serverAddresses = client.getLocalServers();
                 try {
-                    sleep(1000);
+                    sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

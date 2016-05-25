@@ -58,14 +58,12 @@ public class ConnectionState extends GameState {
         if (hostButton.isClicked()) {
             dispose();
             sound.play();
-            sound.dispose();
             gsm.hostGame(true);
             gsm.setState(GameStateManager.PLAY);
         }
         if(joinButton.isClicked()){
             dispose();
             sound.play();
-            sound.dispose();
             gsm.hostGame(false);
             gsm.setState(GameStateManager.JOIN_SERVER);
         }
