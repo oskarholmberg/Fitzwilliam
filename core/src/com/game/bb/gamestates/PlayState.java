@@ -526,7 +526,8 @@ public class PlayState extends GameState {
             opponents.get(it.next()).render(sb);
         }
         for (IntMap.Keys it = powerups.keys(); it.hasNext;){
-            powerups.get(it.next()).render(sb);
+            powerups.get(it.next()).render(sb)
+            ;
         }
         player.render(sb);
         hud.render(sb);
