@@ -242,6 +242,7 @@ public class PlayState extends GameState {
                     bullet.getBody().setLinearVelocity(pkt.force);
                     opEntities.put(pkt.id, bullet);
                 }
+                break;
             case B2DVars.NET_DESTROY_BODY:
                 if(opEntities.containsKey(pkt.id)){
                     System.out.println("Destroy oponent entity: " + pkt.id);
