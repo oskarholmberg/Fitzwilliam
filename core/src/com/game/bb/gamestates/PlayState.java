@@ -233,6 +233,7 @@ public class PlayState extends GameState {
                     grenade.setId(pkt.id);
                     grenade.getBody().setTransform(pkt.pos, 0);
                     grenade.getBody().setLinearVelocity(pkt.force);
+                    grenade.initInterpolator();
                     opEntities.put(pkt.id, grenade);
                 } else if (pkt.miscString.equals("bullet")){
                     EnemyBullet bullet = Pooler.enemyBullet();
@@ -240,6 +241,7 @@ public class PlayState extends GameState {
                     bullet.setId(pkt.id);
                     bullet.getBody().setTransform(pkt.pos, 0);
                     bullet.getBody().setLinearVelocity(pkt.force);
+                    bullet.initInterpolator();
                     opEntities.put(pkt.id, bullet);
                 }
                 break;
