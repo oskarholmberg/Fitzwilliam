@@ -54,6 +54,7 @@ public class PlayState extends GameState {
     private float respawnTimer = 0;
     private GameClient client;
     private HUD hud;
+    private PowerupHandler powerHandler;
     private MapBuilder map;
     private IntArray removedIds;
     private Texture backGround = new Texture("images/spaceBackground.png");
@@ -62,7 +63,7 @@ public class PlayState extends GameState {
     private float[] touchNbrs = {(cam.viewportWidth/ 5), cam.viewportWidth * 4 / 5};
     private int entityPktSequence = 0, playerPktSequence = 0;
     private boolean  grenadesIsEmpty = false, debugClick = false, hosting = false;
-    private float sendEntityInfo = 0f, sendPlayerInfo = 0f, unlimitedAmmo = 50f;
+    private float sendEntityInfo = 0f, sendPlayerInfo = 0f;
 
     public int currentTexture = SPOpponent.STAND_LEFT;
     public World world;
@@ -91,12 +92,16 @@ public class PlayState extends GameState {
             powerupSpawner = new PowerupSpawner(world, client);
         }
 
+        powerHandler = new PowerupHandler();
+
+
         opponents = new IntMap<SPOpponent>();
         removedIds = new IntArray();
 
         map = new MapBuilder(world, 1);
         map.buildMap();
         spawnLocations = map.getSpawnLocations();
+        cam.rotate(30f);
 
 
         //Players
@@ -246,7 +251,7 @@ public class PlayState extends GameState {
             }
             for (EntityPacket pkt : cluster.pkts) {
                 if (opEntities.containsKey(pkt.id)) {
-                    opEntities.get(pkt.id).applyInterpolation(pkt);
+                    opEntities.get(pkt.id).updateEntityState(pkt);
                 } else if (!removedIds.contains(pkt.id)){
                     System.out.println("New enemy entity grabbed from pool id: " + pkt.id);
                     if (pkt.type == B2DVars.TYPE_GRENADE) {
@@ -293,8 +298,7 @@ public class PlayState extends GameState {
     }
 
     private void refreshAmmo(float dt) {
-        if (unlimitedAmmo < 10f){
-            unlimitedAmmo += dt;
+        if (powerHandler.unlimitedAmmo()){
             amntBullets = B2DVars.AMOUNT_BULLET;
             amntGrenades = B2DVars.AMOUNT_GRENADE;
             hud.setAmountBulletsLeft(amntBullets);
@@ -443,9 +447,7 @@ public class PlayState extends GameState {
             client.sendTCP(pkt);
             Pooler.free(pkt);
 
-            if (powerType ==  B2DVars.POWER_AMMO){
-                unlimitedAmmo = 0f;
-            }
+            powerHandler.applyPowerup(powerType);
         }
     }
 
@@ -496,6 +498,7 @@ public class PlayState extends GameState {
         checkGrenadeTimer(dt);
         bulletsHittingWall();
         powerupTaken();
+        powerHandler.update(dt);
         if (hosting){
             powerupSpawner.update(dt);
         }

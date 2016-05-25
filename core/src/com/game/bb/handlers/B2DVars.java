@@ -25,7 +25,7 @@ public class B2DVars {
     public static final short BIT_GROUND = 2, BIT_PLAYER = 4, BIT_OPPONENT = 8, BIT_BULLET = 16,
             BIT_GRENADE = 32, BIT_DOME = 64, BIT_ENEMY_ENTITY = 128;
 
-    public static final int POWER_AMMO = 1;
+    public static final int POWERTYPE_AMMO = 1;
 
     public static final float PLAYER_HEIGHT = 22f/PPM, PLAYER_WIDTH = 18f/PPM;
 
