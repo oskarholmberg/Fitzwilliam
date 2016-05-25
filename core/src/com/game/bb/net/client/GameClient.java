@@ -35,7 +35,8 @@ public class GameClient extends Listener {
         movementPackets = new Array<PlayerMovementPacket>();
         kryoClient = new Client();
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
-                TCPEventPacket.class, EntityCluster.class, EntityPacket[].class, PlayerMovementPacket.class};
+                TCPEventPacket.class, EntityCluster.class, EntityPacket[].class, PlayerMovementPacket.class,
+                String.class};
         for (Class c : classes){
             kryoClient.getKryo().register(c);
         }

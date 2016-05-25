@@ -132,18 +132,34 @@ public class PlayState extends GameState {
                 myEntities.put(id, bullet);
                 amntBullets--;
                 hud.setAmountBulletsLeft(amntBullets);
+                TCPEventPacket pkt = Pooler.tcpEventPacket();
+                pkt.id=bullet.getId();
+                pkt.action=B2DVars.NET_NEW_ENTITY;
+                pkt.miscString="bullet";
+                pkt.pos=bullet.getBody().getPosition();
+                pkt.force=bullet.getBody().getLinearVelocity();
+                client.sendTCP(pkt);
+                Pooler.free(pkt);
             }
         }
     }
 
     private void throwGrenade() {
         if (amntGrenades > 0 && !player.isDead()) {
-            int ID = newEntityID();
+            int id = newEntityID();
             Vector2 pos = player.getPosition();
-            SPGrenade spg = new SPGrenade(world, pos.x, pos.y, lastJumpDirection, false, ID);
-            myEntities.put(ID, spg);
+            SPGrenade spg = new SPGrenade(world, pos.x, pos.y, lastJumpDirection, false, id);
+            myEntities.put(id, spg);
             amntGrenades--;
             hud.setAmountGrenadesLeft(amntGrenades);
+            TCPEventPacket pkt = Pooler.tcpEventPacket();
+            pkt.id=spg.getId();
+            pkt.action=B2DVars.NET_NEW_ENTITY;
+            pkt.miscString="grenade";
+            pkt.pos=spg.getBody().getPosition();
+            pkt.force=spg.getBody().getLinearVelocity();
+            client.sendTCP(pkt);
+            Pooler.free(pkt);
             if (amntGrenades == 0) {
                 grenadesIsEmpty = true;
                 grenadeRefresh = 0;
@@ -197,7 +213,7 @@ public class PlayState extends GameState {
                     TCPEventPacket packet = new TCPEventPacket();
                     packet.action=B2DVars.NET_CONNECT;
                     packet.pos=player.getPosition();
-                    packet.id=player.getID();
+                    packet.id=player.getId();
                     hud.setOpponentDeath(pkt.id, 0);
                     client.sendTCP(packet);
                 }
@@ -210,6 +226,22 @@ public class PlayState extends GameState {
                     hud.removeOpponentDeathCount(pkt.id);
                 }
                 break;
+            case B2DVars.NET_NEW_ENTITY:
+                if (pkt.miscString.equals("grenade")){
+                    EnemyGrenade grenade = Pooler.enemyGrenade();
+                    grenade.setAnimation("red");
+                    grenade.setId(pkt.id);
+                    grenade.getBody().setTransform(pkt.pos, 0);
+                    grenade.getBody().setLinearVelocity(pkt.force);
+                    opEntities.put(pkt.id, grenade);
+                } else if (pkt.miscString.equals("bullet")){
+                    EnemyBullet bullet = Pooler.enemyBullet();
+                    bullet.setAnimation("red");
+                    bullet.setId(pkt.id);
+                    bullet.getBody().setTransform(pkt.pos, 0);
+                    bullet.getBody().setLinearVelocity(pkt.force);
+                    opEntities.put(pkt.id, bullet);
+                }
             case B2DVars.NET_DESTROY_BODY:
                 if(opEntities.containsKey(pkt.id)){
                     System.out.println("Destroy oponent entity: " + pkt.id);
@@ -252,26 +284,7 @@ public class PlayState extends GameState {
             for (EntityPacket pkt : cluster.pkts) {
                 if (opEntities.containsKey(pkt.id)) {
                     opEntities.get(pkt.id).updateEntityState(pkt);
-                } else if (!removedIds.contains(pkt.id)){
-                    System.out.println("New enemy entity grabbed from pool id: " + pkt.id);
-                    if (pkt.type == B2DVars.TYPE_GRENADE) {
-                        EnemyGrenade enemyGrenade = Pooler.enemyGrenade(); // get it from the pool
-                        enemyGrenade.setAnimation("red");
-                        enemyGrenade.setId(pkt.id);
-                        enemyGrenade.getBody().setTransform(pkt.xp, pkt.yp, 0);
-                        enemyGrenade.getBody().setLinearVelocity(pkt.xf, pkt.yf);
-                        enemyGrenade.initInterpolator();
-                        opEntities.put(pkt.id, enemyGrenade);
-                    } else if (pkt.type == B2DVars.TYPE_BULLET) {
-                        EnemyBullet enemyBullet = Pooler.enemyBullet(); // get it from the pool
-                        enemyBullet.setAnimation("red");
-                        enemyBullet.setId(pkt.id);
-                        enemyBullet.getBody().setTransform(pkt.xp, pkt.yp, 0);
-                        enemyBullet.getBody().setLinearVelocity(pkt.xf, pkt.yf);
-                        enemyBullet.initInterpolator();
-                        opEntities.put(pkt.id, enemyBullet);
-                    }
-                }
+                } 
             }
         }
     }
@@ -380,7 +393,7 @@ public class PlayState extends GameState {
         pkt.seq = playerPktSequence++;
         pkt.sound=0;
         pkt.tex = currentTexture;
-        pkt.id=player.getID();
+        pkt.id=player.getId();
         pkt.time = TimeUtils.millis();
         client.sendUDP(pkt);
         Pooler.free(pkt); //return it to the pool
@@ -415,7 +428,7 @@ public class PlayState extends GameState {
             pkt.id= id;
             client.sendTCP(pkt);
             pkt.action=B2DVars.NET_DEATH;
-            pkt.id = player.getID();
+            pkt.id = player.getId();
             pkt.misc = hud.getPlayerDeathCount();
             client.sendTCP(pkt);
             Pooler.free(pkt); //return it to the pool
@@ -437,14 +450,14 @@ public class PlayState extends GameState {
 
     private void powerupTaken(){
         if (cl.powerTaken()){
-            SPPower power = powerups.remove(cl.getLastPowerTaken().getID());
+            SPPower power = powerups.remove(cl.getLastPowerTaken().getId());
             int powerType = power.getPowerType();
             world.destroyBody(power.getBody());
             power.dispose();
 
             TCPEventPacket pkt = Pooler.tcpEventPacket();
             pkt.action = B2DVars.NET_DESTROY_BODY;
-            pkt.id = power.getID();
+            pkt.id = power.getId();
             client.sendTCP(pkt);
             Pooler.free(pkt);
 

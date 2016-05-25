@@ -40,7 +40,7 @@ public abstract class SPSprite implements Disposable {
 
     }
 
-    public int getID(){return ID;}
+    public int getId(){return ID;}
 
     public void render(SpriteBatch sb){
 

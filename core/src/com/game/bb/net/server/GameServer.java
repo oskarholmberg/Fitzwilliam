@@ -32,7 +32,8 @@ public class GameServer extends Listener {
         connections = new HashMap<Connection, String>();
         playerIds = new HashMap<Connection, Integer>();
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
-            TCPEventPacket.class, EntityCluster.class, EntityPacket[].class, PlayerMovementPacket.class};
+            TCPEventPacket.class, EntityCluster.class, EntityPacket[].class, PlayerMovementPacket.class,
+            String.class};
         for (Class c : classes){
             kryoServer.getKryo().register(c);
         }

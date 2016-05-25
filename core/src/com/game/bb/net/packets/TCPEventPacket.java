@@ -8,8 +8,9 @@ import com.badlogic.gdx.utils.Pool;
  */
 public class TCPEventPacket implements Pool.Poolable{
     public int action;
-    public Vector2 pos;
+    public Vector2 pos, force;
     public int id, misc;
+    public String miscString;
 
     @Override
     public void reset() {
