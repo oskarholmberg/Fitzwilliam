@@ -436,14 +436,16 @@ public class PlayState extends GameState {
                 SPSprite entity = myEntities.remove(id);
                 world.destroyBody(entity.getBody());
                 entity.dispose();
-                System.out.println("Removing: entity - hit");
             } else if (opEntities.containsKey(id)){
-                EnemyEntity entity = opEntities.get(id);
+                EnemyEntity entity = opEntities.remove(id);
                 removedIds.add(id);
-                if (entity instanceof EnemyGrenade)
+                if (entity instanceof EnemyGrenade) {
+                    entity.getBody().setTransform(400f, 400f, 0);
                     Pooler.free((EnemyGrenade) entity);
-                else if (entity instanceof EnemyBullet)
+                } else if (entity instanceof EnemyBullet) {
+                    entity.getBody().setTransform(400f, 400f, 0);
                     Pooler.free((EnemyBullet) entity);
+                }
             }
         }
     }
