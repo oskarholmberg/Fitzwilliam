@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -15,8 +16,8 @@ import com.game.bb.handlers.SPAnimation;
  */
 public class SPPower extends SPSprite{
     private SPAnimation animation;
-    private int offset = 32;
-    private PolygonShape shape;
+    private int offset = 16;
+    private CircleShape shape;
     private int powerType;
 
     public SPPower(World world, float xPos, float yPos, int ID, int powerType) {
@@ -24,7 +25,7 @@ public class SPPower extends SPSprite{
         createPowerBody(xPos, yPos);
         this.powerType = powerType;
 
-        animation = new SPAnimation(TextureRegion.split(new Texture("images/weapons/unlimitedAmmoPower.png"), 17, 17)[0], 0.2f);
+        animation = new SPAnimation(TextureRegion.split(new Texture("images/weapons/unlimitedAmmoPower.png"), 17, 17)[0], 0.1f);
     }
 
     public int getPowerType(){
@@ -32,8 +33,8 @@ public class SPPower extends SPSprite{
     }
 
     private void createPowerBody(float xPos, float yPos){
-        shape = new PolygonShape();
-        shape.setAsBox(8 / B2DVars.PPM, 8 / B2DVars.PPM);
+        shape = new CircleShape();
+        shape.setRadius(16 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         fdef.filter.categoryBits = B2DVars.BIT_ENEMY_ENTITY;
@@ -57,7 +58,7 @@ public class SPPower extends SPSprite{
         float x = body.getPosition().x * B2DVars.PPM - width / 2;
         float y = body.getPosition().y * B2DVars.PPM - height / 2;
         sb.begin();
-        sb.draw(animation.getFrame(), x - offset, y - offset);
+        sb.draw(animation.getFrame(), x - offset, y - offset, 32, 32);
         sb.end();
     }
 
