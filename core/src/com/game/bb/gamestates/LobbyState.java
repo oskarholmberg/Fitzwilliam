@@ -28,7 +28,6 @@ import java.util.List;
 public class LobbyState extends GameState {
 
     private HashMap<InetAddress, SPButton> joinButtons;
-    private Array<String> servers;
     private World world;
     private Texture background = new Texture("images/spaceBackground.png");
     private Texture availableServers = new Texture("images/font/availableServers.png");
@@ -59,7 +58,6 @@ public class LobbyState extends GameState {
         for (int i = 0; i < 5; i++) {
             font[i + 6] = new TextureRegion(hudTex, 32 + i * 9, 25, 9, 9);
         }
-        servers = new Array<String>();
         fallingBody();
     }
 
@@ -97,7 +95,7 @@ public class LobbyState extends GameState {
     @Override
     public void update(float dt) {
         handleInput();
-        if(refresh > 5f){
+        if(refresh > 2f){
             joinButtons = getJoinButtons();
             refresh=0;
         }
@@ -162,7 +160,6 @@ public class LobbyState extends GameState {
             SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth-350, (cam.viewportHeight - 170) - 50 * i, 100f, 20f, cam);
             button.setInfo(server.getHostAddress());
             buttons.put(server, button);
-            System.out.println("Server found");
             i++;
         }
         return buttons;
@@ -201,7 +198,7 @@ public class LobbyState extends GameState {
             while(searching){
                 serverAddresses = client.getLocalServers();
                 try {
-                    sleep(2000);
+                    sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

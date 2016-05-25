@@ -34,8 +34,8 @@ public class ConnectionState extends GameState {
         world = new World(new Vector2(0, -9.81f), true);
         itRains = new Array<FallingBody>();
 
-        hostButton = new SPButton(new Texture("images/button/hostButton.png"), cam.viewportWidth/2, (cam.viewportHeight/2)+100, 289f, 28f, cam);
-        joinButton = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth/2, (cam.viewportHeight/2), 289f, 28f, cam);
+        hostButton = new SPButton(new Texture("images/button/hostGameButton.png"), cam.viewportWidth/2, (cam.viewportHeight/2)+100, 289f, 28f, cam);
+        joinButton = new SPButton(new Texture("images/button/joinGameButton.png"), cam.viewportWidth/2, (cam.viewportHeight/2), 289f, 28f, cam);
         fallingBody();
     }
 
