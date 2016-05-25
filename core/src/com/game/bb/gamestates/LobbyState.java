@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -12,23 +13,21 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.game.bb.entities.SPBullet;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
-import com.sun.org.apache.xpath.internal.SourceTree;
-
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import com.game.bb.net.client.GameClient;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by erik on 12/05/16.
  */
 public class LobbyState extends GameState {
 
-    private Array<SPButton> joinButtons;
+    private HashMap<InetAddress, SPButton> joinButtons;
     private Array<String> servers;
     private World world;
     private Texture background = new Texture("images/spaceBackground.png");
@@ -36,20 +35,31 @@ public class LobbyState extends GameState {
     private SPButton backbutton;
     private Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
     private Array<FallingBody> itRains;
-    private float newFallingBody = 0f;
-    private GameServerSearcher searcher;
+    private float newFallingBody = 0f, refresh = 5f;
+    private GameClient client;
+    private ServerSearcher searcher;
+    private TextureRegion[] font;
 
 
     public LobbyState(GameStateManager gsm) {
         super(gsm);
         world = new World(new Vector2(0, -9.81f), true);
+        client = new GameClient();
+        searcher = new ServerSearcher();
+        searcher.start();
         itRains = new Array<FallingBody>();
-        joinButtons = new Array<SPButton>();
+        joinButtons = new HashMap<InetAddress, SPButton>();
         backbutton = new SPButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
                 cam.viewportHeight - 100, 40f, 40f, cam);
+        font = new TextureRegion[11];
+        Texture hudTex = new Texture("images/hud.png");
+        for (int i = 0; i < 6; i++) {
+            font[i] = new TextureRegion(hudTex, 32 + i * 9, 16, 9, 9);
+        }
+        for (int i = 0; i < 5; i++) {
+            font[i + 6] = new TextureRegion(hudTex, 32 + i * 9, 25, 9, 9);
+        }
         servers = new Array<String>();
-        searcher = new GameServerSearcher();
-        searcher.start();
         fallingBody();
     }
 
@@ -70,20 +80,15 @@ public class LobbyState extends GameState {
     @Override
     public void handleInput() {
         if (backbutton.isClicked()) {
-            System.out.println("Button clicked");
-            searcher.stopSearch();
-            System.out.println("Search stopped");
             sound.play();
-            System.out.println("Returning to connect mode");
             gsm.setState(GameStateManager.CONNECT);
         }
-        for (SPButton joinButton : joinButtons) {
-            if (joinButton.isClicked()) {
-                dispose();
-                gsm.setIpAddress(joinButton.getInfo());
-                searcher.stopSearch();
+        for (InetAddress address : joinButtons.keySet()) {
+            if (joinButtons.get(address).isClicked()) {
+                client.connectToServer(address);
+                gsm.setClient(client);
                 sound.play();
-                sound.dispose();
+                searcher.stopSearch();
                 gsm.setState(GameStateManager.PLAY);
             }
         }
@@ -92,8 +97,13 @@ public class LobbyState extends GameState {
     @Override
     public void update(float dt) {
         handleInput();
-        servers = searcher.getServerList();
-        joinButtons = getJoinButtons(servers);
+        if(refresh > 5f){
+            joinButtons = getJoinButtons();
+            refresh=0;
+        }
+        else{
+            refresh+=dt;
+        }
         backbutton.update(dt);
         if (newFallingBody > 1f) {
             fallingBody();
@@ -102,8 +112,8 @@ public class LobbyState extends GameState {
             newFallingBody += dt;
         }
         world.step(dt, 6, 2);
-        for (SPButton button : joinButtons) {
-            button.update(dt);
+        for (InetAddress address : joinButtons.keySet()) {
+            joinButtons.get(address).update(dt);
         }
     }
 
@@ -115,11 +125,25 @@ public class LobbyState extends GameState {
         sb.end();
         for (FallingBody body : itRains)
             body.render(sb);
-        for (SPButton button : joinButtons) {
-            button.render(sb);
+        for (InetAddress address : joinButtons.keySet()) {
+            joinButtons.get(address).render(sb);
         }
         backbutton.render(sb);
         sb.begin();
+        int k = 0;
+        for(InetAddress address : joinButtons.keySet()){
+            SPButton button = joinButtons.get(address);
+            int j = 0;
+            String[] ip = button.getInfo().split("\\.");
+            for (int e = 0; e < ip.length; e++) {
+                for (int i = 0; i < ip[e].length(); i++) {
+                    sb.draw(font[Integer.valueOf(ip[e].substring(i, i+1))], 100 + j * 22, (cam.viewportHeight - 180) - 50 * k, 20, 20);
+                    j++;
+                }
+                j++;
+            }
+            k++;
+        }
         sb.draw(availableServers, 100, cam.viewportHeight-120, 600, 30);
         sb.end();
     }
@@ -131,13 +155,14 @@ public class LobbyState extends GameState {
         }
     }
 
-    private Array<SPButton> getJoinButtons(Array<String> servers) {
-        Array<SPButton> buttons = new Array<SPButton>();
+    private HashMap<InetAddress, SPButton> getJoinButtons() {
+        HashMap<InetAddress, SPButton> buttons = new HashMap<InetAddress, SPButton>();
         int i = 0;
-        for (String server : servers) {
-            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth/5, (cam.viewportHeight - 180) - 50 * i, 200f, 20f, cam);
-            button.setInfo(server);
-            buttons.add(button);
+        for (InetAddress server : searcher.getServers()) {
+            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth-350, (cam.viewportHeight - 170) - 50 * i, 100f, 20f, cam);
+            button.setInfo(server.getHostAddress());
+            buttons.put(server, button);
+            System.out.println("Server found");
             i++;
         }
         return buttons;
@@ -163,81 +188,32 @@ public class LobbyState extends GameState {
         }
     }
 
-    private class GameServerSearcher extends Thread {
+    private class ServerSearcher extends Thread{
 
-        private DatagramSocket socket;
-        private String serverAddress;
-        private Array<String> serverList;
-        private GameServerProbe probe;
+        private boolean searching = true;
+        private List<InetAddress> serverAddresses;
 
-        private GameServerSearcher() {
-            serverList = new Array<String>();
-            try {
-                socket = new DatagramSocket();
-                probe = new GameServerProbe(socket);
-                probe.start();
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
+        private ServerSearcher(){
+            serverAddresses = new ArrayList<InetAddress>();
         }
 
-        public void run() {
-            while (!socket.isClosed()) {
+        public void run(){
+            while(searching){
+                serverAddresses = client.getLocalServers();
                 try {
-                    byte[] serverInfo = new byte[1024];
-                    DatagramPacket received = new DatagramPacket(serverInfo, serverInfo.length);
-                    socket.receive(received);
-                    serverAddress = new String(received.getData()).trim();
-                    if (!serverList.contains(serverAddress, false)) {
-                        serverList.add(serverAddress);
-                        System.out.println("Server found!");
-                    }
                     sleep(2000);
-                } catch (SocketException e) {
-                    stopSearch();
-                } catch (UnknownHostException e) {
-                    stopSearch();
-                } catch (IOException e) {
-                    stopSearch();
-                } catch (InterruptedException e) {
-                    stopSearch();
-                }
-            }
-        }
-
-        public synchronized void stopSearch() {
-            socket.close();
-            System.out.println("Server search stopped, socket closed.");
-        }
-
-        public synchronized Array<String> getServerList() {
-            return serverList;
-        }
-    }
-
-    private class GameServerProbe extends Thread {
-
-        private DatagramSocket socket;
-
-        private GameServerProbe(DatagramSocket socket) {
-            this.socket = socket;
-        }
-
-        public void run() {
-            while (!socket.isClosed()) {
-                try {
-                    byte[] hello = "HELLO".getBytes();
-                    DatagramPacket packet = new DatagramPacket(hello, hello.length, InetAddress.getByName("224.0.13.37"), 8081);
-                    socket.send(packet);
-                    sleep(2000);
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+        }
+
+        private List<InetAddress> getServers(){
+            return serverAddresses;
+        }
+
+        private void stopSearch(){
+            searching = false;
         }
     }
 }

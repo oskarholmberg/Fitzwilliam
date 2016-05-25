@@ -1,7 +1,6 @@
 package com.game.bb.net.client;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -43,22 +42,15 @@ public class GameClient extends Listener {
         kryoClient.addListener(this);
         kryoClient.start();
         Gdx.app.log("NET_CLIENT", "GameClient started at " + TimeUtils.millis());
-
-        findLocalServer();
-    }
-
-    private void findLocalServer() {
-        addresses = kryoClient.discoverHosts(udpPort, 2000);
-        Gdx.app.log("NET_CLIENT_CONNECT", "Addresses found: " + addresses.toString());
     }
 
     public List<InetAddress> getLocalServers() {
-        return addresses;
+        return kryoClient.discoverHosts(udpPort, 2000);
     }
 
-    public void connectToServer(int index) {
+    public void connectToServer(InetAddress address) {
         try {
-            kryoClient.connect(5000, addresses.get(index), tcpPort, udpPort);
+            kryoClient.connect(1000, address, tcpPort, udpPort);
             Gdx.app.log("NET_CLIENT_CONNECT", "Connected to host @");
         } catch (IOException e) {
             e.printStackTrace();

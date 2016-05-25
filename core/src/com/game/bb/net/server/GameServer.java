@@ -43,13 +43,13 @@ public class GameServer extends Listener {
         }
         kryoServer.addListener(this);
         kryoServer.start();
-        Gdx.app.log("NET_SERVER", "Game server started at " + TimeUtils.millis());
-        Gdx.app.log("NET_SERVER", "UDP port: " + udpPort + " TCP port: " + tcpPort);
+        Gdx.app.log("NET_SERVER", "Game server started");
+        Gdx.app.log("NET_SERVER", "Server running on UDP port: " + udpPort + ", TCP port: " + tcpPort);
     }
 
     @Override
     public void connected(Connection c){
-        Gdx.app.log("NET_SERVER_CONNECTION", "Client @" + c.getRemoteAddressUDP().getAddress().toString().substring(1) + " connected.");
+        Gdx.app.log("NET_SERVER", "Client @" + c.getRemoteAddressUDP().getAddress().toString().substring(1) + " connected.");
         connections.put(c, c.getRemoteAddressTCP().getAddress().toString().substring(1) + ":" + c.getRemoteAddressTCP().getPort());
     }
 
@@ -78,7 +78,7 @@ public class GameServer extends Listener {
 
     @Override
     public void disconnected(Connection c){
-        Gdx.app.log("NET_SERVER_DISCONNECTION", "Client @" + connections.get(c) + " disconnected.");
+        Gdx.app.log("NET_SERVER", "Client @" + connections.get(c) + " disconnected.");
         TCPEventPacket packet = new TCPEventPacket();
         packet.action = B2DVars.NET_DISCONNECT;
         packet.id = playerIds.get(c);

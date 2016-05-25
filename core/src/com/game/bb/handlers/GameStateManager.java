@@ -6,8 +6,11 @@ import com.game.bb.gamestates.StartScreenState;
 import com.game.bb.gamestates.PlayState;
 import com.game.bb.main.Game;
 import com.game.bb.gamestates.GameState;
+import com.game.bb.net.client.GameClient;
 import com.game.bb.net.server.GameServer;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Stack;
 
 /**
@@ -16,7 +19,7 @@ import java.util.Stack;
 public class GameStateManager {
     private Game game;
     private Stack<GameState> states;
-    private String ipAddress;
+    private GameClient client;
     private boolean hosting = false;
     public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, LOBBY = 4;
 
@@ -48,8 +51,14 @@ public class GameStateManager {
             case PLAY:
                 if(hosting){
                     new GameServer();
+                    client = new GameClient();
+                    try {
+                        client.connectToServer(InetAddress.getLocalHost());
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
                 }
-                return new PlayState(this);
+                return new PlayState(this, client);
             case START_SCREEN:
                 return new StartScreenState(this);
             case CONNECT:
@@ -78,8 +87,9 @@ public class GameStateManager {
         this.hosting = hosting;
     }
 
-    public void setIpAddress(String ip){
-        ipAddress = ip;
+    public void setClient(GameClient client){
+        this.client=client;
     }
+
 }
 

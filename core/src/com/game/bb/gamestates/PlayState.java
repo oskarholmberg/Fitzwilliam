@@ -65,15 +65,14 @@ public class PlayState extends GameState {
     public World world;
     public static PlayState playState;
 
-    public PlayState(GameStateManager gsm) {
+    public PlayState(GameStateManager gsm, GameClient client) {
         super(gsm);
 
         playState = this;
         world = new World(new Vector2(0, -7.81f), true);
         world.setContactListener(cl = new SPContactListener());
 
-        client = new GameClient();
-        client.connectToServer(0);
+        this.client = client;
 
         Pooler.init();
 
@@ -188,7 +187,7 @@ public class PlayState extends GameState {
                 break;
             case B2DVars.NET_DISCONNECT:
                 if(opponents.containsKey(pkt.id)){
-                    SPOpponent opponent = opponents.get(pkt.id);
+                    SPOpponent opponent = opponents.remove(pkt.id);
                     world.destroyBody(opponent.getBody());
                     opponent.dispose();
                     hud.removeOpponentDeathCount(pkt.id);
