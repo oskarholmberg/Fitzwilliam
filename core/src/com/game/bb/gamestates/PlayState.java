@@ -426,6 +426,7 @@ public class PlayState extends GameState {
                 System.out.println("Removing: entity - hit");
             } else if (opEntities.containsKey(id)){
                 EnemyEntity entity = opEntities.get(id);
+                removedIds.add(id);
                 if (entity instanceof EnemyGrenade)
                     Pooler.free((EnemyGrenade) entity);
                 else if (entity instanceof EnemyBullet)
