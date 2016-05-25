@@ -36,11 +36,12 @@ public class EntityInterpolator {
 
 
 
-    public Vector2 getPosition(EntityPacket pkt){
+    public void updateEntityState(EntityPacket pkt){
         currentPos.set(body.getPosition());
         targetPos.set(pkt.xp, pkt.yp);
         velocity.set(currentPos).lerp(targetPos, getAlpha());
-        return velocity;
+        body.setTransform(velocity, 0);
+        body.setLinearVelocity(pkt.xf, pkt.yf);
     }
 
     public Vector2 getPlayerPosition(PlayerMovementPacket pkt){

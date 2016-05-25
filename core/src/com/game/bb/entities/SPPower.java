@@ -17,24 +17,30 @@ public class SPPower extends SPSprite{
     private SPAnimation animation;
     private int offset = 32;
     private PolygonShape shape;
+    private int powerType;
 
-    public SPPower(World world, float xPos, float yPos, int ID) {
+    public SPPower(World world, float xPos, float yPos, int ID, int powerType) {
         super(world, ID);
         createPowerBody(xPos, yPos);
+        this.powerType = powerType;
 
         animation = new SPAnimation(TextureRegion.split(new Texture("images/powerUpBox.png"), 32, 32)[0], 0.2f);
     }
 
+    public int getPowerType(){
+        return powerType;
+    }
+
     private void createPowerBody(float xPos, float yPos){
         shape = new PolygonShape();
-        shape.setAsBox(32 / B2DVars.PPM, 32 / B2DVars.PPM);
+        shape.setAsBox(8 / B2DVars.PPM, 8 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         fdef.filter.categoryBits = B2DVars.BIT_ENEMY_ENTITY;
         fdef.filter.maskBits =  B2DVars.BIT_PLAYER | B2DVars.BIT_GROUND;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
-        bdef.gravityScale=0.2f;
+        bdef.gravityScale=0.1f;
         bdef.type = BodyDef.BodyType.DynamicBody; // Should be dynamic
         body = world.createBody(bdef);
         body.createFixture(fdef).setUserData(B2DVars.ID_POWERUP);

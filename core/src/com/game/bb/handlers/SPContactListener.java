@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Array;
 import com.game.bb.entities.EnemyEntity;
+import com.game.bb.entities.SPPower;
 import com.game.bb.entities.SPSprite;
 
 /**
@@ -64,12 +65,12 @@ public class SPContactListener implements ContactListener {
             playerHit = true;
             // If a player catches a powerup
         } else if (fa.getUserData().equals(B2DVars.ID_POWERUP) && fb.getUserData().equals(B2DVars.ID_PLAYER)){
-            //lastPowerUp = fa;
-            //playerPowerUp = true;
+            lastPowerUp = fa;
+            playerPowerUp = true;
             // - || -
         } else if (fb.getUserData().equals(B2DVars.ID_POWERUP) && fa.getUserData().equals(B2DVars.ID_PLAYER)){
-            //lastPowerUp = fb;
-            //playerPowerUp = true;
+            lastPowerUp = fb;
+            playerPowerUp = true;
         } else if ((fa.getUserData().equals(B2DVars.ID_PLAYER) || fb.getUserData().equals(B2DVars.ID_PLAYER)) &&
                 (fa.getUserData().equals(B2DVars.ID_ENEMY_ENTITY) || fb.getUserData().equals(B2DVars.ID_ENEMY_ENTITY))){
             if (fa.getUserData().equals(B2DVars.ID_ENEMY_ENTITY))
@@ -101,6 +102,10 @@ public class SPContactListener implements ContactListener {
             return true;
         }
         return false;
+    }
+
+    public SPPower getLastPowerTaken(){
+        return (SPPower) lastPowerUp.getBody().getUserData();
     }
 
     public boolean powerTaken() {

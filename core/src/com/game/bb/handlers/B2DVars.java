@@ -25,6 +25,8 @@ public class B2DVars {
     public static final short BIT_GROUND = 2, BIT_PLAYER = 4, BIT_OPPONENT = 8, BIT_BULLET = 16,
             BIT_GRENADE = 32, BIT_DOME = 64, BIT_ENEMY_ENTITY = 128;
 
+    public static final int POWERTYPE_AMMO = 1;
+
     public static final float PLAYER_HEIGHT = 22f/PPM, PLAYER_WIDTH = 18f/PPM;
 
     public static final String ID_FOOT = "foot", ID_PLAYER = "player", ID_OPPONENT = "opponent",
@@ -32,7 +34,7 @@ public class B2DVars {
     ID_POWERUP = "powerup", ID_ENEMY_GRENADE = "enemygrenade", ID_ENEMY_ENTITY = "enemyentity";
 
     public static final int NET_CONNECT = 1, NET_RESPAWN = 2, NET_DEATH = 3, NET_SHOOT = 4,
-    NET_GRENADE = 5, NET_DISCONNECT = 6, NET_DESTROY_BODY = 7;
+    NET_GRENADE = 5, NET_DISCONNECT = 6, NET_DESTROY_BODY = 7, NET_POWER = 8;
 
     public static final int TYPE_BULLET = 1, TYPE_GRENADE = 2;
 

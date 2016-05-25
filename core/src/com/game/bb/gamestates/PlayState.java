@@ -19,6 +19,7 @@ import com.game.bb.entities.EnemyGrenade;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.entities.SPGrenade;
 import com.game.bb.entities.SPOpponent;
+import com.game.bb.entities.SPPower;
 import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
@@ -43,6 +44,8 @@ public class PlayState extends GameState {
     private SPPlayer player;
     private IntMap<SPOpponent> opponents;
     private Array<Vector2> spawnLocations;
+    private PowerupSpawner powerupSpawner;
+    private IntMap<SPPower> powerups;
     private int entityAccum = 0;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
@@ -51,6 +54,7 @@ public class PlayState extends GameState {
     private float respawnTimer = 0;
     private GameClient client;
     private HUD hud;
+    private PowerupHandler powerHandler;
     private MapBuilder map;
     private IntArray removedIds;
     private Texture backGround = new Texture("images/spaceBackground.png");
@@ -58,7 +62,7 @@ public class PlayState extends GameState {
     private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
     private float[] touchNbrs = {(cam.viewportWidth/ 5), cam.viewportWidth * 4 / 5};
     private int entityPktSequence = 0, playerPktSequence = 0;
-    private boolean  grenadesIsEmpty = false, debugClick = false;
+    private boolean  grenadesIsEmpty = false, debugClick = false, hosting = false;
     private float sendEntityInfo = 0f, sendPlayerInfo = 0f;
 
     public int currentTexture = SPOpponent.STAND_LEFT;
@@ -80,12 +84,24 @@ public class PlayState extends GameState {
 
         hud = new HUD();
 
+        powerups = new IntMap<SPPower>();
+
+        if (gsm.isHosting()){
+            hosting=true;
+            powerupSpawner = new PowerupSpawner(world, client);
+        }
+
+        powerHandler = new PowerupHandler();
+
+
         opponents = new IntMap<SPOpponent>();
         removedIds = new IntArray();
 
         map = new MapBuilder(world, 1);
         map.buildMap();
         spawnLocations = map.getSpawnLocations();
+        cam.rotate(30f);
+
 
         //Players
         Vector2 spawn = spawnLocations.random();
@@ -207,12 +223,20 @@ public class PlayState extends GameState {
                     SPSprite myEntity = myEntities.remove(pkt.id);
                     world.destroyBody(myEntity.getBody());
                     myEntity.dispose();
+                } else if (powerups.containsKey(pkt.id)){
+                    System.out.println("Destroy my entity: " + pkt.id);
+                    SPPower powerup = powerups.remove(pkt.id);
+                    world.destroyBody(powerup.getBody());
+                    powerup.dispose();
                 }
                 break;
             case B2DVars.NET_DEATH:
                 if (opponents.containsKey(pkt.id)){
                     hud.setOpponentDeath(pkt.id, pkt.misc);
                 }
+                break;
+            case B2DVars.NET_POWER:
+                powerups.put(pkt.id, new SPPower(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.misc));
         }
     }
 
@@ -226,7 +250,7 @@ public class PlayState extends GameState {
             }
             for (EntityPacket pkt : cluster.pkts) {
                 if (opEntities.containsKey(pkt.id)) {
-                    opEntities.get(pkt.id).applyInterpolation(pkt);
+                    opEntities.get(pkt.id).updateEntityState(pkt);
                 } else if (!removedIds.contains(pkt.id)){
                     System.out.println("New enemy entity grabbed from pool id: " + pkt.id);
                     if (pkt.type == B2DVars.TYPE_GRENADE) {
@@ -273,20 +297,27 @@ public class PlayState extends GameState {
     }
 
     private void refreshAmmo(float dt) {
-        if (bulletRefresh > 3f && amntBullets==0) {
+        if (powerHandler.unlimitedAmmo()){
             amntBullets = B2DVars.AMOUNT_BULLET;
-            bulletRefresh = 0;
-            hud.setAmountBulletsLeft(amntBullets);
-            reloadSound.play();
-        } else if (amntBullets == 0){
-            bulletRefresh += dt;
-        }
-        if (grenadeRefresh > 8f && grenadesIsEmpty) {
             amntGrenades = B2DVars.AMOUNT_GRENADE;
-            grenadesIsEmpty = false;
+            hud.setAmountBulletsLeft(amntBullets);
             hud.setAmountGrenadesLeft(amntGrenades);
-        } else if (amntGrenades == 0){
-            grenadeRefresh += dt;
+        } else {
+            if (bulletRefresh > 3f && amntBullets == 0) {
+                amntBullets = B2DVars.AMOUNT_BULLET;
+                bulletRefresh = 0;
+                hud.setAmountBulletsLeft(amntBullets);
+                reloadSound.play();
+            } else if (amntBullets == 0) {
+                bulletRefresh += dt;
+            }
+            if (grenadeRefresh > 8f && grenadesIsEmpty) {
+                amntGrenades = B2DVars.AMOUNT_GRENADE;
+                grenadesIsEmpty = false;
+                hud.setAmountGrenadesLeft(amntGrenades);
+            } else if (amntGrenades == 0) {
+                grenadeRefresh += dt;
+            }
         }
     }
 
@@ -402,6 +433,27 @@ public class PlayState extends GameState {
         }
     }
 
+    private void powerupTaken(){
+        if (cl.powerTaken()){
+            SPPower power = powerups.remove(cl.getLastPowerTaken().getID());
+            int powerType = power.getPowerType();
+            world.destroyBody(power.getBody());
+            power.dispose();
+
+            TCPEventPacket pkt = Pooler.tcpEventPacket();
+            pkt.action = B2DVars.NET_DESTROY_BODY;
+            pkt.id = power.getID();
+            client.sendTCP(pkt);
+            Pooler.free(pkt);
+
+            powerHandler.applyPowerup(powerType);
+        }
+    }
+
+    public void addPowerup(SPPower power, int id){
+        powerups.put(id, power);
+    }
+
     @Override
     public void update(float dt) {
         handleInput();
@@ -444,6 +496,11 @@ public class PlayState extends GameState {
         }
         checkGrenadeTimer(dt);
         bulletsHittingWall();
+        powerupTaken();
+        powerHandler.update(dt);
+        if (hosting){
+            powerupSpawner.update(dt);
+        }
     }
 
     @Override
