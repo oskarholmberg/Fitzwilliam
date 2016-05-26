@@ -31,13 +31,13 @@ public class PowerupSpawner {
                 630 / B2DVars.PPM);
         powerIdAccum++;
         int id = Integer.valueOf(powerId + Integer.toString(powerIdAccum));
-        SPPower power = new SPPower(world, powerPos.x, powerPos.y, id, B2DVars.POWERTYPE_AMMO);
+        SPPower power = new SPPower(world, powerPos.x, powerPos.y, id, B2DVars.POWERTYPE_TILTSCREEN);
         PlayState.playState.addPowerup(power, id);
         TCPEventPacket pkt = Pooler.tcpEventPacket();
         pkt.id = id;
         pkt.action = B2DVars.NET_POWER;
         pkt.pos = powerPos;
-        pkt.misc = B2DVars.POWERTYPE_AMMO;
+        pkt.misc = B2DVars.POWERTYPE_TILTSCREEN;
         client.sendTCP(pkt);
         Pooler.free(pkt);
     }

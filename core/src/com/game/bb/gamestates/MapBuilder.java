@@ -1,6 +1,7 @@
 package com.game.bb.gamestates;
 
 import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -22,6 +23,7 @@ public class MapBuilder {
     private World world;
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer renderer;
+    private MapProperties mapProperties;
     private float ppm = B2DVars.PPM;
     public static int MAP_WIDTH = 0;
 
@@ -29,6 +31,7 @@ public class MapBuilder {
         this.world=world;
         Vector2 cam = new Vector2(PlayState.playState.cam.viewportWidth, PlayState.playState.cam.viewportHeight);
         tiledMap = new TmxMapLoader().load("maps/level" + mapIndex + ".tmx");
+        mapProperties = tiledMap.getProperties();
 
         createBoundary(cam.x / 2, cam.y, cam.x / 2, 1); //top
         createBoundary(cam.x / 2, 0, cam.x / 2, 1); //bottom
@@ -61,6 +64,10 @@ public class MapBuilder {
             spawnLocArray.add(new Vector2(rect.getX() / ppm, rect.getY() / ppm));
         }
         return spawnLocArray;
+    }
+
+    public int getMapWidth(){
+        return mapProperties.get("width", Integer.class);
     }
 
     public void buildMap(){

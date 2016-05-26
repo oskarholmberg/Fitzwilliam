@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Created by erik on 12/05/16.
  */
-public class LobbyState extends GameState {
+public class JoinServerState extends GameState {
 
     private HashMap<InetAddress, SPButton> joinButtons;
     private World world;
@@ -40,7 +40,7 @@ public class LobbyState extends GameState {
     private TextureRegion[] font;
 
 
-    public LobbyState(GameStateManager gsm) {
+    public JoinServerState(GameStateManager gsm) {
         super(gsm);
         world = new World(new Vector2(0, -9.81f), true);
         client = new GameClient();
@@ -157,7 +157,7 @@ public class LobbyState extends GameState {
         HashMap<InetAddress, SPButton> buttons = new HashMap<InetAddress, SPButton>();
         int i = 0;
         for (InetAddress server : searcher.getServers()) {
-            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth-350, (cam.viewportHeight - 170) - 50 * i, 100f, 20f, cam);
+            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth-350, (cam.viewportHeight - 120) - 50 * i, 100f, 20f, cam);
             button.setInfo(server.getHostAddress());
             buttons.put(server, button);
             i++;

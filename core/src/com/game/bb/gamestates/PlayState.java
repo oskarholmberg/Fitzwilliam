@@ -246,7 +246,6 @@ public class PlayState extends GameState {
                 break;
             case B2DVars.NET_DESTROY_BODY:
                 if(opEntities.containsKey(pkt.id)){
-                    System.out.println("Destroy oponent entity: " + pkt.id);
                     removedIds.add(pkt.id);
                     EnemyEntity opEntity = opEntities.remove(pkt.id);
                     if (opEntity instanceof EnemyBullet)
@@ -254,12 +253,10 @@ public class PlayState extends GameState {
                     else if (opEntity instanceof EnemyGrenade)
                         Pooler.free((EnemyGrenade) opEntity); // return it to the pool
                 } else if (myEntities.containsKey(pkt.id)){
-                    System.out.println("Destroy my entity: " + pkt.id);
                     SPSprite myEntity = myEntities.remove(pkt.id);
                     world.destroyBody(myEntity.getBody());
                     myEntity.dispose();
                 } else if (powerups.containsKey(pkt.id)){
-                    System.out.println("Destroy my entity: " + pkt.id);
                     SPPower powerup = powerups.remove(pkt.id);
                     world.destroyBody(powerup.getBody());
                     powerup.dispose();
@@ -271,7 +268,20 @@ public class PlayState extends GameState {
                 }
                 break;
             case B2DVars.NET_POWER:
-                powerups.put(pkt.id, new SPPower(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.misc));
+                switch (pkt.misc) {
+                    case B2DVars.POWERTYPE_AMMO:
+                        powerups.put(pkt.id, new SPPower(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.misc));
+                        break;
+                    case B2DVars.POWERTYPE_TILTSCREEN:
+                        powerups.put(pkt.id, new SPPower(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.misc));
+                        break;
+                }
+                break;
+            case B2DVars.NET_APPLY_ANTIPOWER:
+                if (pkt.misc==B2DVars.POWERTYPE_TILTSCREEN) {
+                    powerHandler.applyPowerup(pkt.misc);
+                }
+                break;
         }
     }
 
@@ -465,7 +475,17 @@ public class PlayState extends GameState {
             client.sendTCP(pkt);
             Pooler.free(pkt);
 
-            powerHandler.applyPowerup(powerType);
+            switch (powerType){
+                case B2DVars.POWERTYPE_AMMO:
+                    powerHandler.applyPowerup(powerType);
+                    break;
+                case B2DVars.POWERTYPE_TILTSCREEN:
+                    TCPEventPacket pkt2 = Pooler.tcpEventPacket();
+                    pkt2.action = B2DVars.NET_APPLY_ANTIPOWER;
+                    pkt2.misc = powerType;
+                    client.sendTCP(pkt2);
+                    Pooler.free(pkt2);
+            }
         }
     }
 
@@ -474,18 +494,28 @@ public class PlayState extends GameState {
     }
 
     private void updateCamPosition(){
-        
-        if ((player.getPosition().x * B2DVars.PPM) > (cam.position.x + 300f)) {
-            cam.position.x = cam.position.x + 2f;
-        } else if ((player.getPosition().x * B2DVars.PPM) < (cam.position.x - 300f)){
-            cam.position.x = cam.position.x - 2f;
+        //if the player moves far right
+        float camX = cam.position.x;
+        if ((player.getPosition().x * B2DVars.PPM) > (camX + 200f)) {
+            if ((camX + cam.viewportWidth/2) < map.getMapWidth() ) {
+                cam.position.x = camX + 2f;
+            }
+            //if the player moves far left
+        } else if ((player.getPosition().x * B2DVars.PPM) < (camX - 200f)) {
+            if ((camX - cam.viewportWidth / 2) > 0) {
+                cam.position.x = camX - 2f;
+                System.out.println(camX + cam.viewportWidth / 2);
+                System.out.println("Cam position: " + cam.position.x);
+            }
         }
-
-
         cam.update();
     }
+
     @Override
     public void update(float dt) {
+        if(!client.isConnected()){
+            gsm.setState(GameStateManager.HOST_OFFLINE);
+        }
         world.step(dt, 6, 2);
         player.update(dt);
         for (IntMap.Keys it = opponents.keys(); it.hasNext;) {
@@ -555,14 +585,13 @@ public class PlayState extends GameState {
             opponents.get(it.next()).render(sb);
         }
         for (IntMap.Keys it = powerups.keys(); it.hasNext;){
-            powerups.get(it.next()).render(sb)
-            ;
+            powerups.get(it.next()).render(sb);
         }
         player.render(sb);
         hud.render(sb);
 
         //Do this last in render
-        //b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+//        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         sb.setProjectionMatrix(cam.combined);
     }
 
