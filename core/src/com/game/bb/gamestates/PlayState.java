@@ -213,7 +213,7 @@ public class PlayState extends GameState {
                 if (!opponents.containsKey(pkt.id)) {
                     SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id, "red");
                     opponents.put(pkt.id, opponent);
-                    killedByEntity.put(Tools.getPlayerId(pkt.id), new Array<String>());
+                    killedByEntity.put(pkt.id, new Array<String>());
                     TCPEventPacket packet = new TCPEventPacket();
                     packet.action=B2DVars.NET_CONNECT;
                     packet.pos=player.getPosition();
@@ -464,11 +464,11 @@ public class PlayState extends GameState {
                 if (entity instanceof EnemyGrenade) {
                     entity.getBody().setTransform(400f, 400f, 0);
                     Pooler.free((EnemyGrenade) entity);
-                    killedByEntity.get(Tools.getPlayerId(id)).add("grenade");
+                    killedByEntity.get(id).add("grenade");
                 } else if (entity instanceof EnemyBullet) {
                     entity.getBody().setTransform(400f, 400f, 0);
                     Pooler.free((EnemyBullet) entity);
-                    killedByEntity.get(Tools.getPlayerId(id)).add("bullet");
+                    killedByEntity.get(id).add("bullet");
                 }
             }
         }
