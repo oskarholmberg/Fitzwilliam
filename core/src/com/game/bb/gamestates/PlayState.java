@@ -46,6 +46,7 @@ public class PlayState extends GameState {
     private Array<Vector2> spawnLocations;
     private PowerupSpawner powerupSpawner;
     private IntMap<SPPower> powerups;
+    private IntMap<Array<String>> killedByEntity;
     private int entityAccum = 0;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
     private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
@@ -62,7 +63,7 @@ public class PlayState extends GameState {
     private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
     private Sound laserShot = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
     private float[] touchNbrs = {(cam.viewportWidth/ 5), cam.viewportWidth * 4 / 5};
-    private int entityPktSequence = 0, playerPktSequence = 0;
+    private int entityPktSequence = 0, playerPktSequence = 0, myEntityId;
     private boolean  grenadesIsEmpty = false, debugClick = false, hosting = false;
     private float sendEntityInfo = 0f, sendPlayerInfo = 0f;
 
@@ -101,17 +102,18 @@ public class PlayState extends GameState {
         map = new MapBuilder(world, 1);
         map.buildMap();
         spawnLocations = map.getSpawnLocations();
-
+        killedByEntity = new IntMap<Array<String>>();
 
         //Players
         Vector2 spawn = spawnLocations.random();
-        int tempEntityID = newEntityID();
-        player = new SPPlayer(world, spawn.x, spawn.y, tempEntityID, "blue");
+        myEntityId = newEntityID();
+        player = new SPPlayer(world, spawn.x, spawn.y, myEntityId, "blue");
         TCPEventPacket packet = new TCPEventPacket();
         packet.action = B2DVars.NET_CONNECT;
         packet.pos = spawn;
-        packet.id = tempEntityID;
+        packet.id = myEntityId;
         client.sendTCP(packet);
+        killedByEntity.put(Tools.getPlayerId(myEntityId), new Array<String>());
 
 
         // set up box2d cam
@@ -199,6 +201,7 @@ public class PlayState extends GameState {
         if (SPInput.isPressed(SPInput.BUTTON_Y)) {
             System.out.println("Debug is clicked! printing the next debug event.");
             debugClick = true;
+            System.out.println(killedByEntity.toString());
         }
     }
 
@@ -210,6 +213,7 @@ public class PlayState extends GameState {
                 if (!opponents.containsKey(pkt.id)) {
                     SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id, "red");
                     opponents.put(pkt.id, opponent);
+                    killedByEntity.put(Tools.getPlayerId(pkt.id), new Array<String>());
                     TCPEventPacket packet = new TCPEventPacket();
                     packet.action=B2DVars.NET_CONNECT;
                     packet.pos=player.getPosition();
@@ -450,15 +454,18 @@ public class PlayState extends GameState {
                 SPSprite entity = myEntities.remove(id);
                 world.destroyBody(entity.getBody());
                 entity.dispose();
+                killedByEntity.get(Tools.getPlayerId(myEntityId)).add("grenade");
             } else if (opEntities.containsKey(id)){
                 EnemyEntity entity = opEntities.remove(id);
                 removedIds.add(id);
                 if (entity instanceof EnemyGrenade) {
                     entity.getBody().setTransform(400f, 400f, 0);
                     Pooler.free((EnemyGrenade) entity);
+                    killedByEntity.get(Tools.getPlayerId(id)).add("grenade");
                 } else if (entity instanceof EnemyBullet) {
                     entity.getBody().setTransform(400f, 400f, 0);
                     Pooler.free((EnemyBullet) entity);
+                    killedByEntity.get(Tools.getPlayerId(id)).add("bullet");
                 }
             }
         }
@@ -564,6 +571,9 @@ public class PlayState extends GameState {
         powerHandler.update(dt);
         if (hosting){
             powerupSpawner.update(dt);
+            if (hud.gameOver()){
+                gameOver();
+            }
         }
         handleInput();
         updateCamPosition();
@@ -600,5 +610,33 @@ public class PlayState extends GameState {
     @Override
     public void dispose() {
 
+    }
+
+    private void gameOver(){
+        TCPEventPacket pkt = Pooler.tcpEventPacket();
+        pkt.action = B2DVars.NET_GAME_OVER;
+        client.sendTCP(pkt);
+        Pooler.free(pkt);
+        System.out.println("THE GAME IS OVER!");
+    }
+
+    // following methods are various contains-checks and getters
+    public boolean containsOpponentEntity(int id){
+        return opEntities.containsKey(id);
+    }
+    public IntMap<EnemyEntity> getOpponentEntities(){
+        return opEntities;
+    }
+    public boolean containsMyEntity(int id){
+        return myEntities.containsKey(id);
+    }
+    public IntMap<SPSprite> getMyEntities(){
+        return myEntities;
+    }
+    public boolean containsPowerup(int id){
+        return powerups.containsKey(id);
+    }
+    public IntMap<SPPower> getPowerups(){
+        return powerups;
     }
 }

@@ -36,7 +36,7 @@ public class B2DVars {
 
     public static final int NET_CONNECT = 1, NET_RESPAWN = 2, NET_DEATH = 3, NET_SHOOT = 4,
             NET_GRENADE = 5, NET_DISCONNECT = 6, NET_DESTROY_BODY = 7, NET_POWER = 8, NET_NEW_ENTITY = 9,
-            NET_APPLY_ANTIPOWER = 10;
+            NET_APPLY_ANTIPOWER = 10, NET_GAME_OVER = 11;
 
     public static final int TYPE_BULLET = 1, TYPE_GRENADE = 2;
 

@@ -12,12 +12,13 @@ import java.util.HashMap;
  */
 public class HUD {
     private TextureRegion[] font;
-    private int playerDeaths = 0;
+    private int playerDeaths = 3;
     private HashMap<Integer, Integer> opponentDeaths;
     private Texture playerTexture, opponentTexture, bulletTexture;
     private TextureRegion grenadeTexture;
     private int bulletsLeft = B2DVars.AMOUNT_BULLET;
     private int grenadesLeft = B2DVars.AMOUNT_GRENADE;
+    private boolean gameOver = false;
 
     public HUD() {
 
@@ -37,8 +38,26 @@ public class HUD {
         }
     }
 
+    private void checkGameOver(){
+        int amountPlayersAlive = opponentDeaths.size() + 1;
+        for (Integer i : opponentDeaths.keySet()){
+            if (opponentDeaths.get(i) == 0){
+                amountPlayersAlive--;
+            }
+        }
+        if (playerDeaths == 0){
+            amountPlayersAlive--;
+        }
+        if (amountPlayersAlive <= 1 && opponentDeaths.size() > 0){
+            gameOver=true;
+        } else if (opponentDeaths.size() == 0 && amountPlayersAlive == 0){
+            gameOver= true;
+        }
+    }
+
     public void addPlayerDeath() {
-        playerDeaths++;
+        playerDeaths--;
+        checkGameOver();
     }
 
     public void setAmountBulletsLeft(int amount){
@@ -49,6 +68,8 @@ public class HUD {
 
     public void setOpponentDeath(int id,int deaths) {
         opponentDeaths.put(id, deaths);
+        checkGameOver();
+
     }
 
     public void removeOpponentDeathCount(int id){
@@ -84,5 +105,9 @@ public class HUD {
 
     public int getPlayerDeathCount() {
         return playerDeaths;
+    }
+
+    public boolean gameOver() {
+        return gameOver;
     }
 }
