@@ -14,6 +14,8 @@ public class TCPEventPacket implements Pool.Poolable{
 
     @Override
     public void reset() {
-        id = 0;
+        id = -1;
+        miscString="";
+        action=-1;
     }
 }

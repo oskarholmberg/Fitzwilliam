@@ -22,12 +22,14 @@ public class SPPlayer extends SPSprite {
     protected int xOffset = 23, yOffset = 25;
     private boolean onGround = true, isDead = false;
     private float textureTimer = 0;
+    private String color;
     private PolygonShape shape;
     public static int STAND_RIGHT = 0, STAND_LEFT = 1, JUMP_RIGHT = 2, JUMP_LEFT = 3,
             DEAD_RIGHT = 4, DEAD_LEFT = 5;
 
     public SPPlayer(World world, float xPos, float yPos, int id, String color) {
         super(world, id);
+        this.color=color;
         createPlayerBody(xPos, yPos);
         dir = 0;
         jetpackSound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
@@ -73,6 +75,10 @@ public class SPPlayer extends SPSprite {
         isDead = false;
         setTexture(textures[STAND_RIGHT]);
         PlayState.playState.currentTexture=STAND_RIGHT;
+    }
+
+    public String getColor(){
+        return color;
     }
 
     @Override

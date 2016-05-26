@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -106,14 +107,13 @@ public class PlayState extends GameState {
 
         //Players
         Vector2 spawn = spawnLocations.random();
-        myEntityId = newEntityID();
-        player = new SPPlayer(world, spawn.x, spawn.y, myEntityId, "blue");
+        player = new SPPlayer(world, spawn.x, spawn.y, Integer.valueOf(B2DVars.MY_ID), "blue");
         TCPEventPacket packet = new TCPEventPacket();
         packet.action = B2DVars.NET_CONNECT;
         packet.pos = spawn;
         packet.id = myEntityId;
         client.sendTCP(packet);
-        killedByEntity.put(Tools.getPlayerId(myEntityId), new Array<String>());
+        killedByEntity.put(player.getId(), new Array<String>());
 
 
         // set up box2d cam
@@ -288,6 +288,9 @@ public class PlayState extends GameState {
                     powerHandler.applyPowerup(pkt.misc);
                 }
                 break;
+            case B2DVars.NET_GAME_OVER:
+                gameOver();
+                break;
         }
     }
 
@@ -454,7 +457,7 @@ public class PlayState extends GameState {
                 SPSprite entity = myEntities.remove(id);
                 world.destroyBody(entity.getBody());
                 entity.dispose();
-                killedByEntity.get(Tools.getPlayerId(myEntityId)).add("grenade");
+                killedByEntity.get(player.getId()).add("grenade");
             } else if (opEntities.containsKey(id)){
                 EnemyEntity entity = opEntities.remove(id);
                 removedIds.add(id);
@@ -572,6 +575,11 @@ public class PlayState extends GameState {
         if (hosting){
             powerupSpawner.update(dt);
             if (hud.gameOver()){
+                TCPEventPacket pkt = Pooler.tcpEventPacket();
+                pkt.action = B2DVars.NET_GAME_OVER;
+                pkt.miscString = hud.getVictoryString();
+                client.sendTCP(pkt);
+                Pooler.free(pkt);
                 gameOver();
             }
         }
@@ -609,15 +617,28 @@ public class PlayState extends GameState {
 
     @Override
     public void dispose() {
-
     }
 
     private void gameOver(){
-        TCPEventPacket pkt = Pooler.tcpEventPacket();
-        pkt.action = B2DVars.NET_GAME_OVER;
-        client.sendTCP(pkt);
-        Pooler.free(pkt);
-        System.out.println("THE GAME IS OVER!");
+        ArrayMap<String, Array<String>> temp = new ArrayMap<String, Array<String>>();
+        for (IntMap.Keys it = killedByEntity.keys(); it.hasNext;){
+            int id = it.next();
+            if (id == player.getId()){
+                temp.put("blue", new Array<String>());
+                for (String weapon : killedByEntity.get(id)){
+                    temp.get("blue").add(weapon);
+                }
+            } else {
+                String color = opponents.get(id).getColor();
+                temp.put(color, new Array<String>());
+                for (String weapon : killedByEntity.get(id)){
+                    temp.get(color).add(weapon);
+                }
+            }
+        }
+        gsm.setKilledByEntities(temp);
+        gsm.setState(GameStateManager.GAME_OVER);
+        dispose();
     }
 
     // following methods are various contains-checks and getters

@@ -1,6 +1,10 @@
 package com.game.bb.handlers;
 
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ArrayMap;
+import com.badlogic.gdx.utils.IntMap;
 import com.game.bb.gamestates.ConnectionState;
+import com.game.bb.gamestates.GameOverState;
 import com.game.bb.gamestates.HostOfflineState;
 import com.game.bb.gamestates.JoinServerState;
 import com.game.bb.gamestates.StartScreenState;
@@ -22,13 +26,19 @@ public class GameStateManager {
     private Stack<GameState> states;
     private GameClient client;
     private boolean hosting = false;
-    public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, JOIN_SERVER = 4, HOST_OFFLINE = 5;
+    public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, JOIN_SERVER = 4, HOST_OFFLINE = 5, GAME_OVER = 6;
+    public ArrayMap<String, Array<String>> killedByEnteties;
 
 
     public GameStateManager(Game game) {
         this.game = game;
         states = new Stack<GameState>();
         pushState(START_SCREEN);
+    }
+
+    public void setKilledByEntities(ArrayMap<String, Array<String>> entities){
+        killedByEnteties = entities;
+        System.out.println(killedByEnteties);
     }
 
     public boolean isHosting(){
@@ -68,6 +78,8 @@ public class GameStateManager {
                 return new JoinServerState(this);
             case HOST_OFFLINE:
                 return new HostOfflineState(this);
+            case GAME_OVER:
+                return new GameOverState(this);
             default:
                 return null;
         }

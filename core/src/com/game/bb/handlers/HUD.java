@@ -3,6 +3,7 @@ package com.game.bb.handlers;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.OrderedMap;
 import com.game.bb.gamestates.PlayState;
 
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.HashMap;
  */
 public class HUD {
     private TextureRegion[] font;
-    private int playerDeaths = 3;
+    private int playerDeaths = 1;
     private HashMap<Integer, Integer> opponentDeaths;
     private Texture playerTexture, opponentTexture, bulletTexture;
     private TextureRegion grenadeTexture;
@@ -55,6 +56,10 @@ public class HUD {
         }
     }
 
+    public String getVictoryString(){
+        return "NOT_YET_IMPLEMENTED";
+    }
+
     public void addPlayerDeath() {
         playerDeaths--;
         checkGameOver();
@@ -69,7 +74,6 @@ public class HUD {
     public void setOpponentDeath(int id,int deaths) {
         opponentDeaths.put(id, deaths);
         checkGameOver();
-
     }
 
     public void removeOpponentDeathCount(int id){
