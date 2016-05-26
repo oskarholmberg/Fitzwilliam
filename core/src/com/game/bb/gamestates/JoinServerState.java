@@ -157,8 +157,12 @@ public class JoinServerState extends GameState {
     private HashMap<InetAddress, SPButton> getJoinButtons() {
         HashMap<InetAddress, SPButton> buttons = new HashMap<InetAddress, SPButton>();
         int i = 0;
-        for (InetAddress server : searcher.getServers()) {
-            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth-350, (cam.viewportHeight - 170) - (50 * i), 100, 20, cam);
+        int offset = 0;
+        List<InetAddress> servers = searcher.getServers();
+        for (InetAddress server : servers) {
+            if(servers.size() > 2) offset = 120;
+            else offset = 170;
+            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth-350, (cam.viewportHeight - offset) - (50 * i), 100, 20, cam);
             button.setInfo(server.getHostAddress());
             buttons.put(server, button);
             i++;
