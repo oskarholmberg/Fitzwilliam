@@ -60,6 +60,7 @@ public class PlayState extends GameState {
     private Texture backGround = new Texture("images/spaceBackground.png");
     private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
     private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
+    private Sound laserShot = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
     private float[] touchNbrs = {(cam.viewportWidth/ 5), cam.viewportWidth * 4 / 5};
     private int entityPktSequence = 0, playerPktSequence = 0;
     private boolean  grenadesIsEmpty = false, debugClick = false, hosting = false;
@@ -242,6 +243,7 @@ public class PlayState extends GameState {
                     bullet.getBody().setLinearVelocity(pkt.force);
                     bullet.initInterpolator();
                     opEntities.put(pkt.id, bullet);
+                    laserShot.play();
                 }
                 break;
             case B2DVars.NET_DESTROY_BODY:

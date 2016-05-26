@@ -45,7 +45,7 @@ public class PowerupSpawner {
 
     public void update(float dt){
         if (timeCheck > randomTime){
-            randomTime = MathUtils.random(30.0f, 60.0f);
+            randomTime = MathUtils.random(30.0f, 40.0f);
             System.out.println("Powerup spawned! next time: " + randomTime);
             timeCheck = 0f;
             generatePowerup();
