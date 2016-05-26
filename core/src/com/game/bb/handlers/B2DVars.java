@@ -26,6 +26,7 @@ public class B2DVars {
             BIT_GRENADE = 32, BIT_DOME = 64, BIT_ENEMY_ENTITY = 128;
 
     public static final int POWERTYPE_AMMO = 1, POWERTYPE_TILTSCREEN = 2;
+    public static final int POWERTYPE_AMOUNT = 2;
 
     public static final float PLAYER_HEIGHT = 22f/PPM, PLAYER_WIDTH = 18f/PPM;
 
