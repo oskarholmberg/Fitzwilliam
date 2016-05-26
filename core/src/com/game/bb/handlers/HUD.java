@@ -122,7 +122,6 @@ public class HUD {
     }
 
     public boolean gameOver() {
-        //return gameOver;
-        return false;
+        return gameOver;
     }
 }
