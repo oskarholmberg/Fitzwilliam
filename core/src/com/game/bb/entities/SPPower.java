@@ -25,7 +25,7 @@ public class SPPower extends SPSprite{
         createPowerBody(xPos, yPos);
         this.powerType = powerType;
 
-        animation = new SPAnimation(TextureRegion.split(new Texture("images/weapons/unlimitedAmmoPower.png"), 17, 17)[0], 0.1f);
+        animation = new SPAnimation(TextureRegion.split(new Texture("images/powerups/unlimitedAmmoPower.png"), 17, 17)[0], 0.1f);
     }
 
     public int getPowerType(){
