@@ -2,7 +2,6 @@ package com.game.bb.handlers;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
-import com.badlogic.gdx.utils.IntMap;
 import com.game.bb.gamestates.ConnectionState;
 import com.game.bb.gamestates.GameOverState;
 import com.game.bb.gamestates.HostOfflineState;
@@ -27,7 +26,7 @@ public class GameStateManager {
     private GameClient client;
     private boolean hosting = false;
     public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, JOIN_SERVER = 4, HOST_OFFLINE = 5, GAME_OVER = 6;
-    public ArrayMap<String, Array<String>> killedByEnteties;
+    public ArrayMap<String, Array<String>> killedByEntities;
 
 
     public GameStateManager(Game game) {
@@ -37,8 +36,7 @@ public class GameStateManager {
     }
 
     public void setKilledByEntities(ArrayMap<String, Array<String>> entities){
-        killedByEnteties = entities;
-        System.out.println(killedByEnteties);
+        killedByEntities = entities;
     }
 
     public boolean isHosting(){
@@ -79,7 +77,7 @@ public class GameStateManager {
             case HOST_OFFLINE:
                 return new HostOfflineState(this);
             case GAME_OVER:
-                return new GameOverState(this);
+                return new GameOverState(this, killedByEntities);
             default:
                 return null;
         }
