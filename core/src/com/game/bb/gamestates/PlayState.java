@@ -111,7 +111,7 @@ public class PlayState extends GameState {
         TCPEventPacket packet = new TCPEventPacket();
         packet.action = B2DVars.NET_CONNECT;
         packet.pos = spawn;
-        packet.id = myEntityId;
+        packet.id = player.getId();
         client.sendTCP(packet);
         killedByEntity.put(player.getId(), new Array<String>());
 
