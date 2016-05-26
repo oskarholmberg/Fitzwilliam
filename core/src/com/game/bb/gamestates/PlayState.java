@@ -319,16 +319,21 @@ public class PlayState extends GameState {
     }
 
     private void respawnPlayer() {
-        Vector2 spawnLoc = spawnLocations.random();
-        respawnTimer = 0;
-        player.revive();
-        player.jump(0, 0, spawnLoc.x, spawnLoc.y);
-        amntBullets = B2DVars.AMOUNT_BULLET;
-        amntGrenades = B2DVars.AMOUNT_GRENADE;
-        hud.setAmountBulletsLeft(amntBullets);
-        hud.setAmountGrenadesLeft(amntGrenades);
-        cl.resetJumps();
-        cl.revivePlayer();
+        if (hud.getPlayerDeathCount() != 0) {
+            Vector2 spawnLoc = spawnLocations.random();
+            respawnTimer = 0;
+            player.revive();
+            player.jump(0, 0, spawnLoc.x, spawnLoc.y);
+            amntBullets = B2DVars.AMOUNT_BULLET;
+            amntGrenades = B2DVars.AMOUNT_GRENADE;
+            hud.setAmountBulletsLeft(amntBullets);
+            hud.setAmountGrenadesLeft(amntGrenades);
+            cl.resetJumps();
+            cl.revivePlayer();
+        } else {
+            player.dispose();
+            player.getBody().setTransform(B2DVars.VOID_X, B2DVars.VOID_Y, 0);
+        }
     }
 
     private void refreshAmmo(float dt) {
@@ -647,12 +652,12 @@ public class PlayState extends GameState {
         String victoryOrder = "";
         for (Integer id : temp){
             if (id == player.getId()){
-                victoryOrder += player.getColor() + ":";
+                victoryOrder = player.getColor() + ":" + victoryOrder;
             } else {
-                victoryOrder += opponents.get(id).getColor() + ":";
+                victoryOrder = opponents.get(id).getColor() + ":" + victoryOrder;
             }
         }
-        return victoryOrder;
+        return victoryOrder.substring(0, victoryOrder.length()-1);
     }
 
     // following methods are various contains-checks and getters
