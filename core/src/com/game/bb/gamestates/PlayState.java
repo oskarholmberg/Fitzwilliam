@@ -289,7 +289,7 @@ public class PlayState extends GameState {
                 }
                 break;
             case B2DVars.NET_GAME_OVER:
-                gameOver();
+                gameOver(pkt);
                 break;
         }
     }
@@ -577,10 +577,10 @@ public class PlayState extends GameState {
             if (hud.gameOver()){
                 TCPEventPacket pkt = Pooler.tcpEventPacket();
                 pkt.action = B2DVars.NET_GAME_OVER;
-                pkt.miscString = hud.getVictoryString();
+                pkt.miscString = constructVictoryOrderString();
                 client.sendTCP(pkt);
+                gameOver(pkt);
                 Pooler.free(pkt);
-                gameOver();
             }
         }
         handleInput();
@@ -619,7 +619,7 @@ public class PlayState extends GameState {
     public void dispose() {
     }
 
-    private void gameOver(){
+    private void gameOver(TCPEventPacket pkt){
         ArrayMap<String, Array<String>> temp = new ArrayMap<String, Array<String>>();
         for (IntMap.Keys it = killedByEntity.keys(); it.hasNext;){
             int id = it.next();
@@ -636,9 +636,23 @@ public class PlayState extends GameState {
                 }
             }
         }
+        gsm.setVictoryOrder(pkt.miscString);
         gsm.setKilledByEntities(temp);
         gsm.setState(GameStateManager.GAME_OVER);
         dispose();
+    }
+
+    private String constructVictoryOrderString(){
+        Array<Integer> temp = hud.getVictoryOrder();
+        String victoryOrder = "";
+        for (Integer id : temp){
+            if (id == player.getId()){
+                victoryOrder += player.getColor() + ":";
+            } else {
+                victoryOrder += opponents.get(id).getColor() + ":";
+            }
+        }
+        return victoryOrder;
     }
 
     // following methods are various contains-checks and getters

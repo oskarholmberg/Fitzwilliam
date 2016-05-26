@@ -28,6 +28,7 @@ public class GameStateManager {
     private boolean hosting = false;
     public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, JOIN_SERVER = 4, HOST_OFFLINE = 5, GAME_OVER = 6;
     public ArrayMap<String, Array<String>> killedByEnteties;
+    public String victoryOrder;
 
 
     public GameStateManager(Game game) {
@@ -39,6 +40,10 @@ public class GameStateManager {
     public void setKilledByEntities(ArrayMap<String, Array<String>> entities){
         killedByEnteties = entities;
         System.out.println(killedByEnteties);
+    }
+
+    public void setVictoryOrder(String order){
+        victoryOrder=order;
     }
 
     public boolean isHosting(){

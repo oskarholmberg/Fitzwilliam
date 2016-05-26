@@ -3,6 +3,7 @@ package com.game.bb.handlers;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.game.bb.gamestates.PlayState;
 
@@ -17,6 +18,7 @@ public class HUD {
     private HashMap<Integer, Integer> opponentDeaths;
     private Texture playerTexture, opponentTexture, bulletTexture;
     private TextureRegion grenadeTexture;
+    private Array<Integer> victoryOrder;
     private int bulletsLeft = B2DVars.AMOUNT_BULLET;
     private int grenadesLeft = B2DVars.AMOUNT_GRENADE;
     private boolean gameOver = false;
@@ -29,6 +31,7 @@ public class HUD {
         bulletTexture = new Texture("images/weapons/blueBullet.png");
         grenadeTexture = TextureRegion.split(new Texture("images/weapons/blueGrenade.png"), 30, 30)[0][0];
         opponentDeaths = new HashMap<Integer, Integer>();
+        victoryOrder = new Array<Integer>();
 
         font = new TextureRegion[11];
         for (int i = 0; i < 6; i++) {
@@ -41,13 +44,19 @@ public class HUD {
 
     private void checkGameOver(){
         int amountPlayersAlive = opponentDeaths.size() + 1;
-        for (Integer i : opponentDeaths.keySet()){
-            if (opponentDeaths.get(i) == 0){
+        for (Integer id : opponentDeaths.keySet()){
+            if (opponentDeaths.get(id) == 0){
                 amountPlayersAlive--;
+                if (!victoryOrder.contains(id, true)){
+                    victoryOrder.add(id);
+                }
             }
         }
         if (playerDeaths == 0){
             amountPlayersAlive--;
+            if (!victoryOrder.contains(Integer.valueOf(B2DVars.MY_ID), true)){
+                victoryOrder.add(Integer.valueOf(B2DVars.MY_ID));
+            }
         }
         if (amountPlayersAlive <= 1 && opponentDeaths.size() > 0){
             gameOver=true;
@@ -56,8 +65,9 @@ public class HUD {
         }
     }
 
-    public String getVictoryString(){
-        return "NOT_YET_IMPLEMENTED";
+    public Array<Integer> getVictoryOrder(){
+
+        return victoryOrder;
     }
 
     public void addPlayerDeath() {
