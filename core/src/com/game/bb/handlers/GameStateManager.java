@@ -42,6 +42,7 @@ public class GameStateManager {
 
     public void setVictoryOrder(String order){
         victoryOrder=order;
+        System.out.println(victoryOrder);
     }
 
     public boolean isHosting(){
