@@ -40,7 +40,7 @@ public class GameServer extends Listener {
         try {
             kryoServer.bind(tcpPort, udpPort);
         } catch (IOException e) {
-            e.printStackTrace();
+            Gdx.app.log("NET_SERVER", "Server already running, joining local game.");
         }
         kryoServer.addListener(this);
         kryoServer.start();
