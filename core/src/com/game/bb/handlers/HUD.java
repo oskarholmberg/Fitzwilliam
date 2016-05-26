@@ -13,7 +13,7 @@ import java.util.HashMap;
  */
 public class HUD {
     private TextureRegion[] font;
-    private int playerDeaths = 5;
+    private int playerDeaths = B2DVars.AMOUNT_LIVES;
     private HashMap<Integer, Integer> opponentDeaths;
     private Texture playerTexture, opponentTexture, bulletTexture;
     private TextureRegion grenadeTexture;

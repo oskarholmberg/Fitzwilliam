@@ -218,7 +218,7 @@ public class PlayState extends GameState {
                     packet.action=B2DVars.NET_CONNECT;
                     packet.pos=player.getPosition();
                     packet.id=player.getId();
-                    hud.setOpponentDeath(pkt.id, 0);
+                    hud.setOpponentDeath(pkt.id, B2DVars.AMOUNT_LIVES);
                     client.sendTCP(packet);
                 }
                 break;
