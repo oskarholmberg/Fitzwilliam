@@ -13,7 +13,7 @@ import java.util.HashMap;
  */
 public class HUD {
     private TextureRegion[] font;
-    private int playerDeaths = 1;
+    private int playerDeaths = 5;
     private HashMap<Integer, Integer> opponentDeaths;
     private Texture playerTexture, opponentTexture, bulletTexture;
     private TextureRegion grenadeTexture;
