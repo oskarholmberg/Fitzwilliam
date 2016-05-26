@@ -25,7 +25,13 @@ public class SPPower extends SPSprite{
         createPowerBody(xPos, yPos);
         this.powerType = powerType;
 
-        animation = new SPAnimation(TextureRegion.split(new Texture("images/powerups/unlimitedAmmoPower.png"), 17, 17)[0], 0.1f);
+        if (powerType == B2DVars.POWERTYPE_AMMO) {
+            animation = new SPAnimation(TextureRegion.split(
+                    new Texture("images/powerups/unlimitedAmmoPower.png"), 17, 17)[0], 0.1f);
+        } else if (powerType == B2DVars.POWERTYPE_TILTSCREEN){
+            animation = new SPAnimation(TextureRegion.split(
+                    new Texture("images/powerups/shakeWorldPower.png"), 17, 17)[0], 0.1f);
+        }
     }
 
     public int getPowerType(){
