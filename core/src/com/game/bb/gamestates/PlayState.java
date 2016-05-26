@@ -65,7 +65,8 @@ public class PlayState extends GameState {
     private Sound laserShot = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
     private float[] touchNbrs = {(cam.viewportWidth/ 5), cam.viewportWidth * 4 / 5};
     private int entityPktSequence = 0, playerPktSequence = 0, myEntityId;
-    private boolean  grenadesIsEmpty = false, debugClick = false, hosting = false;
+    private boolean  grenadesIsEmpty = false, debugClick = false, hosting = false,
+            removeMeMessageSent = false;
     private float sendEntityInfo = 0f, sendPlayerInfo = 0f;
 
     public int currentTexture = SPOpponent.STAND_LEFT;
@@ -291,6 +292,9 @@ public class PlayState extends GameState {
             case B2DVars.NET_GAME_OVER:
                 gameOver(pkt);
                 break;
+            case B2DVars.NET_REMOVE_ME:
+                opponents.get(pkt.id).getBody().setTransform(B2DVars.VOID_X, B2DVars.VOID_Y, 0);
+                break;
         }
     }
 
@@ -330,9 +334,15 @@ public class PlayState extends GameState {
             hud.setAmountGrenadesLeft(amntGrenades);
             cl.resetJumps();
             cl.revivePlayer();
-        } else {
+        } else if (!removeMeMessageSent){
             player.dispose();
             player.getBody().setTransform(B2DVars.VOID_X, B2DVars.VOID_Y, 0);
+            TCPEventPacket pkt = Pooler.tcpEventPacket();
+            pkt.action = B2DVars.NET_REMOVE_ME;
+            pkt.id = player.getId();
+            client.sendTCP(pkt);
+            Pooler.free(pkt);
+            removeMeMessageSent = true;
         }
     }
 
@@ -569,7 +579,9 @@ public class PlayState extends GameState {
         }
         if (sendPlayerInfo > B2DVars.MOVEMENT_UPDATE_FREQ){
             sendPlayerInfo = 0f;
-            sendPlayerInfo();
+            if (hud.getPlayerDeathCount()!=0) {
+                sendPlayerInfo();
+            }
         } else {
             sendPlayerInfo+=dt;
         }
