@@ -464,11 +464,11 @@ public class PlayState extends GameState {
                 if (entity instanceof EnemyGrenade) {
                     entity.getBody().setTransform(400f, 400f, 0);
                     Pooler.free((EnemyGrenade) entity);
-                    killedByEntity.get(id).add("grenade");
+                    killedByEntity.get(Tools.getPlayerId(id)).add("grenade");
                 } else if (entity instanceof EnemyBullet) {
                     entity.getBody().setTransform(400f, 400f, 0);
                     Pooler.free((EnemyBullet) entity);
-                    killedByEntity.get(id).add("bullet");
+                    killedByEntity.get(Tools.getPlayerId(id)).add("bullet");
                 }
             }
         }
