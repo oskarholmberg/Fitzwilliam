@@ -59,7 +59,6 @@ public class StartScreenState extends GameState {
             dispose();
             Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
             sound.play();
-            sound.dispose();
             gsm.setState(GameStateManager.CONNECT);
         }
     }
