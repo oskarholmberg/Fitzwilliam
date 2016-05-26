@@ -30,6 +30,9 @@ public class GameOverState extends GameState {
         super(gsm);
         this.killedByEntities = killedByEntities;
         this.victoryOrder = victoryOrder.split(":");
+        for(int i = 0 ; i < this.victoryOrder.length; i++){
+            System.out.println(this.victoryOrder[i]);
+        }
         world = new World(new Vector2(0, -9.81f), true);
         backbutton = new SPButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
                 cam.viewportHeight - 100, 40f, 40f, cam);
@@ -69,12 +72,11 @@ public class GameOverState extends GameState {
         sb.begin();
         sb.draw(background, 0, 0);
         sb.draw(gameOver, cam.viewportWidth / 4, cam.viewportHeight - 130, 350, 30);
-        int i = 0;
-        for (String color : victoryOrder) {
+        for (int i = 0; i < victoryOrder.length; i++) {
             int k = 0;
             int j = 0;
             sb.draw(placings[i], cam.viewportWidth / 5, (cam.viewportHeight - 200) - (50 * i), 38, 48);
-            sb.draw(getPlayerTexture(color), cam.viewportWidth / 5 + 100, (cam.viewportHeight - 200) - (50 * i));
+            sb.draw(getPlayerTexture(victoryOrder[i]), cam.viewportWidth / 5 + 100, (cam.viewportHeight - 200) - (50 * i));
             for (String player : killedByEntities.keys()){
                 for(String type : killedByEntities.get(player)){
                     if(type.equals("grenade")){
@@ -86,7 +88,6 @@ public class GameOverState extends GameState {
                     }
                 }
             }
-            i++;
         }
         sb.end();
         backbutton.render(sb);
