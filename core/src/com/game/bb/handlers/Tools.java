@@ -7,7 +7,7 @@ public class Tools {
 
     public static int getPlayerId(int entityId){
         String idString = Integer.toString(entityId);
-        idString = idString.substring(0, 4);
+        idString = idString.substring(0, 2);
         return Integer.valueOf(idString);
     }
 }

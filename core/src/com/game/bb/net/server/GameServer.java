@@ -3,11 +3,13 @@ package com.game.bb.net.server;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.game.bb.handlers.B2DVars;
+import com.game.bb.handlers.pools.Pooler;
 import com.game.bb.net.packets.EntityCluster;
 import com.game.bb.net.packets.EntityPacket;
 import com.game.bb.net.packets.PlayerMovementPacket;
@@ -26,11 +28,17 @@ public class GameServer extends Listener {
     private Server kryoServer;
     private HashMap<Connection, String> connections;
     private HashMap<Connection, Integer> playerIds;
+    private int playerId;
+    private Array<String> availableColors;
 
     public GameServer(){
         kryoServer = new Server();
         connections = new HashMap<Connection, String>();
         playerIds = new HashMap<Connection, Integer>();
+        playerId = 10;
+        availableColors = new Array<String>();
+        availableColors.add(B2DVars.COLOR_BLUE);
+        availableColors.add(B2DVars.COLOR_RED);
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
             TCPEventPacket.class, EntityCluster.class, EntityPacket[].class, PlayerMovementPacket.class,
             String.class};
@@ -51,7 +59,26 @@ public class GameServer extends Listener {
     @Override
     public void connected(Connection c){
         Gdx.app.log("NET_SERVER", "Client @" + c.getRemoteAddressUDP().getAddress().toString().substring(1) + " connected.");
-        connections.put(c, c.getRemoteAddressTCP().getAddress().toString().substring(1) + ":" + c.getRemoteAddressTCP().getPort());
+        connections.put(c, c.getRemoteAddressTCP().getAddress().toString().substring(1) + ":"
+                + c.getRemoteAddressTCP().getPort());
+        int id = newPlayerId();
+        String color = newPlayerColor();
+        TCPEventPacket pkt = Pooler.tcpEventPacket();
+        pkt.action = B2DVars.NET_SERVER_INFO;
+        pkt.id=id;
+        pkt.miscString = color;
+        c.sendTCP(pkt);
+        Pooler.free(pkt);
+
+    }
+    private int newPlayerId(){
+        playerId++;
+        return playerId;
+    }
+    private String newPlayerColor(){
+        String color = availableColors.random();
+        availableColors.removeValue(color, true);
+        return color;
     }
 
     @Override

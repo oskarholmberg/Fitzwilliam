@@ -8,6 +8,7 @@ import com.game.bb.gamestates.HostOfflineState;
 import com.game.bb.gamestates.JoinServerState;
 import com.game.bb.gamestates.StartScreenState;
 import com.game.bb.gamestates.PlayState;
+import com.game.bb.handlers.pools.Pooler;
 import com.game.bb.main.Game;
 import com.game.bb.gamestates.GameState;
 import com.game.bb.net.client.GameClient;
@@ -33,6 +34,7 @@ public class GameStateManager {
     public GameStateManager(Game game) {
         this.game = game;
         states = new Stack<GameState>();
+        Pooler.init();
         pushState(START_SCREEN);
     }
 

@@ -82,8 +82,6 @@ public class PlayState extends GameState {
 
         this.client = client;
 
-        Pooler.init();
-
         b2dr = new Box2DDebugRenderer();
 
         hud = new HUD();
@@ -106,21 +104,22 @@ public class PlayState extends GameState {
         spawnLocations = map.getSpawnLocations();
         killedByEntity = new IntMap<Array<String>>();
 
-        //Players
-        Vector2 spawn = spawnLocations.random();
-        player = new SPPlayer(world, spawn.x, spawn.y, Integer.valueOf(B2DVars.MY_ID), "blue");
-        TCPEventPacket packet = new TCPEventPacket();
-        packet.action = B2DVars.NET_CONNECT;
-        packet.pos = spawn;
-        packet.id = player.getId();
-        client.sendTCP(packet);
-        killedByEntity.put(player.getId(), new Array<String>());
-
-
         // set up box2d cam
         b2dCam = new OrthographicCamera();
         b2dCam.setToOrtho(false, cam.viewportWidth / B2DVars.PPM, cam.viewportHeight / B2DVars.PPM);
 
+    }
+
+    private void createPlayer(String color){
+        Vector2 spawn = spawnLocations.random();
+        player = new SPPlayer(world, spawn.x, spawn.y, B2DVars.MY_ID, color);
+        TCPEventPacket packet = new TCPEventPacket();
+        packet.action = B2DVars.NET_CONNECT;
+        packet.pos = spawn;
+        packet.miscString = player.getColor();
+        packet.id = player.getId();
+        client.sendTCP(packet);
+        killedByEntity.put(player.getId(), new Array<String>());
     }
 
 
@@ -172,7 +171,7 @@ public class PlayState extends GameState {
 
     public int newEntityID() {
         entityAccum++;
-        String temp = B2DVars.MY_ID + entityAccum;
+        String temp = Integer.toString(B2DVars.MY_ID) + entityAccum;
         return Integer.valueOf(temp);
     }
 
@@ -210,15 +209,22 @@ public class PlayState extends GameState {
         TCPEventPacket pkt = client.getTCPEventPackets();
         if (pkt==null) return;
         switch (pkt.action) {
+            case B2DVars.NET_SERVER_INFO:
+                B2DVars.setMyId(pkt.id);
+                B2DVars.setMyColor(pkt.miscString);
+                createPlayer(pkt.miscString);
+                break;
             case B2DVars.NET_CONNECT:
                 if (!opponents.containsKey(pkt.id)) {
-                    SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id, "red");
+                    SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.miscString);
                     opponents.put(pkt.id, opponent);
+                    hud.setColorToId(pkt.id, pkt.miscString);
                     killedByEntity.put(pkt.id, new Array<String>());
                     TCPEventPacket packet = new TCPEventPacket();
                     packet.action=B2DVars.NET_CONNECT;
                     packet.pos=player.getPosition();
                     packet.id=player.getId();
+                    packet.miscString=player.getColor();
                     hud.setOpponentDeath(pkt.id, B2DVars.AMOUNT_LIVES);
                     client.sendTCP(packet);
                 }
@@ -544,7 +550,8 @@ public class PlayState extends GameState {
             gsm.setState(GameStateManager.HOST_OFFLINE);
         }
         world.step(dt, 6, 2);
-        player.update(dt);
+        if (player!=null)
+            player.update(dt);
         for (IntMap.Keys it = opponents.keys(); it.hasNext;) {
             opponents.get(it.next()).update(dt);
         }
@@ -624,7 +631,8 @@ public class PlayState extends GameState {
         for (IntMap.Keys it = powerups.keys(); it.hasNext;){
             powerups.get(it.next()).render(sb);
         }
-        player.render(sb);
+        if (player!=null)
+            player.render(sb);
         hud.render(sb);
 
         //Do this last in render
