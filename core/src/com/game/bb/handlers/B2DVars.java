@@ -42,7 +42,8 @@ public class B2DVars {
 
     public static final float ENTITY_UPDATE_FREQ = 1/30f, MOVEMENT_UPDATE_FREQ = 1/30f;
 
-    public static final String COLOR_RED = "red", COLOR_BLUE = "blue";
+    public static final String COLOR_RED = "red", COLOR_BLUE = "blue", COLOR_GREEN = "green",
+            COLOR_YELLOW = "yellow";
 
     public static void setMyId(int id){
         MY_ID = id;

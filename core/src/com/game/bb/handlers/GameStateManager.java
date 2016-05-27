@@ -35,6 +35,7 @@ public class GameStateManager {
         this.game = game;
         states = new Stack<GameState>();
         Pooler.init();
+        Assets.init();
         pushState(START_SCREEN);
     }
 

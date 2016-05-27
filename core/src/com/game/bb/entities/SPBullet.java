@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 
 
@@ -24,13 +25,7 @@ public class SPBullet extends SPSprite {
         createBullet(xPos+dir* posXoffset, yPos-posYoffset, dir, harmful);
         shootStound = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
         shootStound.play();
-        if (harmful) {
-            // set enemy color texture
-            setTexture(new Texture("images/weapons/redBullet.png"));
-        } else {
-            // set friendly color texture
-            setTexture(new Texture("images/weapons/blueBullet.png"));
-        }
+        setTexture(Assets.getTex(B2DVars.MY_COLOR + "Bullet"));
     }
 
     @Override
@@ -45,7 +40,7 @@ public class SPBullet extends SPSprite {
     }
 
     private void createBullet(float xPos, float yPos, float dir, boolean harmful){
-        shape = new PolygonShape();
+        PolygonShape shape = new PolygonShape();
         shape.setAsBox(8 / B2DVars.PPM, 4 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
@@ -63,12 +58,11 @@ public class SPBullet extends SPSprite {
         body.createFixture(fdef).setUserData(B2DVars.ID_BULLET);
         body.setLinearVelocity(B2DVars.PH_BULLET_SPEED * dir / B2DVars.PPM, 0);
         body.setUserData(this);
+        shape.dispose();
     }
 
     @Override
     public void dispose() {
-        texture.dispose();
-        shape.dispose();
         shootStound.dispose();
     }
 }

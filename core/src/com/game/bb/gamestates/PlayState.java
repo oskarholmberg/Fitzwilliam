@@ -59,12 +59,12 @@ public class PlayState extends GameState {
     private PowerupHandler powerHandler;
     private MapBuilder map;
     private IntArray removedIds;
-    private Texture backGround = new Texture("images/spaceBackground.png");
+    private Texture backGround = Assets.getBackground();
     private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
     private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
     private Sound laserShot = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
     private float[] touchNbrs = {(cam.viewportWidth/ 5), cam.viewportWidth * 4 / 5};
-    private int entityPktSequence = 0, playerPktSequence = 0, myEntityId;
+    private int entityPktSequence = 0, playerPktSequence = 0;
     private boolean  grenadesIsEmpty = false, debugClick = false, hosting = false,
             removeMeMessageSent = false;
     private float sendEntityInfo = 0f, sendPlayerInfo = 0f;
@@ -120,6 +120,7 @@ public class PlayState extends GameState {
         packet.id = player.getId();
         client.sendTCP(packet);
         killedByEntity.put(player.getId(), new Array<String>());
+        hud.setMyNewColor(B2DVars.MY_COLOR);
     }
 
 
@@ -138,6 +139,7 @@ public class PlayState extends GameState {
                 pkt.id=bullet.getId();
                 pkt.action=B2DVars.NET_NEW_ENTITY;
                 pkt.miscString="bullet";
+                pkt.color=B2DVars.MY_COLOR;
                 pkt.pos=bullet.getBody().getPosition();
                 pkt.force=bullet.getBody().getLinearVelocity();
                 client.sendTCP(pkt);
@@ -158,6 +160,7 @@ public class PlayState extends GameState {
             pkt.id=spg.getId();
             pkt.action=B2DVars.NET_NEW_ENTITY;
             pkt.miscString="grenade";
+            pkt.color=B2DVars.MY_COLOR;
             pkt.pos=spg.getBody().getPosition();
             pkt.force=spg.getBody().getLinearVelocity();
             client.sendTCP(pkt);
@@ -211,8 +214,8 @@ public class PlayState extends GameState {
         switch (pkt.action) {
             case B2DVars.NET_SERVER_INFO:
                 B2DVars.setMyId(pkt.id);
-                B2DVars.setMyColor(pkt.miscString);
-                createPlayer(pkt.miscString);
+                B2DVars.setMyColor(pkt.color);
+                createPlayer(B2DVars.MY_COLOR);
                 break;
             case B2DVars.NET_CONNECT:
                 if (!opponents.containsKey(pkt.id)) {
@@ -240,7 +243,7 @@ public class PlayState extends GameState {
             case B2DVars.NET_NEW_ENTITY:
                 if (pkt.miscString.equals("grenade")){
                     EnemyGrenade grenade = Pooler.enemyGrenade();
-                    grenade.setAnimation("red");
+                    grenade.setAnimation(pkt.color);
                     grenade.setId(pkt.id);
                     grenade.getBody().setTransform(pkt.pos, 0);
                     grenade.getBody().setLinearVelocity(pkt.force);
@@ -248,7 +251,7 @@ public class PlayState extends GameState {
                     opEntities.put(pkt.id, grenade);
                 } else if (pkt.miscString.equals("bullet")){
                     EnemyBullet bullet = Pooler.enemyBullet();
-                    bullet.setAnimation("red");
+                    bullet.setAnimation(pkt.color);
                     bullet.setId(pkt.id);
                     bullet.getBody().setTransform(pkt.pos, 0);
                     bullet.getBody().setLinearVelocity(pkt.force);
@@ -649,9 +652,9 @@ public class PlayState extends GameState {
         for (IntMap.Keys it = killedByEntity.keys(); it.hasNext;){
             int id = it.next();
             if (id == player.getId()){
-                temp.put("blue", new Array<String>());
+                temp.put(B2DVars.MY_COLOR, new Array<String>());
                 for (String weapon : killedByEntity.get(id)){
-                    temp.get("blue").add(weapon);
+                    temp.get(B2DVars.MY_COLOR).add(weapon);
                 }
             } else {
                 String color = opponents.get(id).getColor();

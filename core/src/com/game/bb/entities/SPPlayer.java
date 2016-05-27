@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.game.bb.gamestates.PlayState;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 
 /**
@@ -142,29 +143,17 @@ public class SPPlayer extends SPSprite {
 
     public void loadTexture(String color) {
         textures = new Texture[6];
-        if (color.equals("blue")) {
-            textures[STAND_RIGHT] = new Texture("images/player/bluePlayerStandRight.png");
-            textures[STAND_LEFT] = new Texture("images/player/bluePlayerStandLeft.png");
-            textures[JUMP_RIGHT] = new Texture("images/player/bluePlayerJumpRight.png");
-            textures[JUMP_LEFT] = new Texture("images/player/bluePlayerJumpLeft.png");
-            textures[DEAD_RIGHT] = new Texture("images/player/bluePlayerDeadRight.png");
-            textures[DEAD_LEFT] = new Texture("images/player/bluePlayerDeadLeft.png");
-        } else {
-            textures[STAND_RIGHT] = new Texture("images/player/redPlayerStandRight.png");
-            textures[STAND_LEFT] = new Texture("images/player/redPlayerStandLeft.png");
-            textures[JUMP_RIGHT] = new Texture("images/player/redPlayerJumpRight.png");
-            textures[JUMP_LEFT] = new Texture("images/player/redPlayerJumpLeft.png");
-            textures[DEAD_RIGHT] = new Texture("images/player/redPlayerDeadRight.png");
-            textures[DEAD_LEFT] = new Texture("images/player/redPlayerDeadLeft.png");
-        }
+
+        textures[STAND_RIGHT] = Assets.getTex(color + "StandRight");
+        textures[STAND_LEFT] = Assets.getTex(color + "StandLeft");
+        textures[JUMP_RIGHT] = Assets.getTex(color + "JumpRight");
+        textures[JUMP_LEFT] = Assets.getTex(color + "JumpLeft");
+        textures[DEAD_RIGHT] = Assets.getTex(color + "DeadRight");
+        textures[DEAD_LEFT] = Assets.getTex(color + "DeadLeft");
     }
 
     @Override
     public void dispose() {
-        texture.dispose();
-        for (Texture texture : textures) {
-            texture.dispose();
-        }
         jetpackSound.dispose();
     }
 }

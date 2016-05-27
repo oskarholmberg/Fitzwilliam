@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.game.bb.gamestates.PlayState;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.SPAnimation;
 
@@ -19,12 +20,10 @@ public class EnemyBullet extends EnemyEntity {
     }
 
     public void setAnimation(String color){
-        if (color.equals("red")){
-            Texture bullet = new Texture("images/weapons/redBullet.png");
-            textureWidth = bullet.getWidth();
-            textureHeight = bullet.getHeight();
-            animation = new SPAnimation(new Texture("images/weapons/redBullet.png"));
-        }
+        Texture bullet = Assets.getTex(color + "Bullet");
+        textureWidth = bullet.getWidth();
+        textureHeight = bullet.getHeight();
+        animation = new SPAnimation(bullet);
         textureOffset = 0;
     }
 
@@ -47,12 +46,11 @@ public class EnemyBullet extends EnemyEntity {
 
     @Override
     public void dispose() {
-        animation.dispose();
+
     }
 
     @Override
     public void reset() {
-        dispose();
         id=-1;
         body.setLinearVelocity(0,0);
         body.setTransform(B2DVars.VOID_X, B2DVars.VOID_Y, 0);

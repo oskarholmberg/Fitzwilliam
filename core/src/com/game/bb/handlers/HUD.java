@@ -31,10 +31,12 @@ public class HUD {
 
         Texture hudTex = new Texture("images/hud.png");
         textureFromColor = new ArrayMap<String, Texture>();
-        textureFromColor.put(B2DVars.COLOR_BLUE, new Texture("images/player/bluePlayerStandRight.png"));
-        textureFromColor.put(B2DVars.COLOR_RED, new Texture("images/player/redPlayerStandRight.png"));
-        bulletTexture = new Texture("images/weapons/blueBullet.png");
-        grenadeTexture = TextureRegion.split(new Texture("images/weapons/blueGrenade.png"), 30, 30)[0][0];
+        textureFromColor.put(B2DVars.COLOR_BLUE, Assets.getTex("blueStandRight"));
+        textureFromColor.put(B2DVars.COLOR_RED, Assets.getTex("redStandRight"));
+        textureFromColor.put(B2DVars.COLOR_YELLOW, Assets.getTex("yellowStandRight"));
+        textureFromColor.put(B2DVars.COLOR_GREEN, Assets.getTex("greenStandRight"));
+        bulletTexture = Assets.getTex(B2DVars.MY_COLOR + "Bullet");
+        grenadeTexture = Assets.getAnimation(B2DVars.MY_COLOR + "Grenade")[0];
         opponentDeaths = new HashMap<Integer, Integer>();
         victoryOrder = new Array<Integer>();
         idsToColors = new IntMap<String>();
@@ -46,6 +48,11 @@ public class HUD {
         for (int i = 0; i < 5; i++) {
             font[i + 6] = new TextureRegion(hudTex, 32 + i * 9, 25, 9, 9);
         }
+    }
+
+    public void setMyNewColor(String color){
+        bulletTexture = Assets.getTex(color + "Bullet");
+        grenadeTexture = Assets.getAnimation(color + "Grenade")[0];
     }
 
     public void setColorToId(int id, String color){

@@ -39,6 +39,8 @@ public class GameServer extends Listener {
         availableColors = new Array<String>();
         availableColors.add(B2DVars.COLOR_BLUE);
         availableColors.add(B2DVars.COLOR_RED);
+        availableColors.add(B2DVars.COLOR_YELLOW);
+        availableColors.add(B2DVars.COLOR_GREEN);
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
             TCPEventPacket.class, EntityCluster.class, EntityPacket[].class, PlayerMovementPacket.class,
             String.class};
@@ -66,7 +68,7 @@ public class GameServer extends Listener {
         TCPEventPacket pkt = Pooler.tcpEventPacket();
         pkt.action = B2DVars.NET_SERVER_INFO;
         pkt.id=id;
-        pkt.miscString = color;
+        pkt.color = color;
         c.sendTCP(pkt);
         Pooler.free(pkt);
 

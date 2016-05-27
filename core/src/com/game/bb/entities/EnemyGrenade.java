@@ -1,12 +1,11 @@
 package com.game.bb.entities;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.game.bb.gamestates.PlayState;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.SPAnimation;
 
@@ -19,10 +18,7 @@ public class EnemyGrenade extends EnemyEntity{
     }
 
     public void setAnimation(String color){
-        if (color.equals("red")){
-            animation = new SPAnimation(TextureRegion.split(new Texture("images/weapons/redGrenade.png"),
-                    30, 30)[0], 0.2f);
-        }
+        animation = new SPAnimation(Assets.getAnimation(color + "Grenade"), 0.2f);
         textureOffset = 15;
     }
 
@@ -47,12 +43,11 @@ public class EnemyGrenade extends EnemyEntity{
 
     @Override
     public void dispose() {
-        animation.dispose();
+
     }
 
     @Override
     public void reset() {
-        dispose();
         id=-1;
         body.setLinearVelocity(0,0);
         body.setTransform(B2DVars.VOID_X, B2DVars.VOID_Y, 0);

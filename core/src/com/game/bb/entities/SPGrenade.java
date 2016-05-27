@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.SPAnimation;
 
@@ -18,7 +19,6 @@ public class SPGrenade extends SPSprite {
     private int offset = 15;
     private float posYoffset = 5 / B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH + (20 / B2DVars.PPM);
     private SPAnimation animation;
-    private Texture grenade;
     private boolean opponentGrenade;
     private CircleShape shape;
     private float lifetime = 0f;
@@ -28,13 +28,7 @@ public class SPGrenade extends SPSprite {
         this.dir = dir;
         this.opponentGrenade=opponentGrenade;
         createGrenadeBody(xPos + dir * getPosXoffset, yPos - posYoffset, dir);
-        if(opponentGrenade){
-            grenade = new Texture("images/weapons/redGrenade.png");
-        }
-        else{
-            grenade = new Texture("images/weapons/blueGrenade.png");
-        }
-        animation = new SPAnimation(TextureRegion.split(grenade, 30, 30)[0], 0.2f);
+        animation = new SPAnimation(Assets.getAnimation(B2DVars.MY_COLOR + "Grenade"), 0.2f);
 
     }
 
@@ -90,7 +84,5 @@ public class SPGrenade extends SPSprite {
     @Override
     public void dispose() {
         shape.dispose();
-        grenade.dispose();
-        animation.dispose();
     }
 }

@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.game.bb.entities.SPBullet;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
 import com.game.bb.net.client.GameClient;
@@ -171,7 +172,7 @@ public class JoinServerState extends GameState {
     }
 
     public class FallingBody implements Disposable{
-        private Texture texture = new Texture("images/player/redPlayerJumpLeft.png");
+        private Texture texture = Assets.getTex("redJumpLeft");
         private Body body;
 
         public FallingBody(Body body) {
@@ -186,7 +187,6 @@ public class JoinServerState extends GameState {
 
         @Override
         public void dispose() {
-            texture.dispose();
         }
     }
 

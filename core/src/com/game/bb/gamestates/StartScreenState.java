@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
 
@@ -22,7 +23,7 @@ public class StartScreenState extends GameState {
 
     private SPButton playButton;
     private World world;
-    private Texture background = new Texture("images/spaceBackground.png");
+    private Texture background = Assets.getBackground();
     private Array<FallingBody> itRains;
     private float newFallingBody = 0f;
 
@@ -95,7 +96,7 @@ public class StartScreenState extends GameState {
     }
 
     public class FallingBody implements Disposable{
-        private Texture texture = new Texture("images/player/bluePlayerJumpLeft.png");
+        private Texture texture = Assets.getTex("blueJumpRight");
         private Body body;
         public FallingBody(Body body){
             this.body=body;
@@ -109,7 +110,6 @@ public class StartScreenState extends GameState {
 
         @Override
         public void dispose() {
-            texture.dispose();
         }
     }
 }
