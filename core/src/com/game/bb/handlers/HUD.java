@@ -76,8 +76,24 @@ public class HUD {
             }
         }
         if (amountPlayersAlive <= 1 && opponentDeaths.size() > 0){
+            if (!victoryOrder.contains(B2DVars.MY_ID, true)){
+                victoryOrder.add(B2DVars.MY_ID);
+            }
+            for (Integer id : opponentDeaths.keySet()){
+                if (!victoryOrder.contains(id, true)){
+                    victoryOrder.add(id);
+                }
+            }
             gameOver=true;
         } else if (opponentDeaths.size() == 0 && amountPlayersAlive == 0){
+            if (!victoryOrder.contains(B2DVars.MY_ID, true)){
+                victoryOrder.add(B2DVars.MY_ID);
+            }
+            for (Integer id : opponentDeaths.keySet()){
+                if (!victoryOrder.contains(id, true)){
+                    victoryOrder.add(id);
+                }
+            }
             gameOver= true;
         }
     }

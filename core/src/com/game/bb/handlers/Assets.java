@@ -32,7 +32,7 @@ public class Assets {
         background = new Texture("images/spaceBackground.png");
         //textures
         //blue player
-        tex.put("bluepDeadLeft", new Texture("images/player/bluePlayerDeadLeft.png"));
+        tex.put("blueDeadLeft", new Texture("images/player/bluePlayerDeadLeft.png"));
         tex.put("blueDeadRight", new Texture("images/player/bluePlayerDeadRight.png"));
         tex.put("blueJumpLeft", new Texture("images/player/bluePlayerJumpLeft.png"));
         tex.put("blueJumpRight", new Texture("images/player/bluePlayerJumpRight.png"));
