@@ -1,5 +1,6 @@
 package com.game.bb.handlers;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Array;
 import com.game.bb.entities.EnemyEntity;
+import com.game.bb.entities.SPPlayer;
 import com.game.bb.entities.SPPower;
 import com.game.bb.entities.SPSprite;
 
@@ -15,7 +17,7 @@ import com.game.bb.entities.SPSprite;
  */
 public class SPContactListener implements ContactListener {
     private int footContact = 0, amntJumps = 0, killingEntityID;
-    private boolean playerHit = false, playerPowerUp = false;
+    private boolean playerHit = false, playerPowerUp = false, bounceMe = false;
     private Fixture  lastPowerUp;
     private Array<Integer> idsToRemove;
 
@@ -30,8 +32,17 @@ public class SPContactListener implements ContactListener {
         Fixture fb = contact.getFixtureB();
 
 
-        // if a foot touches ground
-        if (fa.getUserData().equals(B2DVars.ID_FOOT) || fb.getUserData().equals(B2DVars.ID_FOOT)) {
+        // if player touches bouncy ground
+        if (fa.getUserData().equals(B2DVars.ID_BOUNCE) && fb.getUserData().equals(B2DVars.ID_PLAYER)) {
+            footContact++;
+            bounceMe = true;
+            amntJumps = 0;
+        } else if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BOUNCE)) {
+            footContact++;
+            bounceMe = true;
+            amntJumps = 0;
+            // if a foot touches ground
+        } else if (fa.getUserData().equals(B2DVars.ID_FOOT) || fb.getUserData().equals(B2DVars.ID_FOOT)) {
             footContact++;
             amntJumps = 0;
             //If the player is hit by an enemy bullet
@@ -87,6 +98,10 @@ public class SPContactListener implements ContactListener {
 
         if (fa.getUserData().equals(B2DVars.ID_FOOT) || fb.getUserData().equals(B2DVars.ID_FOOT)) {
             footContact--;
+        } else if (fa.getUserData().equals(B2DVars.ID_BOUNCE) && fb.getUserData().equals(B2DVars.ID_PLAYER)) {
+            footContact--;
+        } else if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BOUNCE)) {
+            footContact--;
         }
     }
 
@@ -98,6 +113,14 @@ public class SPContactListener implements ContactListener {
     public boolean isPlayerHit() {
         if (playerHit) {
             playerHit = false;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean bouncePlayer(){
+        if (bounceMe){
+            bounceMe = false;
             return true;
         }
         return false;

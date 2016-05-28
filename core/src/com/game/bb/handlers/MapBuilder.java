@@ -1,4 +1,4 @@
-package com.game.bb.gamestates;
+package com.game.bb.handlers;
 
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.game.bb.gamestates.PlayState;
 import com.game.bb.handlers.B2DVars;
 
 /**
@@ -25,18 +26,24 @@ public class MapBuilder {
     private OrthogonalTiledMapRenderer renderer;
     private MapProperties mapProperties;
     private float ppm = B2DVars.PPM;
+    private float mapWidth;
+    private boolean buildBoundaries;
     public static int MAP_WIDTH = 0;
 
-    public MapBuilder(World world, int mapIndex){
+    public MapBuilder(World world, int mapIndex, boolean buildBoundaries){
         this.world=world;
+        this.buildBoundaries=buildBoundaries;
         Vector2 cam = new Vector2(PlayState.playState.cam.viewportWidth, PlayState.playState.cam.viewportHeight);
         tiledMap = new TmxMapLoader().load("maps/level" + mapIndex + ".tmx");
         mapProperties = tiledMap.getProperties();
+        mapWidth = mapProperties.get("width", Integer.class) * 32f;
 
-        createBoundary(cam.x / 2, cam.y, cam.x / 2, 1); //top
-        createBoundary(cam.x / 2, 0, cam.x / 2, 1); //bottom
-        createBoundary(0, cam.y / 2, 1, cam.y / 2); // left
-        createBoundary(cam.x, cam.y / 2, 1, cam.y / 2); // right
+        if (buildBoundaries) {
+            createBoundary(cam.x / 2, cam.y, cam.x / 2, 1); //top
+            createBoundary(cam.x / 2, 0, cam.x / 2, 1); //bottom
+            createBoundary(0, cam.y / 2, 1, cam.y / 2); // left
+            createBoundary(cam.x, cam.y / 2, 1, cam.y / 2); // right
+        }
     }
 
     private void createBoundary(float xPos, float yPos, float width, float height){
@@ -66,8 +73,8 @@ public class MapBuilder {
         return spawnLocArray;
     }
 
-    public int getMapWidth(){
-        return mapProperties.get("width", Integer.class);
+    public float getMapWidth(){
+        return mapWidth;
     }
 
     public void buildMap(){
@@ -85,15 +92,29 @@ public class MapBuilder {
                     | B2DVars.BIT_GRENADE | B2DVars.BIT_ENEMY_ENTITY;
             world.createBody(bdef).createFixture(fdef).setUserData(B2DVars.ID_GROUND);
         }
-        for (MapObject obj : tiledMap.getLayers().get("dome").getObjects().getByType(RectangleMapObject.class)){
-            Rectangle rect = ((RectangleMapObject) obj).getRectangle();
-            bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX() / ppm + rect.getWidth() / 2 / ppm, rect.getY() / ppm + rect.getHeight() / 2 / ppm);
-            shape.setAsBox(rect.getWidth() / 2 / ppm, rect.getHeight() / 2 / ppm);
-            fdef.shape=shape;
-            fdef.filter.categoryBits = B2DVars.BIT_DOME;
-            fdef.filter.maskBits = B2DVars.BIT_BULLET | B2DVars.BIT_GRENADE;
-            world.createBody(bdef).createFixture(fdef).setUserData(B2DVars.ID_DOME);
+        if (tiledMap.getLayers().get("dome") != null) {
+            for (MapObject obj : tiledMap.getLayers().get("dome").getObjects().getByType(RectangleMapObject.class)) {
+                Rectangle rect = ((RectangleMapObject) obj).getRectangle();
+                bdef.type = BodyDef.BodyType.StaticBody;
+                bdef.position.set(rect.getX() / ppm + rect.getWidth() / 2 / ppm, rect.getY() / ppm + rect.getHeight() / 2 / ppm);
+                shape.setAsBox(rect.getWidth() / 2 / ppm, rect.getHeight() / 2 / ppm);
+                fdef.shape = shape;
+                fdef.filter.categoryBits = B2DVars.BIT_DOME;
+                fdef.filter.maskBits = B2DVars.BIT_BULLET | B2DVars.BIT_GRENADE;
+                world.createBody(bdef).createFixture(fdef).setUserData(B2DVars.ID_DOME);
+            }
+        }
+        if (tiledMap.getLayers().get("bounce") != null){
+            for (MapObject obj : tiledMap.getLayers().get("bounce").getObjects().getByType(RectangleMapObject.class)) {
+                Rectangle rect = ((RectangleMapObject) obj).getRectangle();
+                bdef.type = BodyDef.BodyType.StaticBody;
+                bdef.position.set(rect.getX() / ppm + rect.getWidth() / 2 / ppm, rect.getY() / ppm + rect.getHeight() / 2 / ppm);
+                shape.setAsBox(rect.getWidth() / 2 / ppm, rect.getHeight() / 2 / ppm);
+                fdef.shape = shape;
+                fdef.filter.categoryBits = B2DVars.BIT_BOUNCE;
+                fdef.filter.maskBits = B2DVars.BIT_PLAYER;
+                world.createBody(bdef).createFixture(fdef).setUserData(B2DVars.ID_BOUNCE);
+            }
         }
         shape.dispose();
         renderer = new OrthogonalTiledMapRenderer(tiledMap);

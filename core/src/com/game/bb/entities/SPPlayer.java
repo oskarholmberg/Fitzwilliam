@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -123,7 +124,7 @@ public class SPPlayer extends SPSprite {
         fdef.shape = shape;
         fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
         fdef.filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BULLET | B2DVars.BIT_GRENADE
-                | B2DVars.BIT_ENEMY_ENTITY;
+                | B2DVars.BIT_ENEMY_ENTITY | B2DVars.BIT_BOUNCE;
         BodyDef bdef = new BodyDef();
         bdef.position.set(xPos, yPos);
         bdef.type = BodyDef.BodyType.DynamicBody;
@@ -139,6 +140,11 @@ public class SPPlayer extends SPSprite {
         fdef.isSensor = true;
         body.createFixture(fdef).setUserData(B2DVars.ID_FOOT);
         shape.dispose();
+    }
+
+    public void bouncePlayer(){
+        body.setLinearVelocity(0, 0);
+        body.applyForceToCenter(MathUtils.random(-3f, 3f) * 50, B2DVars.PH_JUMPY*1.3f, true);
     }
 
     public void loadTexture(String color) {

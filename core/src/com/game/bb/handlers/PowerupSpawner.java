@@ -17,17 +17,19 @@ public class PowerupSpawner {
     private float timeCheck;
     private String powerId = "123123";
     private int powerIdAccum = 0;
+    private float mapWidth;
 
-    public PowerupSpawner(World world, GameClient client){
+    public PowerupSpawner(World world, GameClient client, float mapWidth){
         this.world=world;
         this.client=client;
+        this.mapWidth=mapWidth;
         randomTime = 5f;
         System.out.println("Time until power up spawn: " + randomTime);
         timeCheck = 0;
     }
 
     public void generatePowerup(){
-        Vector2 powerPos = new Vector2(MathUtils.random(10f / B2DVars.PPM, 950f / B2DVars.PPM),
+        Vector2 powerPos = new Vector2(MathUtils.random(10f / B2DVars.PPM, (mapWidth - 10f) / B2DVars.PPM),
                 630 / B2DVars.PPM);
         powerIdAccum++;
         int id = Integer.valueOf(powerId + Integer.toString(powerIdAccum));

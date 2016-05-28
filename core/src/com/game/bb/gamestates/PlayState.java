@@ -2,7 +2,6 @@ package com.game.bb.gamestates;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -24,6 +23,7 @@ import com.game.bb.entities.SPPower;
 import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.*;
 import com.game.bb.entities.SPPlayer;
+import com.game.bb.handlers.MapBuilder;
 import com.game.bb.handlers.pools.Pooler;
 import com.game.bb.net.client.GameClient;
 import com.game.bb.net.packets.EntityCluster;
@@ -57,7 +57,7 @@ public class PlayState extends GameState {
     private GameClient client;
     private HUD hud;
     private PowerupHandler powerHandler;
-    private MapBuilder map;
+    private com.game.bb.handlers.MapBuilder map;
     private IntArray removedIds;
     private Texture backGround = Assets.getBackground();
     private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
@@ -88,10 +88,6 @@ public class PlayState extends GameState {
 
         powerups = new IntMap<SPPower>();
 
-        if (gsm.isHosting()){
-            hosting=true;
-            powerupSpawner = new PowerupSpawner(world, client);
-        }
 
         powerHandler = new PowerupHandler();
 
@@ -99,11 +95,15 @@ public class PlayState extends GameState {
         opponents = new IntMap<SPOpponent>();
         removedIds = new IntArray();
 
-        map = new MapBuilder(world, 1);
+        map = new MapBuilder(world, 3, false);
         map.buildMap();
         spawnLocations = map.getSpawnLocations();
         killedByEntity = new IntMap<Array<String>>();
 
+        if (gsm.isHosting()){
+            hosting=true;
+            powerupSpawner = new PowerupSpawner(world, client, map.getMapWidth());
+        }
         // set up box2d cam
         b2dCam = new OrthographicCamera();
         b2dCam.setToOrtho(false, cam.viewportWidth / B2DVars.PPM, cam.viewportHeight / B2DVars.PPM);
@@ -120,6 +120,14 @@ public class PlayState extends GameState {
         packet.id = player.getId();
         client.sendTCP(packet);
         killedByEntity.put(player.getId(), new Array<String>());
+        float camX = player.getPosition().x * B2DVars.PPM;
+        if ((camX + cam.viewportWidth / 2) > map.getMapWidth()){
+            cam.position.x = map.getMapWidth() - cam.viewportWidth / 2;
+        } else if ((camX - cam.viewportWidth / 2) < 0){
+            cam.position.x = 0 + cam.viewportWidth / 2;
+        } else {
+            cam.position.x = camX;
+        }
         hud.setMyNewColor(B2DVars.MY_COLOR);
     }
 
@@ -204,7 +212,7 @@ public class PlayState extends GameState {
         if (SPInput.isPressed(SPInput.BUTTON_Y)) {
             System.out.println("Debug is clicked! printing the next debug event.");
             debugClick = true;
-            System.out.println(killedByEntity.toString());
+            System.out.println("HudCam pos: " + hudCam.position.x + " cam pos: " + cam.position.x);
         }
     }
 
@@ -343,6 +351,14 @@ public class PlayState extends GameState {
             hud.setAmountGrenadesLeft(amntGrenades);
             cl.resetJumps();
             cl.revivePlayer();
+            float camX = player.getPosition().x * B2DVars.PPM;
+            if ((camX + cam.viewportWidth / 2) > map.getMapWidth()){
+                cam.position.x = map.getMapWidth() - cam.viewportWidth / 2;
+            } else if ((camX - cam.viewportWidth / 2) < 0){
+                cam.position.x = 0 + cam.viewportWidth / 2;
+            } else {
+                cam.position.x = camX;
+            }
         } else if (!removeMeMessageSent){
             player.dispose();
             player.getBody().setTransform(B2DVars.VOID_X, B2DVars.VOID_Y, 0);
@@ -540,8 +556,6 @@ public class PlayState extends GameState {
         } else if ((player.getPosition().x * B2DVars.PPM) < (camX - 200f)) {
             if ((camX - cam.viewportWidth / 2) > 0) {
                 cam.position.x = camX - 2f;
-                System.out.println(camX + cam.viewportWidth / 2);
-                System.out.println("Cam position: " + cam.position.x);
             }
         }
         cam.update();
@@ -574,6 +588,9 @@ public class PlayState extends GameState {
         refreshAmmo(dt);
         if (cl.isPlayerHit()) {
             playerHit();
+        }
+        if (cl.bouncePlayer()){
+            player.bouncePlayer();
         }
         if (player.isDead()) {
             respawnTimer += dt;
@@ -616,8 +633,7 @@ public class PlayState extends GameState {
 
     @Override
     public void render() {
-        //Clear screen
-        Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        sb.setProjectionMatrix(cam.combined);
         sb.begin();
         sb.draw(backGround, cam.position.x - cam.viewportWidth / 2, 0);
         sb.end();
@@ -636,11 +652,13 @@ public class PlayState extends GameState {
         }
         if (player!=null)
             player.render(sb);
+
+        sb.setProjectionMatrix(hudCam.combined);
         hud.render(sb);
 
-        //Do this last in render
+        //below is debugging stuff for hitboxes etc...
+        //Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
 //        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
-        sb.setProjectionMatrix(cam.combined);
     }
 
     @Override
