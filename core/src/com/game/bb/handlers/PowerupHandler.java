@@ -48,6 +48,15 @@ public class PowerupHandler {
             if (tiltAccum >= TILT_DUR) {
                 PlayState.playState.cam.setToOrtho(false);
                 rotationAngle = 0;
+                float camX = PlayState.playState.player.getPosition().x * B2DVars.PPM;
+                if ((camX + PlayState.playState.cam.viewportWidth / 2) > PlayState.playState.map.getMapWidth()){
+                    PlayState.playState.cam.position.x = PlayState.playState.map.getMapWidth()
+                            - PlayState.playState.cam.viewportWidth / 2;
+                } else if ((camX - PlayState.playState.cam.viewportWidth / 2) < 0){
+                    PlayState.playState.cam.position.x = 0 + PlayState.playState.cam.viewportWidth / 2;
+                } else {
+                    PlayState.playState.cam.position.x = camX;
+                }
             }
         }
     }

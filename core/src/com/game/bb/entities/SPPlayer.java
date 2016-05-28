@@ -144,7 +144,7 @@ public class SPPlayer extends SPSprite {
 
     public void bouncePlayer(){
         body.setLinearVelocity(0, 0);
-        body.applyForceToCenter(MathUtils.random(-3f, 3f) * 50, B2DVars.PH_JUMPY*1.3f, true);
+        body.applyForceToCenter(MathUtils.random(-3f, 3f) * 40, B2DVars.PH_JUMPY*1.3f, true);
     }
 
     public void loadTexture(String color) {

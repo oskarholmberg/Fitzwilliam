@@ -42,7 +42,7 @@ public class PlayState extends GameState {
     private Box2DDebugRenderer b2dr;
     private OrthographicCamera b2dCam;
     private SPContactListener cl;
-    private SPPlayer player;
+    public SPPlayer player;
     private IntMap<SPOpponent> opponents;
     private Array<Vector2> spawnLocations;
     private PowerupSpawner powerupSpawner;
@@ -57,7 +57,7 @@ public class PlayState extends GameState {
     private GameClient client;
     private HUD hud;
     private PowerupHandler powerHandler;
-    private com.game.bb.handlers.MapBuilder map;
+    public com.game.bb.handlers.MapBuilder map;
     private IntArray removedIds;
     private Texture backGround = Assets.getBackground();
     private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
@@ -682,6 +682,7 @@ public class PlayState extends GameState {
                 }
             }
         }
+        cam.setToOrtho(false);
         gsm.setVictoryOrder(pkt.miscString);
         gsm.setKilledByEntities(temp);
         gsm.setState(GameStateManager.GAME_OVER);
