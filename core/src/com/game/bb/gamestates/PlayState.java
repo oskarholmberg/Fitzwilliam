@@ -1,5 +1,7 @@
 package com.game.bb.gamestates;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -60,7 +62,7 @@ public class PlayState extends GameState {
     private float[] touchNbrs = {(cam.viewportWidth / 5), cam.viewportWidth * 4 / 5};
     private int entityPktSequence = 0, playerPktSequence = 0;
     private boolean grenadesIsEmpty = false, debugClick = false, hosting = false,
-            removeMeMessageSent = false;
+            removeMeMessageSent = false, debuggingMode = false;
     private float sendEntityInfo = 0f, sendPlayerInfo = 0f;
 
     public int currentTexture = SPOpponent.STAND_LEFT;
@@ -203,6 +205,7 @@ public class PlayState extends GameState {
         if (SPInput.isPressed(SPInput.BUTTON_Y)) {
             System.out.println("Debug is clicked! printing the next debug event.");
             debugClick = true;
+            debuggingMode = !debuggingMode;
             System.out.println("HudCam pos: " + hudCam.position.x + " cam pos: " + cam.position.x);
         }
     }
@@ -648,9 +651,11 @@ public class PlayState extends GameState {
         sb.setProjectionMatrix(hudCam.combined);
         hud.render(sb);
 
-        //below is debugging stuff for hitboxes etc...
-        //Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
-//        b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+        //below is debuggingMode stuff for hitboxes etc...
+        if (debuggingMode) {
+            Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
+        }
     }
 
     @Override
