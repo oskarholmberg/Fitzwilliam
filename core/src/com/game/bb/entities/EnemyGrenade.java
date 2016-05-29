@@ -51,7 +51,6 @@ public class EnemyGrenade extends EnemyEntity{
         id=-1;
         body.setLinearVelocity(0,0);
         body.setTransform(B2DVars.VOID_X, B2DVars.VOID_Y, 0);
-        System.out.println("Grenade removed.");
     }
 
     @Override

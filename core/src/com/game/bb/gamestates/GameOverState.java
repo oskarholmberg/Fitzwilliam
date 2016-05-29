@@ -31,7 +31,6 @@ public class GameOverState extends GameState {
     public GameOverState(GameStateManager gsm, ArrayMap<String, Array<String>> killedByEntities, String victoryOrder) {
         super(gsm);
         this.killedByEntities = killedByEntities;
-        System.out.println(killedByEntities);
         this.victoryOrder = victoryOrder.split(":");
         world = new World(new Vector2(0, -9.81f), true);
         backbutton = new SPButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
@@ -59,7 +58,6 @@ public class GameOverState extends GameState {
                 }
             }
         }
-        System.out.println("colorgrenades" + colorGrenades + "colorbullets" + colorBullets);
     }
 
     @Override

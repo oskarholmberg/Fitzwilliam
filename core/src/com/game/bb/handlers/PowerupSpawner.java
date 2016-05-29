@@ -24,7 +24,6 @@ public class PowerupSpawner {
         this.client=client;
         this.mapWidth=mapWidth;
         randomTime = 5f;
-        System.out.println("Time until power up spawn: " + randomTime);
         timeCheck = 0;
     }
 
@@ -48,7 +47,6 @@ public class PowerupSpawner {
     public void update(float dt){
         if (timeCheck > randomTime){
             randomTime = MathUtils.random(25.0f, 40.0f);
-            System.out.println("Powerup spawned! next time: " + randomTime);
             timeCheck = 0f;
             generatePowerup();
         } else {
