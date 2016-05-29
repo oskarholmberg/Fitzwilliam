@@ -65,6 +65,7 @@ public class EnemyGrenade extends EnemyEntity{
 
     @Override
     public void update(float dt) {
+        interpolator.updateEntityState();
         animation.update(dt);
     }
 }

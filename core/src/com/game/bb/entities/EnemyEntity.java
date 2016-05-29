@@ -23,8 +23,8 @@ public abstract class EnemyEntity implements Disposable, Pool.Poolable{
         interpolator = new EntityInterpolator(this);
     }
 
-    public void updateEntityState(EntityPacket pkt){
-        interpolator.updateEntityState(pkt);
+    public void addEntityPacket(EntityPacket pkt){
+        interpolator.addEntityPacket(pkt);
     }
 
     public void setId(int id){

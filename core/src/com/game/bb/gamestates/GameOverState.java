@@ -94,7 +94,7 @@ public class GameOverState extends GameState {
             sb.draw(Assets.getTex(color + "StandRight"), cam.viewportWidth / 5 + 50, cam.viewportHeight - 400 - 70 * i,
                     48, 48);
             for (int j = 0; j < colorBullets.get(color); j++){
-                sb.draw(Assets.getTex(color + "Bullet"), cam.viewportWidth / 5 + 60 + j * 30,
+                sb.draw(Assets.getTex(color + "Bullet"), cam.viewportWidth / 5 + 110 + j * 30,
                         cam.viewportHeight - 365 - 70 * i);
             }
             for (int j = 0; j < colorGrenades.get(color); j++){

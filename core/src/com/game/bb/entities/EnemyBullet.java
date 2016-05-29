@@ -67,5 +67,6 @@ public class EnemyBullet extends EnemyEntity {
 
     @Override
     public void update(float dt) {
+        interpolator.updateEntityState();
     }
 }
