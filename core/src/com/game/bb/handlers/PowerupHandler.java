@@ -1,5 +1,7 @@
 package com.game.bb.handlers;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.game.bb.gamestates.PlayState;
 
 /**
@@ -9,6 +11,9 @@ public class PowerupHandler {
     private float ammoAccum = 20f, tiltAccum = 20f, tiltDirection = 1f;
     private static final float AMMO_DUR = 10f, TILT_DUR = 10f;
     private float rotationAngle = 0f;
+    private boolean shielded;
+    private int xOffset = 25, yOffset = 30;
+    private SPAnimation animation = new SPAnimation(Assets.getAnimation("shield"), 0.2f);
 
     public PowerupHandler(){
 
@@ -29,10 +34,31 @@ public class PowerupHandler {
             case B2DVars.POWERTYPE_TILTSCREEN:
                 tiltAccum = 0f;
                 break;
+            case B2DVars.POWERTYPE_SHIELD:
+                shielded = true;
+                break;
+        }
+    }
+
+    public void removeShield(){
+        shielded = false;
+    }
+
+    public boolean isShielded(){
+        return shielded;
+    }
+
+    public void render(SpriteBatch sb){
+        if(shielded){
+            Vector2 pos = PlayState.playState.player.getPosition();
+            sb.begin();
+            sb.draw(animation.getFrame(), pos.x*B2DVars.PPM-xOffset, pos.y*B2DVars.PPM-yOffset, 50, 60);
+            sb.end();
         }
     }
 
     public void update(float dt){
+        animation.update(dt);
         if (ammoAccum < AMMO_DUR){
             ammoAccum += dt;
         }
