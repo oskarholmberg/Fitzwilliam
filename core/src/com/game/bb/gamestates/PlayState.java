@@ -95,7 +95,7 @@ public class PlayState extends GameState {
         opponents = new IntMap<SPOpponent>();
         removedIds = new IntArray();
 
-        map = new MapBuilder(world, 3, false);
+        map = new MapBuilder(world, 4, false);
         map.buildMap();
         spawnLocations = map.getSpawnLocations();
         killedByEntity = new IntMap<Array<String>>();
@@ -559,7 +559,6 @@ public class PlayState extends GameState {
     public void update(float dt) {
         if(!client.isConnected()){
             client.stop();
-            world.dispose();
             gsm.setState(GameStateManager.HOST_OFFLINE);
         }
         world.step(dt, 6, 2);
@@ -681,7 +680,6 @@ public class PlayState extends GameState {
         cam.setToOrtho(false);
         gsm.setVictoryOrder(pkt.miscString);
         gsm.setKilledByEntities(temp);
-        world.dispose();
         gsm.setState(GameStateManager.GAME_OVER);
         dispose();
     }
