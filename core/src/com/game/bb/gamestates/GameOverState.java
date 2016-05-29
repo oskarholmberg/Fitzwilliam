@@ -55,10 +55,11 @@ public class GameOverState extends GameState {
                 if (killedByEntities.get(color).get(i).equals("grenade")) {
                     colorGrenades.put(color, colorGrenades.get(color) + 1);
                 } else if (killedByEntities.get(color).get(i).equals("bullet")){
-                    colorBullets.put(color, colorBullets.get((color) + 1));
+                    colorBullets.put(color, colorBullets.get(color) + 1);
                 }
             }
         }
+        System.out.println("colorgrenades" + colorGrenades + "colorbullets" + colorBullets);
     }
 
     @Override
