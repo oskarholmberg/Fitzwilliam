@@ -65,15 +65,9 @@ public class GameClient extends Listener {
             Gdx.app.log("NET_CLIENT_TCP_RECEIVED", packet.toString());
             tcpPackets.add((TCPEventPacket) packet);
         } else if (packet instanceof EntityCluster) {
-            if (((EntityCluster) packet).seq > lastEntitySeq){
-                lastEntitySeq = ((EntityCluster) packet).seq;
-                entityClusters.add((EntityCluster) packet);
-            }
+            entityClusters.add((EntityCluster) packet);
         } else if (packet instanceof PlayerMovementPacket){
-            if (((PlayerMovementPacket) packet).seq > lastMovementSeq){
-                lastMovementSeq = ((PlayerMovementPacket) packet).seq;
-                movementPackets.add((PlayerMovementPacket) packet);
-            }
+            movementPackets.add((PlayerMovementPacket) packet);
         }
     }
 

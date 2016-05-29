@@ -8,7 +8,7 @@ import java.util.List;
  * Created by erik on 18/05/16.
  */
 public class EntityCluster implements Pool.Poolable{
-    public int seq;
+    public int seq, id;
     public EntityPacket[] pkts;
     public long time;
 

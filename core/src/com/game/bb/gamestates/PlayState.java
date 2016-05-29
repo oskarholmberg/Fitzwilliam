@@ -46,6 +46,7 @@ public class PlayState extends GameState {
     private Array<Vector2> spawnLocations;
     private PowerupSpawner powerupSpawner;
     private IntMap<SPPower> powerups;
+    private IntMap<Integer> opponentEntitySequence;
     private IntMap<Array<String>> killedByEntity;
     private int entityAccum = 0;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
@@ -87,6 +88,7 @@ public class PlayState extends GameState {
         powerHandler = new PowerupHandler();
 
         opponents = new IntMap<SPOpponent>();
+        opponentEntitySequence = new IntMap<Integer>();
         removedIds = new IntArray();
 
         map = new MapBuilder(world, 4, false);
@@ -224,6 +226,7 @@ public class PlayState extends GameState {
                         opponents.put(pkt.id, opponent);
                         hud.setColorToId(pkt.id, pkt.miscString);
                         killedByEntity.put(pkt.id, new Array<String>());
+                        opponentEntitySequence.put(pkt.id, 0);
                         TCPEventPacket packet = new TCPEventPacket();
                         packet.action = B2DVars.NET_CONNECT;
                         packet.pos = player.getPosition();
@@ -311,9 +314,12 @@ public class PlayState extends GameState {
     private void opponentEntityEvents() {
         Array<EntityCluster> packets = client.getEntityClusters();
         for (EntityCluster cluster : packets) {
-            for (EntityPacket pkt : cluster.pkts) {
-                if (opEntities.containsKey(pkt.id)) {
-                    opEntities.get(pkt.id).addEntityPacket(pkt);
+            if (cluster.seq > opponentEntitySequence.get(cluster.id)) {
+                opponentEntitySequence.put(cluster.id, cluster.seq);
+                for (EntityPacket pkt : cluster.pkts) {
+                    if (opEntities.containsKey(pkt.id)) {
+                        opEntities.get(pkt.id).addEntityPacket(pkt);
+                    }
                 }
             }
         }
@@ -323,7 +329,7 @@ public class PlayState extends GameState {
         Array<PlayerMovementPacket> packets = client.getOpponentMovements();
         for (PlayerMovementPacket pkt : packets) {
             if (opponents.containsKey(pkt.id))
-                opponents.get(pkt.id).move(pkt.xp, pkt.yp, pkt.xv, pkt.yv, pkt.tex, pkt.sound);
+                opponents.get(pkt.id).move(pkt.xp, pkt.yp, pkt.xv, pkt.yv, pkt.tex, pkt.sound, pkt.seq);
         }
     }
 
@@ -423,6 +429,7 @@ public class PlayState extends GameState {
             cluster.seq = entityPktSequence++;
             cluster.pkts = packets;
             cluster.time = TimeUtils.millis();
+            cluster.id = B2DVars.MY_ID;
             client.sendUDP(cluster);
             Pooler.free(packets); //return them to the pool
             Pooler.free(cluster);

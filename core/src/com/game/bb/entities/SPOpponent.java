@@ -15,6 +15,7 @@ import com.game.bb.handlers.SPAnimation;
 public class SPOpponent extends SPPlayer {
     private SPAnimation shield;
     private boolean shielded = false;
+    private int lastMovementSeq = 0;
 
     public SPOpponent(World world, float xPos, float yPos, int id, String color) {
         super(world, xPos, yPos, id, color);
@@ -39,12 +40,15 @@ public class SPOpponent extends SPPlayer {
      * @param texture, sets the texture according to value.
      * @param sound, if sound == 1, jetpackSound will play. Else nothing happens.
      */
-    public void move(float xPos, float yPos, float xV, float yV, int texture, int sound) {
-        body.setTransform(xPos, yPos, 0);
-        body.setLinearVelocity(xV, yV);
-        setTexture(textures[texture]);
-        if(sound == 1){
-            jetpackSound.play();
+    public void move(float xPos, float yPos, float xV, float yV, int texture, int sound, int seq) {
+        if (seq > lastMovementSeq) {
+            lastMovementSeq = seq;
+            body.setTransform(xPos, yPos, 0);
+            body.setLinearVelocity(xV, yV);
+            setTexture(textures[texture]);
+            if (sound == 1) {
+                jetpackSound.play();
+            }
         }
     }
 
