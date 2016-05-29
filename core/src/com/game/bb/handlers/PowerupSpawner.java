@@ -33,7 +33,7 @@ public class PowerupSpawner {
                 630 / B2DVars.PPM);
         powerIdAccum++;
         int id = Integer.valueOf(powerId + Integer.toString(powerIdAccum));
-        int powerType = MathUtils.random(3, B2DVars.POWERTYPE_AMOUNT);
+        int powerType = MathUtils.random(1, B2DVars.POWERTYPE_AMOUNT);
         SPPower power = new SPPower(world, powerPos.x, powerPos.y, id, powerType);
         PlayState.playState.addPowerup(power, id);
         TCPEventPacket pkt = Pooler.tcpEventPacket();
@@ -47,7 +47,7 @@ public class PowerupSpawner {
 
     public void update(float dt){
         if (timeCheck > randomTime){
-            randomTime = MathUtils.random(30.0f, 40.0f);
+            randomTime = MathUtils.random(25.0f, 40.0f);
             System.out.println("Powerup spawned! next time: " + randomTime);
             timeCheck = 0f;
             generatePowerup();
