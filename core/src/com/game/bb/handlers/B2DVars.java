@@ -15,7 +15,7 @@ public class B2DVars {
 
     public final static float VOID_X = 200f, VOID_Y = 200f;
 
-    public final static float PH_JUMPX = 70f, PH_JUMPY = 200f, RESPAWN_TIME= 3f, PH_BULLET_SPEED = 200f,
+    public final static float PH_JUMPX = 70f, PH_JUMPY = 200f, RESPAWN_TIME= 3f, PH_BULLET_SPEED = 300f,
             PH_GRENADE_X = 300f, PH_GRENADE_Y = -200f;
 
     public static int MY_ID = -123;
