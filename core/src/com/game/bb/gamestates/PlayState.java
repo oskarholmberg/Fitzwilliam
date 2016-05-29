@@ -505,7 +505,7 @@ public class PlayState extends GameState {
     }
 
     private void powerupTaken() {
-        if (cl.powerTaken()) {
+        if (cl.powerTaken() && cl.getLastPowerTaken() != null) {
             SPPower power = powerups.remove(cl.getLastPowerTaken().getId());
             int powerType = power.getPowerType();
             world.destroyBody(power.getBody());
@@ -653,7 +653,6 @@ public class PlayState extends GameState {
 
         //below is debuggingMode stuff for hitboxes etc...
         if (debuggingMode) {
-            Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
             b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         }
     }
