@@ -292,9 +292,9 @@ public class PlayState extends GameState {
                 if (pkt.misc == B2DVars.POWERTYPE_TILTSCREEN) {
                     powerHandler.applyPowerup(pkt.misc);
                 } else if (pkt.misc == B2DVars.POWERTYPE_SHIELD) {
-                    if (pkt.miscString.equals("applyShield")) {
+                    if (pkt.miscString.equals("applyShield")){
                         opponents.get(pkt.id).applyShield();
-                    } else if (pkt.miscString.equals("removeShield")) {
+                    } else if (pkt.miscString.equals("removeShield")){
                         opponents.get(pkt.id).removeShield();
                     }
                 }
@@ -563,35 +563,44 @@ public class PlayState extends GameState {
         world.step(dt, 6, 2);
         if (player != null) {
             player.update(dt);
-            for (IntMap.Keys it = opponents.keys(); it.hasNext; ) {
-                opponents.get(it.next()).update(dt);
-            }
-            for (IntMap.Keys it = myEntities.keys(); it.hasNext; ) {
-                myEntities.get(it.next()).update(dt);
-            }
-            for (IntMap.Keys it = opEntities.keys(); it.hasNext; ) {
-                opEntities.get(it.next()).update(dt);
-            }
-            for (IntMap.Keys it = powerups.keys(); it.hasNext; ) {
-                powerups.get(it.next()).update(dt);
-            }
-            opponentTCPEvents();
-            opponentEntityEvents();
-            opponentMovementEvents();
-
-            refreshAmmo(dt);
-            if (cl.isPlayerHit()) {
-                playerHit();
-            }
-            if (cl.bouncePlayer()) {
-                player.bouncePlayer();
-            }
             if (player.isDead()) {
                 respawnTimer += dt;
                 if (respawnTimer >= B2DVars.RESPAWN_TIME) {
                     respawnPlayer();
                 }
             }
+            if (sendPlayerInfo > B2DVars.MOVEMENT_UPDATE_FREQ) {
+                sendPlayerInfo = 0f;
+                if (hud.getPlayerDeathCount() != 0) {
+                    sendPlayerInfo();
+                }
+            } else {
+                sendPlayerInfo += dt;
+            }
+            updateCamPosition();
+        }
+        for (IntMap.Keys it = opponents.keys(); it.hasNext; ) {
+            opponents.get(it.next()).update(dt);
+        }
+        for (IntMap.Keys it = myEntities.keys(); it.hasNext; ) {
+            myEntities.get(it.next()).update(dt);
+        }
+        for (IntMap.Keys it = opEntities.keys(); it.hasNext; ) {
+            opEntities.get(it.next()).update(dt);
+        }
+        for (IntMap.Keys it = powerups.keys(); it.hasNext; ) {
+            powerups.get(it.next()).update(dt);
+        }
+        opponentTCPEvents();
+        opponentEntityEvents();
+        opponentMovementEvents();
+
+        refreshAmmo(dt);
+        if (cl.isPlayerHit()) {
+            playerHit();
+        }
+        if (cl.bouncePlayer()) {
+            player.bouncePlayer();
         }
         if (sendEntityInfo > B2DVars.ENTITY_UPDATE_FREQ) {
             sendEntityInfo = 0f;
@@ -599,14 +608,7 @@ public class PlayState extends GameState {
         } else {
             sendEntityInfo += dt;
         }
-        if (sendPlayerInfo > B2DVars.MOVEMENT_UPDATE_FREQ) {
-            sendPlayerInfo = 0f;
-            if (hud.getPlayerDeathCount() != 0) {
-                sendPlayerInfo();
-            }
-        } else {
-            sendPlayerInfo += dt;
-        }
+
         checkGrenadeTimer(dt);
         bulletsHittingWall();
         powerupTaken();
@@ -623,7 +625,6 @@ public class PlayState extends GameState {
             }
         }
         handleInput();
-        updateCamPosition();
     }
 
     @Override
