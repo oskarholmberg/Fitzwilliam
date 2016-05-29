@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
 
@@ -23,7 +24,6 @@ public class ConnectionState extends GameState {
     private SPButton hostButton, joinButton;
     private World world;
     private Texture background = new Texture("images/spaceBackground.png");
-    private Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
     private Array<FallingBody> itRains;
     private float newFallingBody = 0f;
 
@@ -57,13 +57,13 @@ public class ConnectionState extends GameState {
     public void handleInput() {
         if (hostButton.isClicked()) {
             dispose();
-            sound.play();
+            Assets.getSound("menuSelect").play();
             gsm.hostGame(true);
             gsm.setState(GameStateManager.PLAY);
         }
         if(joinButton.isClicked()){
             dispose();
-            sound.play();
+            Assets.getSound("menuSelect").play();
             gsm.hostGame(false);
             gsm.setState(GameStateManager.JOIN_SERVER);
         }

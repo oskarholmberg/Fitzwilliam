@@ -58,8 +58,7 @@ public class StartScreenState extends GameState {
     public void handleInput() {
         if (playButton.isClicked()) {
             dispose();
-            Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
-            sound.play();
+            Assets.getSound("menuSelect").play();
             gsm.setState(GameStateManager.CONNECT);
         }
     }
