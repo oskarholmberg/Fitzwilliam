@@ -35,7 +35,7 @@ public class GameOverState extends GameState {
         world = new World(new Vector2(0, -9.81f), true);
         backbutton = new SPButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
                 cam.viewportHeight - 100, 40f, 40f, cam);
-        placings = new Texture[3];
+        placings = new Texture[4];
         placings[0] = new Texture("images/font/golden1.png");
         placings[1] = new Texture("images/font/silver2.png");
         placings[2] = new Texture("images/font/bronze3.png");
