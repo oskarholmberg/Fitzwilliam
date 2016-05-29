@@ -3,6 +3,8 @@ package com.game.bb.handlers;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.game.bb.gamestates.PlayState;
+import com.game.bb.handlers.pools.Pooler;
+import com.game.bb.net.packets.TCPEventPacket;
 
 /**
  * Created by erik on 25/05/16.
@@ -36,11 +38,25 @@ public class PowerupHandler {
                 break;
             case B2DVars.POWERTYPE_SHIELD:
                 shielded = true;
+                TCPEventPacket pkt = Pooler.tcpEventPacket();
+                pkt.id = B2DVars.MY_ID;
+                pkt.action = B2DVars.NET_APPLY_ANTIPOWER;
+                pkt.misc = B2DVars.POWERTYPE_SHIELD;
+                pkt.miscString = "applyShield";
+                PlayState.playState.client.sendTCP(pkt);
+                Pooler.free(pkt);
                 break;
         }
     }
 
     public void removeShield(){
+        TCPEventPacket pkt = Pooler.tcpEventPacket();
+        pkt.id = B2DVars.MY_ID;
+        pkt.action = B2DVars.NET_APPLY_ANTIPOWER;
+        pkt.misc = B2DVars.POWERTYPE_SHIELD;
+        pkt.miscString = "removeShield";
+        PlayState.playState.client.sendTCP(pkt);
+        Pooler.free(pkt);
         shielded = false;
     }
 

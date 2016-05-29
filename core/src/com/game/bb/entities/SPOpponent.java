@@ -5,15 +5,28 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
+import com.game.bb.handlers.SPAnimation;
 
 /**
  * Created by oskar on 5/18/16.
  */
 public class SPOpponent extends SPPlayer {
+    private SPAnimation shield;
+    private boolean shielded = false;
 
     public SPOpponent(World world, float xPos, float yPos, int id, String color) {
         super(world, xPos, yPos, id, color);
+        shield = new SPAnimation(Assets.getAnimation("shield"), 0.2f);
+    }
+
+    public void applyShield(){
+        shielded = true;
+    }
+
+    public void removeShield(){
+        shielded = false;
     }
 
     /**
@@ -35,15 +48,22 @@ public class SPOpponent extends SPPlayer {
         }
     }
 
+
     @Override
     public void render(SpriteBatch sb) {
         if (texture != null) {
             sb.begin();
             float x = body.getPosition().x * B2DVars.PPM - B2DVars.PLAYER_WIDTH;
             float y = body.getPosition().y * B2DVars.PPM - B2DVars.PLAYER_HEIGHT;
+            if (shielded)
+                sb.draw(shield.getFrame(), x, y, 50, 60);
             sb.draw(texture, x - xOffset, y - yOffset, 54, 48);
             sb.end();
         }
+    }
+
+    public void update(float dt){
+        shield.update(dt);
     }
 
     protected void createPlayerBody(float xPos, float yPos) {

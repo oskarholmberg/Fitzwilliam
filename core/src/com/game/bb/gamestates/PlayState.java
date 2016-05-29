@@ -51,7 +51,7 @@ public class PlayState extends GameState {
     private IntMap<SPSprite> myEntities = new IntMap<SPSprite>();
     private IntMap<EnemyEntity> opEntities = new IntMap<EnemyEntity>();
     private float respawnTimer = 0;
-    private GameClient client;
+    public GameClient client;
     private HUD hud;
     private PowerupHandler powerHandler;
     public com.game.bb.handlers.MapBuilder map;
@@ -288,6 +288,12 @@ public class PlayState extends GameState {
             case B2DVars.NET_APPLY_ANTIPOWER:
                 if (pkt.misc == B2DVars.POWERTYPE_TILTSCREEN) {
                     powerHandler.applyPowerup(pkt.misc);
+                } else if (pkt.misc == B2DVars.POWERTYPE_SHIELD) {
+                    if (pkt.miscString.equals("applyShield")){
+                        opponents.get(pkt.id).applyShield();
+                    } else if (pkt.miscString.equals("removeShield")){
+                        opponents.get(pkt.id).removeShield();
+                    }
                 }
                 break;
             case B2DVars.NET_GAME_OVER:
