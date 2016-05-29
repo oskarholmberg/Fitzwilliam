@@ -28,6 +28,7 @@ public class SPGrenade extends SPSprite {
         this.dir = dir;
         this.opponentGrenade=opponentGrenade;
         createGrenadeBody(xPos + dir * getPosXoffset, yPos - posYoffset, dir);
+        Assets.getSound("grenade").play();
         animation = new SPAnimation(Assets.getAnimation(B2DVars.MY_COLOR + "Grenade"), 0.2f);
 
     }

@@ -5,7 +5,7 @@
  </tileset>
  <layer name="textures" width="30" height="20">
   <data encoding="base64" compression="zlib">
-   eJzVld0KgCAMhef86SrI93/ZDBwNmaWYmgcOBWofbPME8B/ZCcwj2HT+viQVrONTfchTiVfVNonr2LsfyOWzsHLfapS7Gz2FcNe6t/j84AAeiWfLSO5quv43NTnTOq9pNuuCMz7ubcmivWAPrwMx8YVt4bmGJVzKW84k59gm2glrKZd6ltad5y0K5ndIC2ekXkrrJ53kAbQ=
+   eJzVld0KgCAMhTd/6irI93/ZDByNsUQxNQ8cCkw/2OYJ4D/yE5hntOt8viaMtumJH/JQeFXtk7gbew8DuXwWVu5bjd7uRk8ZeGrdW3x+zAAeiWfLSO5quv83NTnTOq8ym23FvhYdBd/IOtDs5Nge8jUs4VLeBsYkI+gZ7JI3ZU1yqWey7jxvjWJ+h6yyR+ultn4BN+QBcA==
   </data>
  </layer>
  <objectgroup name="ground">
@@ -33,11 +33,7 @@
  </objectgroup>
  <objectgroup name="bounce">
   <object id="20" x="606.667" y="216" width="33.3333" height="8"/>
-  <object id="27" x="322.667" y="537.333" width="26.6667" height="8"/>
-  <object id="28" x="353.333" y="573.333" width="32" height="4"/>
   <object id="29" x="386.667" y="601.333" width="28" height="6.66667"/>
-  <object id="31" x="256.667" y="539" width="32" height="5.33333"/>
-  <object id="32" x="224.667" y="570.333" width="31.3333" height="5.33333"/>
   <object id="35" x="191.667" y="601.333" width="32" height="7"/>
   <object id="36" x="415.25" y="378" width="32.75" height="6.5"/>
  </objectgroup>

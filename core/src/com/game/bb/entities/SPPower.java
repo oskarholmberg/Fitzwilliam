@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.SPAnimation;
 
@@ -26,11 +27,11 @@ public class SPPower extends SPSprite{
         this.powerType = powerType;
 
         if (powerType == B2DVars.POWERTYPE_AMMO) {
-            animation = new SPAnimation(TextureRegion.split(
-                    new Texture("images/powerups/unlimitedAmmoPower.png"), 17, 17)[0], 0.1f);
+            animation = new SPAnimation(Assets.getAnimation("unlimitedAmmo"), 0.1f);
         } else if (powerType == B2DVars.POWERTYPE_TILTSCREEN){
-            animation = new SPAnimation(TextureRegion.split(
-                    new Texture("images/powerups/shakeWorldPower.png"), 17, 17)[0], 0.1f);
+            animation = new SPAnimation(Assets.getAnimation("shakeWorld"), 0.1f);
+        } else if(powerType == B2DVars.POWERTYPE_SHIELD) {
+            animation = new SPAnimation(Assets.getAnimation("shieldPower"), 0.1f);
         }
     }
 
@@ -70,7 +71,6 @@ public class SPPower extends SPSprite{
 
     @Override
     public void dispose() {
-        animation.dispose();
         shape.dispose();
     }
 }
