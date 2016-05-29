@@ -10,12 +10,12 @@ import com.game.bb.net.packets.TCPEventPacket;
  * Created by erik on 25/05/16.
  */
 public class PowerupHandler {
-    private float ammoAccum = 20f, tiltAccum = 20f, tiltDirection = 1f;
-    private static final float AMMO_DUR = 10f, TILT_DUR = 10f;
+    private float ammoAccum = 20f, tiltAccum = 20f, shieldAccum = 20f, tiltDirection = 1f;
+    private static final float AMMO_DUR = 10f, TILT_DUR = 10f, SHIELD_DUR = 15f;
     private float rotationAngle = 0f;
     private boolean shielded;
     private int xOffset = 25, yOffset = 30;
-    private SPAnimation animation = new SPAnimation(Assets.getAnimation("shield"), 0.2f);
+    private SPAnimation shield = new SPAnimation(Assets.getAnimation("shield"), 0.2f);
 
     public PowerupHandler(){
 
@@ -45,6 +45,7 @@ public class PowerupHandler {
                 pkt.miscString = "applyShield";
                 PlayState.playState.client.sendTCP(pkt);
                 Pooler.free(pkt);
+                shieldAccum = 0f;
                 break;
         }
     }
@@ -68,13 +69,19 @@ public class PowerupHandler {
         if(shielded){
             Vector2 pos = PlayState.playState.player.getPosition();
             sb.begin();
-            sb.draw(animation.getFrame(), pos.x*B2DVars.PPM-xOffset, pos.y*B2DVars.PPM-yOffset, 50, 60);
+            sb.draw(shield.getFrame(), pos.x*B2DVars.PPM-xOffset, pos.y*B2DVars.PPM-yOffset, 50, 60);
             sb.end();
         }
     }
 
     public void update(float dt){
-        animation.update(dt);
+        shield.update(dt);
+        if (shieldAccum < SHIELD_DUR){
+            shieldAccum += dt;
+            if (shieldAccum > SHIELD_DUR){
+                removeShield();
+            }
+        }
         if (ammoAccum < AMMO_DUR){
             ammoAccum += dt;
         }
