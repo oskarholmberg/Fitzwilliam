@@ -1,8 +1,5 @@
 package com.game.bb.entities;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -17,14 +14,12 @@ public class SPBullet extends SPSprite {
     private int offset = 0;
     private float posYoffset = 5/B2DVars.PPM, posXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
     private PolygonShape shape;
-    private Sound shootStound;
 
     public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful, int ID) {
         super(world, ID);
         this.dir=dir;
         createBullet(xPos+dir* posXoffset, yPos-posYoffset, dir, harmful);
-        shootStound = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
-        shootStound.play();
+        Assets.getSound("lasershot").play();
         setTexture(Assets.getTex(B2DVars.MY_COLOR + "Bullet"));
     }
 
@@ -63,6 +58,6 @@ public class SPBullet extends SPSprite {
 
     @Override
     public void dispose() {
-        shootStound.dispose();
+
     }
 }

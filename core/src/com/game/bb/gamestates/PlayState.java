@@ -1,7 +1,5 @@
 package com.game.bb.gamestates;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -60,9 +58,6 @@ public class PlayState extends GameState {
     public com.game.bb.handlers.MapBuilder map;
     private IntArray removedIds;
     private Texture backGround = Assets.getBackground();
-    private Sound reloadSound = Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav"));
-    private Sound emptyClipSound = Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav"));
-    private Sound laserShot = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
     private float[] touchNbrs = {(cam.viewportWidth/ 5), cam.viewportWidth * 4 / 5};
     private int entityPktSequence = 0, playerPktSequence = 0;
     private boolean  grenadesIsEmpty = false, debugClick = false, hosting = false,
@@ -119,7 +114,6 @@ public class PlayState extends GameState {
         packet.miscString = player.getColor();
         packet.id = player.getId();
         client.sendTCP(packet);
-        System.out.println("Sending my info! " + packet.miscString);
         killedByEntity.put(player.getId(), new Array<String>());
         float camX = player.getPosition().x * B2DVars.PPM;
         if ((camX + cam.viewportWidth / 2) > map.getMapWidth()){
@@ -136,7 +130,7 @@ public class PlayState extends GameState {
     public void shoot(){
         if(!player.isDead()){
             if(amntBullets==0){
-                emptyClipSound.play();
+                Assets.getSound("emptyClip").play();
             } else {
                 int id = newEntityID();
                 Vector2 pos = player.getPosition();
@@ -207,7 +201,6 @@ public class PlayState extends GameState {
             shoot();
         }
         if (SPInput.isPressed(SPInput.BUTTON_E)) {
-
             throwGrenade();
         }
         if (SPInput.isPressed(SPInput.BUTTON_Y)) {
@@ -230,8 +223,6 @@ public class PlayState extends GameState {
                 if (!opponents.containsKey(pkt.id)) {
                     SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.miscString);
                     opponents.put(pkt.id, opponent);
-                    System.out.println("New opponent packet! color: " + pkt.miscString + " also sending my own info: " +
-                    player.getColor());
                     hud.setColorToId(pkt.id, pkt.miscString);
                     killedByEntity.put(pkt.id, new Array<String>());
                     TCPEventPacket packet = new TCPEventPacket();
@@ -268,7 +259,7 @@ public class PlayState extends GameState {
                     bullet.getBody().setLinearVelocity(pkt.force);
                     bullet.initInterpolator();
                     opEntities.put(pkt.id, bullet);
-                    laserShot.play();
+                    Assets.getSound("lasershot").play();
                 }
                 break;
             case B2DVars.NET_DESTROY_BODY:
@@ -380,7 +371,7 @@ public class PlayState extends GameState {
                 amntBullets = B2DVars.AMOUNT_BULLET;
                 bulletRefresh = 0;
                 hud.setAmountBulletsLeft(amntBullets);
-                reloadSound.play();
+                Assets.getSound("reload").play();
             } else if (amntBullets == 0) {
                 bulletRefresh += dt;
             }
@@ -466,7 +457,6 @@ public class PlayState extends GameState {
                     Pooler.free(pkt); // return it to the pool
                     SPSprite grenade = myEntities.remove(id);
                     grenade.dispose();
-                    System.out.println("Removing: grenade-timer");
                     world.destroyBody(grenade.getBody());
                 }
             }

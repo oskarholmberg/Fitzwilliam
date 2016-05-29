@@ -34,7 +34,6 @@ public class EntityInterpolator {
         long now = TimeUtils.millis();
         float alpha = (now - lastUpdateTime) / 30f;
         lastUpdateTime = now;
-        System.out.println(alpha);
         return MathUtils.clamp(alpha, 0f, 1.0f);
     }
 

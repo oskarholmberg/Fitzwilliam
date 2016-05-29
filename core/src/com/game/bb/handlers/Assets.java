@@ -1,5 +1,7 @@
 package com.game.bb.handlers;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -12,6 +14,7 @@ public class Assets {
     private static HashMap<String, Texture> tex;
     private static HashMap<String, TextureRegion[]> texRegions;
     private static HashMap<String, TextureRegion> texRegion;
+    private static HashMap<String, Sound> sounds;
     private static Texture background;
 
     public static Texture getTex(String key){
@@ -23,12 +26,16 @@ public class Assets {
     public static TextureRegion[] getAnimation(String key){
         return texRegions.get(key);
     }
+    public static Sound getSound(String key){
+        return sounds.get(key);
+    }
 
 
     public static void init(){
         tex = new HashMap<String, Texture>();
         texRegions = new HashMap<String, TextureRegion[]>();
         texRegion = new HashMap<String, TextureRegion>();
+        sounds = new HashMap<String, Sound>();
         background = new Texture("images/spaceBackground.png");
         //textures
         //blue player
@@ -75,6 +82,11 @@ public class Assets {
         texRegions.put("redGrenade", TextureRegion.split(new Texture("images/weapons/redGrenade.png"), 30, 30)[0]);
         texRegions.put("greenGrenade", TextureRegion.split(new Texture("images/weapons/greenGrenade.png"), 30, 30)[0]);
         texRegions.put("yellowGrenade", TextureRegion.split(new Texture("images/weapons/yellowGrenade.png"), 30, 30)[0]);
+
+        //sounds
+        sounds.put("lasershot", Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav")));
+        sounds.put("reload", Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav")));
+        sounds.put("emptyClip", Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav")));
 
     }
 
