@@ -211,100 +211,100 @@ public class PlayState extends GameState {
     }
 
     private void opponentTCPEvents() {
-        TCPEventPacket pkt = client.getTCPEventPackets();
-        if (pkt == null) return;
-        switch (pkt.action) {
-            case B2DVars.NET_SERVER_INFO:
-                B2DVars.setMyId(pkt.id);
-                B2DVars.setMyColor(pkt.color);
-                createPlayer(B2DVars.MY_COLOR);
-                break;
-            case B2DVars.NET_CONNECT:
-                if (!opponents.containsKey(pkt.id)) {
-                    SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.miscString);
-                    opponents.put(pkt.id, opponent);
-                    hud.setColorToId(pkt.id, pkt.miscString);
-                    killedByEntity.put(pkt.id, new Array<String>());
-                    TCPEventPacket packet = new TCPEventPacket();
-                    packet.action = B2DVars.NET_CONNECT;
-                    packet.pos = player.getPosition();
-                    packet.id = player.getId();
-                    packet.miscString = player.getColor();
-                    hud.setOpponentDeath(pkt.id, B2DVars.AMOUNT_LIVES);
-                    client.sendTCP(packet);
-                }
-                break;
-            case B2DVars.NET_DISCONNECT:
-                if (opponents.containsKey(pkt.id)) {
-                    SPOpponent opponent = opponents.remove(pkt.id);
-                    world.destroyBody(opponent.getBody());
-                    opponent.dispose();
-                    hud.removeOpponentDeathCount(pkt.id);
-                }
-                break;
-            case B2DVars.NET_NEW_ENTITY:
-                if (pkt.miscString.equals("grenade")) {
-                    EnemyGrenade grenade = Pooler.enemyGrenade();
-                    grenade.setAnimation(pkt.color);
-                    grenade.setId(pkt.id);
-                    grenade.getBody().setTransform(pkt.pos, 0);
-                    grenade.getBody().setLinearVelocity(pkt.force);
-                    grenade.initInterpolator();
-                    opEntities.put(pkt.id, grenade);
-                } else if (pkt.miscString.equals("bullet")) {
-                    EnemyBullet bullet = Pooler.enemyBullet();
-                    bullet.setAnimation(pkt.color);
-                    bullet.setId(pkt.id);
-                    bullet.getBody().setTransform(pkt.pos, 0);
-                    bullet.getBody().setLinearVelocity(pkt.force);
-                    bullet.initInterpolator();
-                    opEntities.put(pkt.id, bullet);
-                    Assets.getSound("lasershot").play();
-                }
-                break;
-            case B2DVars.NET_DESTROY_BODY:
-                if (opEntities.containsKey(pkt.id)) {
-                    removedIds.add(pkt.id);
-                    EnemyEntity opEntity = opEntities.remove(pkt.id);
-                    if (opEntity instanceof EnemyBullet)
-                        Pooler.free((EnemyBullet) opEntity); // return it to the pool
-                    else if (opEntity instanceof EnemyGrenade)
-                        Pooler.free((EnemyGrenade) opEntity); // return it to the pool
-                } else if (myEntities.containsKey(pkt.id)) {
-                    SPSprite myEntity = myEntities.remove(pkt.id);
-                    world.destroyBody(myEntity.getBody());
-                    myEntity.dispose();
-                } else if (powerups.containsKey(pkt.id)) {
-                    SPPower powerup = powerups.remove(pkt.id);
-                    world.destroyBody(powerup.getBody());
-                    powerup.dispose();
-                }
-                break;
-            case B2DVars.NET_DEATH:
-                if (opponents.containsKey(pkt.id)) {
-                    hud.setOpponentDeath(pkt.id, pkt.misc);
-                }
-                break;
-            case B2DVars.NET_POWER:
-                powerups.put(pkt.id, new SPPower(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.misc));
-                break;
-            case B2DVars.NET_APPLY_ANTIPOWER:
-                if (pkt.misc == B2DVars.POWERTYPE_TILTSCREEN) {
-                    powerHandler.applyPowerup(pkt.misc);
-                } else if (pkt.misc == B2DVars.POWERTYPE_SHIELD) {
-                    if (pkt.miscString.equals("applyShield")){
-                        opponents.get(pkt.id).applyShield();
-                    } else if (pkt.miscString.equals("removeShield")){
-                        opponents.get(pkt.id).removeShield();
+        for (TCPEventPacket pkt : client.getTCPEventPackets()) {
+            switch (pkt.action) {
+                case B2DVars.NET_SERVER_INFO:
+                    B2DVars.setMyId(pkt.id);
+                    B2DVars.setMyColor(pkt.color);
+                    createPlayer(B2DVars.MY_COLOR);
+                    break;
+                case B2DVars.NET_CONNECT:
+                    if (!opponents.containsKey(pkt.id)) {
+                        SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.miscString);
+                        opponents.put(pkt.id, opponent);
+                        hud.setColorToId(pkt.id, pkt.miscString);
+                        killedByEntity.put(pkt.id, new Array<String>());
+                        TCPEventPacket packet = new TCPEventPacket();
+                        packet.action = B2DVars.NET_CONNECT;
+                        packet.pos = player.getPosition();
+                        packet.id = player.getId();
+                        packet.miscString = player.getColor();
+                        hud.setOpponentDeath(pkt.id, B2DVars.AMOUNT_LIVES);
+                        client.sendTCP(packet);
                     }
-                }
-                break;
-            case B2DVars.NET_GAME_OVER:
-                gameOver(pkt);
-                break;
-            case B2DVars.NET_REMOVE_ME:
-                opponents.get(pkt.id).getBody().setTransform(B2DVars.VOID_X, B2DVars.VOID_Y, 0);
-                break;
+                    break;
+                case B2DVars.NET_DISCONNECT:
+                    if (opponents.containsKey(pkt.id)) {
+                        SPOpponent opponent = opponents.remove(pkt.id);
+                        world.destroyBody(opponent.getBody());
+                        opponent.dispose();
+                        hud.removeOpponentDeathCount(pkt.id);
+                    }
+                    break;
+                case B2DVars.NET_NEW_ENTITY:
+                    if (pkt.miscString.equals("grenade")) {
+                        EnemyGrenade grenade = Pooler.enemyGrenade();
+                        grenade.setAnimation(pkt.color);
+                        grenade.setId(pkt.id);
+                        grenade.getBody().setTransform(pkt.pos, 0);
+                        grenade.getBody().setLinearVelocity(pkt.force);
+                        grenade.initInterpolator();
+                        opEntities.put(pkt.id, grenade);
+                    } else if (pkt.miscString.equals("bullet")) {
+                        EnemyBullet bullet = Pooler.enemyBullet();
+                        bullet.setAnimation(pkt.color);
+                        bullet.setId(pkt.id);
+                        bullet.getBody().setTransform(pkt.pos, 0);
+                        bullet.getBody().setLinearVelocity(pkt.force);
+                        bullet.initInterpolator();
+                        opEntities.put(pkt.id, bullet);
+                        Assets.getSound("lasershot").play();
+                    }
+                    break;
+                case B2DVars.NET_DESTROY_BODY:
+                    if (opEntities.containsKey(pkt.id)) {
+                        removedIds.add(pkt.id);
+                        EnemyEntity opEntity = opEntities.remove(pkt.id);
+                        if (opEntity instanceof EnemyBullet)
+                            Pooler.free((EnemyBullet) opEntity); // return it to the pool
+                        else if (opEntity instanceof EnemyGrenade)
+                            Pooler.free((EnemyGrenade) opEntity); // return it to the pool
+                    } else if (myEntities.containsKey(pkt.id)) {
+                        SPSprite myEntity = myEntities.remove(pkt.id);
+                        world.destroyBody(myEntity.getBody());
+                        myEntity.dispose();
+                    } else if (powerups.containsKey(pkt.id)) {
+                        SPPower powerup = powerups.remove(pkt.id);
+                        world.destroyBody(powerup.getBody());
+                        powerup.dispose();
+                    }
+                    break;
+                case B2DVars.NET_DEATH:
+                    if (opponents.containsKey(pkt.id)) {
+                        hud.setOpponentDeath(pkt.id, pkt.misc);
+                    }
+                    break;
+                case B2DVars.NET_POWER:
+                    powerups.put(pkt.id, new SPPower(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.misc));
+                    break;
+                case B2DVars.NET_APPLY_ANTIPOWER:
+                    if (pkt.misc == B2DVars.POWERTYPE_TILTSCREEN) {
+                        powerHandler.applyPowerup(pkt.misc);
+                    } else if (pkt.misc == B2DVars.POWERTYPE_SHIELD) {
+                        if (pkt.miscString.equals("applyShield")) {
+                            opponents.get(pkt.id).applyShield();
+                        } else if (pkt.miscString.equals("removeShield")) {
+                            opponents.get(pkt.id).removeShield();
+                        }
+                    }
+                    break;
+                case B2DVars.NET_GAME_OVER:
+                    gameOver(pkt);
+                    break;
+                case B2DVars.NET_REMOVE_ME:
+                    opponents.get(pkt.id).getBody().setTransform(B2DVars.VOID_X, B2DVars.VOID_Y, 0);
+                    break;
+            }
         }
     }
 

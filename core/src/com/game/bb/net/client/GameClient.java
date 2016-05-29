@@ -3,6 +3,7 @@ package com.game.bb.net.client;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -76,13 +77,11 @@ public class GameClient extends Listener {
         }
     }
 
-    public TCPEventPacket getTCPEventPackets() {
-        if (tcpPackets.size > 0)
-            return tcpPackets.pop();
-
-        //Array<Object> temp = new Array<Object>();
-        //temp.addAll(tcpPackets);
-        return null;
+    public Array<TCPEventPacket> getTCPEventPackets() {
+        Array<TCPEventPacket> temp = new Array<TCPEventPacket>();
+        temp.addAll(tcpPackets);
+        tcpPackets.clear();
+        return temp;
 
     }
 
