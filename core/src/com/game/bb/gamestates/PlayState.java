@@ -119,6 +119,7 @@ public class PlayState extends GameState {
         packet.miscString = player.getColor();
         packet.id = player.getId();
         client.sendTCP(packet);
+        System.out.println("Sending my info! " + packet.miscString);
         killedByEntity.put(player.getId(), new Array<String>());
         float camX = player.getPosition().x * B2DVars.PPM;
         if ((camX + cam.viewportWidth / 2) > map.getMapWidth()){
@@ -229,6 +230,8 @@ public class PlayState extends GameState {
                 if (!opponents.containsKey(pkt.id)) {
                     SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.miscString);
                     opponents.put(pkt.id, opponent);
+                    System.out.println("New opponent packet! color: " + pkt.miscString + " also sending my own info: " +
+                    player.getColor());
                     hud.setColorToId(pkt.id, pkt.miscString);
                     killedByEntity.put(pkt.id, new Array<String>());
                     TCPEventPacket packet = new TCPEventPacket();
@@ -318,14 +321,9 @@ public class PlayState extends GameState {
     private void opponentEntityEvents(){
         Array<EntityCluster> packets = client.getEntityClusters();
         for (EntityCluster cluster : packets) {
-            float timeDiff = TimeUtils.millis() - cluster.time;
-            if (debugClick){
-                debugClick=false;
-                System.out.println("The delay between the packets are: " + (TimeUtils.millis() - cluster.time) + " timeDiff: " + timeDiff);
-            }
             for (EntityPacket pkt : cluster.pkts) {
                 if (opEntities.containsKey(pkt.id)) {
-                    opEntities.get(pkt.id).updateEntityState(pkt);
+                    opEntities.get(pkt.id).addEntityPacket(pkt);
                 } 
             }
         }
@@ -335,7 +333,7 @@ public class PlayState extends GameState {
         Array<PlayerMovementPacket> packets = client.getOpponentMovements();
         for (PlayerMovementPacket pkt : packets){
             if(opponents.containsKey(pkt.id))
-            opponents.get(pkt.id).move(pkt.xp, pkt.yp, pkt.xv, pkt.yv, pkt.tex, pkt.sound);
+                opponents.get(pkt.id).move(pkt.xp, pkt.yp, pkt.xv, pkt.yv, pkt.tex, pkt.sound);
         }
     }
 
@@ -427,11 +425,7 @@ public class PlayState extends GameState {
                 pkt.xf = b.getLinearVelocity().x;
                 pkt.yf = b.getLinearVelocity().y;
                 pkt.id = id;
-                pkt.alive = 1;
-                if (myEntities.get(id) instanceof SPGrenade)
-                    pkt.type = B2DVars.TYPE_GRENADE;
-                else if (myEntities.get(id) instanceof SPBullet)
-                    pkt.type = B2DVars.TYPE_BULLET;
+                pkt.time = TimeUtils.millis();
                 packets[index] = pkt;
                 index++;
             }
