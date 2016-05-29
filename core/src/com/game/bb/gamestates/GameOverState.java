@@ -39,6 +39,7 @@ public class GameOverState extends GameState {
         placings[0] = new Texture("images/font/golden1.png");
         placings[1] = new Texture("images/font/silver2.png");
         placings[2] = new Texture("images/font/bronze3.png");
+        placings[3] = new Texture("images/font/white4.png");
         splitKillingEntities();
     }
 
