@@ -28,10 +28,11 @@ public class GameServer extends Listener {
     private Server kryoServer;
     private HashMap<Connection, String> connections;
     private HashMap<Connection, Integer> playerIds;
-    private int playerId;
+    private int playerId, mapNbr = 3;
     private Array<String> availableColors;
 
-    public GameServer(){
+    public GameServer(int mapNbr){
+        this.mapNbr=mapNbr;
         kryoServer = new Server();
         connections = new HashMap<Connection, String>();
         playerIds = new HashMap<Connection, Integer>();
@@ -69,6 +70,7 @@ public class GameServer extends Listener {
         pkt.action = B2DVars.NET_SERVER_INFO;
         pkt.id=id;
         pkt.color = color;
+        pkt.misc = mapNbr;
         c.sendTCP(pkt);
         Pooler.free(pkt);
 
@@ -121,9 +123,5 @@ public class GameServer extends Listener {
 
     public void stop(){
         kryoServer.stop();
-    }
-
-    public static void main(String[] args){
-        new GameServer();
     }
 }

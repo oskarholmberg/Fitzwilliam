@@ -58,6 +58,7 @@ public class ConnectionState extends GameState {
         if (hostButton.isClicked()) {
             dispose();
             Assets.getSound("menuSelect").play();
+            gsm.setMapSelection(3);
             gsm.hostGame(true);
             gsm.setState(GameStateManager.PLAY);
         }

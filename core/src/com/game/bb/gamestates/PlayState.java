@@ -83,9 +83,7 @@ public class PlayState extends GameState {
 
         powerups = new IntMap<SPPower>();
 
-
         powerHandler = new PowerupHandler();
-
 
         opponents = new IntMap<SPOpponent>();
         removedIds = new IntArray();

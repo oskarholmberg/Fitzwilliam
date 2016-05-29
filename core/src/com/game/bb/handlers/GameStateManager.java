@@ -26,6 +26,7 @@ public class GameStateManager {
     private Stack<GameState> states;
     private GameClient client;
     private GameServer server;
+    private int mapNbr;
     private boolean hosting = false;
     public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, JOIN_SERVER = 4, HOST_OFFLINE = 5, GAME_OVER = 6;
     public ArrayMap<String, Array<String>> killedByEntities;
@@ -38,6 +39,10 @@ public class GameStateManager {
         Pooler.init();
         Assets.init();
         pushState(START_SCREEN);
+    }
+
+    public void setMapSelection(int mapNbr){
+        this.mapNbr=mapNbr;
     }
 
     public void setKilledByEntities(ArrayMap<String, Array<String>> entities){
@@ -69,7 +74,7 @@ public class GameStateManager {
         switch (state){
             case PLAY:
                 if(hosting){
-                    server = new GameServer();
+                    server = new GameServer(mapNbr);
                     client = new GameClient();
                     try {
                         client.connectToServer(InetAddress.getLocalHost());
