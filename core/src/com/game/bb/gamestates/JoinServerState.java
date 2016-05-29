@@ -33,7 +33,6 @@ public class JoinServerState extends GameState {
     private Texture background = new Texture("images/spaceBackground.png");
     private Texture availableServers = new Texture("images/font/availableServers.png");
     private SPButton backbutton;
-    private Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
     private Array<FallingBody> itRains;
     private float newFallingBody = 0f, refresh = 5f;
     private GameClient client;
@@ -79,13 +78,13 @@ public class JoinServerState extends GameState {
     @Override
     public void handleInput() {
         if (backbutton.isClicked()) {
-            sound.play();
+            Assets.getSound("menuSelect").play();
             searcher.stopSearch();
             gsm.setState(GameStateManager.CONNECT);
         }
         for (InetAddress address : joinButtons.keySet()) {
             if (joinButtons.get(address).isClicked()) {
-                sound.play();
+                Assets.getSound("menuSelect").play();
                 client.connectToServer(address);
                 gsm.setClient(client);
                 searcher.stopSearch();

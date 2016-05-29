@@ -95,6 +95,7 @@ public class Assets {
         sounds.put("reload", Gdx.audio.newSound(Gdx.files.internal("sfx/reload.wav")));
         sounds.put("emptyClip", Gdx.audio.newSound(Gdx.files.internal("sfx/emptyClip.wav")));
         sounds.put("grenade", Gdx.audio.newSound(Gdx.files.internal("sfx/grenade.wav")));
+        sounds.put("menuSelect", Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav")));
 
     }
 

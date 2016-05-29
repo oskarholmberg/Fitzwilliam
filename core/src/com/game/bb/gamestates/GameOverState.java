@@ -22,7 +22,6 @@ public class GameOverState extends GameState {
     private Texture gameOver = new Texture("images/font/gameOver.png");
     private Texture killedBy = new Texture("images/font/killedBy.png");
     private Texture[] placings;
-    private Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
     private ArrayMap<String, Array<String>> killedByEntities;
     private ArrayMap<String, Integer> colorGrenades;
     private ArrayMap<String, Integer> colorBullets;
@@ -66,7 +65,7 @@ public class GameOverState extends GameState {
     @Override
     public void handleInput() {
         if (backbutton.isClicked()) {
-            sound.play();
+            Assets.getSound("menuSelect").play();
             gsm.setState(GameStateManager.CONNECT);
         }
     }
