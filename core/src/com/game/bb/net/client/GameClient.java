@@ -114,4 +114,8 @@ public class GameClient extends Listener {
     public boolean isConnected(){
         return kryoClient.isConnected();
     }
+
+    public void stop(){
+        kryoClient.stop();
+    }
 }

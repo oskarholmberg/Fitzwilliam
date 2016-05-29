@@ -20,6 +20,7 @@ public class GameOverState extends GameState {
     private World world;
     private Texture background = new Texture("images/spaceBackground.png");
     private Texture gameOver = new Texture("images/font/gameOver.png");
+    private Texture killedBy = new Texture("images/font/killedBy.png");
     private Texture[] placings;
     private Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
     private ArrayMap<String, Array<String>> killedByEntities;
@@ -43,18 +44,18 @@ public class GameOverState extends GameState {
         splitKillingEntities();
     }
 
-    private void splitKillingEntities(){
+    private void splitKillingEntities() {
         colorBullets = new ArrayMap<String, Integer>();
         colorGrenades = new ArrayMap<String, Integer>();
-        for (String color : killedByEntities.keys()){
+        for (String color : killedByEntities.keys()) {
             colorBullets.put(color, 0);
             colorGrenades.put(color, 0);
         }
-        for (String color : killedByEntities.keys()){
+        for (String color : killedByEntities.keys()) {
             for (int i = 0; i < killedByEntities.get(color).size; i++) {
                 if (killedByEntities.get(color).get(i).equals("grenade")) {
                     colorGrenades.put(color, colorGrenades.get(color) + 1);
-                } else if (killedByEntities.get(color).get(i).equals("bullet")){
+                } else if (killedByEntities.get(color).get(i).equals("bullet")) {
                     colorBullets.put(color, colorBullets.get(color) + 1);
                 }
             }
@@ -84,22 +85,28 @@ public class GameOverState extends GameState {
         sb.draw(background, 0, 0);
         sb.draw(gameOver, cam.viewportWidth / 4, cam.viewportHeight - 130, 350, 30);
         //draw victory order
-        for (int i = 0; i < victoryOrder.length; i++){
+        for (int i = 0; i < victoryOrder.length; i++) {
             sb.draw(placings[i], cam.viewportWidth / 5 + 200 * i, cam.viewportHeight - 230, 38, 48);
-            sb.draw(Assets.getTex(victoryOrder[i] + "StandRight"), cam.viewportWidth / 5 + 60 + 200*i,
-                    cam.viewportHeight - 230, 48, 48);
+            if (i == 0) {
+                sb.draw(Assets.getTex(victoryOrder[i] + "Victory"), cam.viewportWidth / 5 + 60 + 200 * i,
+                        cam.viewportHeight - 230, 48, 48);
+            } else {
+                sb.draw(Assets.getTex(victoryOrder[i] + "StandRight"), cam.viewportWidth / 5 + 60 + 200 * i,
+                        cam.viewportHeight - 230, 48, 48);
+            }
         }
         int i = 0;
-        for (String color : killedByEntities.keys()){
-            sb.draw(Assets.getTex(color + "StandRight"), cam.viewportWidth / 5 + 50, cam.viewportHeight - 400 - 70 * i,
+        sb.draw(killedBy, cam.viewportWidth / 4, cam.viewportHeight - 300, 350, 24);
+        for (String color : killedByEntities.keys()) {
+            sb.draw(Assets.getTex(color + "StandRight"), cam.viewportWidth / 5 + 50, cam.viewportHeight - 350 - 70 * i,
                     48, 48);
-            for (int j = 0; j < colorBullets.get(color); j++){
-                sb.draw(Assets.getTex(color + "Bullet"), cam.viewportWidth / 5 + 60 + j * 30,
-                        cam.viewportHeight - 365 - 70 * i);
+            for (int j = 0; j < colorBullets.get(color); j++) {
+                sb.draw(Assets.getTex(color + "Bullet"), cam.viewportWidth / 5 + 110 + j * 30,
+                        cam.viewportHeight - 315 - 70 * i);
             }
-            for (int j = 0; j < colorGrenades.get(color); j++){
+            for (int j = 0; j < colorGrenades.get(color); j++) {
                 sb.draw(Assets.getAnimation(color + "Grenade")[0], cam.viewportWidth / 5 + 110 + j * 30,
-                        cam.viewportHeight - 400 - 70 * i, 25, 25);
+                        cam.viewportHeight - 350 - 70 * i, 25, 25);
             }
             i++;
         }

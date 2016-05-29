@@ -25,6 +25,7 @@ public class GameStateManager {
     private Game game;
     private Stack<GameState> states;
     private GameClient client;
+    private GameServer server;
     private boolean hosting = false;
     public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, JOIN_SERVER = 4, HOST_OFFLINE = 5, GAME_OVER = 6;
     public ArrayMap<String, Array<String>> killedByEntities;
@@ -68,7 +69,7 @@ public class GameStateManager {
         switch (state){
             case PLAY:
                 if(hosting){
-                    new GameServer();
+                    server = new GameServer();
                     client = new GameClient();
                     try {
                         client.connectToServer(InetAddress.getLocalHost());
@@ -86,6 +87,8 @@ public class GameStateManager {
             case HOST_OFFLINE:
                 return new HostOfflineState(this);
             case GAME_OVER:
+                if(server != null) server.stop();
+                if(client != null) client.stop();
                 return new GameOverState(this, killedByEntities, victoryOrder);
             default:
                 return null;

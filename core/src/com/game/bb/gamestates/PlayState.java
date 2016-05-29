@@ -564,6 +564,8 @@ public class PlayState extends GameState {
     @Override
     public void update(float dt) {
         if(!client.isConnected()){
+            client.stop();
+            world.dispose();
             gsm.setState(GameStateManager.HOST_OFFLINE);
         }
         world.step(dt, 6, 2);
@@ -685,6 +687,7 @@ public class PlayState extends GameState {
         cam.setToOrtho(false);
         gsm.setVictoryOrder(pkt.miscString);
         gsm.setKilledByEntities(temp);
+        world.dispose();
         gsm.setState(GameStateManager.GAME_OVER);
         dispose();
     }

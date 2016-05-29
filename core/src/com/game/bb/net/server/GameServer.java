@@ -119,6 +119,10 @@ public class GameServer extends Listener {
         }
     }
 
+    public void stop(){
+        kryoServer.stop();
+    }
+
     public static void main(String[] args){
         new GameServer();
     }
