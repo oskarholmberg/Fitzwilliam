@@ -505,7 +505,7 @@ public class PlayState extends GameState {
     }
 
     private void powerupTaken() {
-        if (cl.powerTaken()) {
+        if (cl.powerTaken() && cl.getLastPowerTaken() != null) {
             SPPower power = powerups.remove(cl.getLastPowerTaken().getId());
             int powerType = power.getPowerType();
             world.destroyBody(power.getBody());
