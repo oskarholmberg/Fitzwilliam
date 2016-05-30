@@ -15,7 +15,6 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.game.bb.gamestates.PlayState;
-import com.game.bb.handlers.B2DVars;
 
 /**
  * Created by erik on 14/05/16.

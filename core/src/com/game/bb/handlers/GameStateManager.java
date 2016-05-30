@@ -4,13 +4,13 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.game.bb.gamestates.ConnectionState;
 import com.game.bb.gamestates.GameOverState;
+import com.game.bb.gamestates.GameState;
 import com.game.bb.gamestates.HostOfflineState;
 import com.game.bb.gamestates.JoinServerState;
-import com.game.bb.gamestates.StartScreenState;
 import com.game.bb.gamestates.PlayState;
+import com.game.bb.gamestates.StartScreenState;
 import com.game.bb.handlers.pools.Pooler;
 import com.game.bb.main.Game;
-import com.game.bb.gamestates.GameState;
 import com.game.bb.net.client.GameClient;
 import com.game.bb.net.server.GameServer;
 
