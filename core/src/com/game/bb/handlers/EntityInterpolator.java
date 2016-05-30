@@ -30,15 +30,6 @@ public class EntityInterpolator {
         entityStates = new Array<EntityPacket>();
     }
 
-    public float getAlpha(){
-        long now = TimeUtils.millis();
-        float alpha = (now - lastUpdateTime) / 30f;
-        lastUpdateTime = now;
-        return MathUtils.clamp(alpha, 0f, 1.0f);
-    }
-
-
-
     public void addEntityPacket(EntityPacket pkt){
         entityStates.add(pkt);
     }
@@ -52,6 +43,13 @@ public class EntityInterpolator {
             body.setTransform(interpolatedPos, 0);
             body.setLinearVelocity(pkt.xf, pkt.yf);
         }
+    }
+
+    public float getAlpha(){
+        long now = TimeUtils.millis();
+        float alpha = (now - lastUpdateTime) / 30f;
+        lastUpdateTime = now;
+        return MathUtils.clamp(alpha, 0f, 1.0f);
     }
 
     public Vector2 getPlayerPosition(PlayerMovementPacket pkt){
