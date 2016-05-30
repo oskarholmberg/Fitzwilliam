@@ -54,6 +54,7 @@ public class PlayState extends GameState {
     private IntMap<SPSprite> myEntities = new IntMap<SPSprite>();
     private IntMap<EnemyEntity> opEntities = new IntMap<EnemyEntity>();
     private float respawnTimer = 0;
+    private TCPEventPacket gameOverPacket;
     public GameClient client;
     private HUD hud;
     private PowerupHandler powerHandler;
@@ -63,7 +64,7 @@ public class PlayState extends GameState {
     private float[] touchNbrs = {(cam.viewportWidth / 5), cam.viewportWidth * 4 / 5};
     private int entityPktSequence = 0, playerPktSequence = 0;
     private boolean grenadesIsEmpty = false, debugClick = false, hosting = false,
-            removeMeMessageSent = false, debuggingMode = false;
+            removeMeMessageSent = false, debuggingMode = false, gameOverReceived = false;
     private float sendEntityInfo = 0f, sendPlayerInfo = 0f;
 
     public int currentTexture = SPOpponent.STAND_LEFT;
@@ -302,7 +303,8 @@ public class PlayState extends GameState {
                     }
                     break;
                 case B2DVars.NET_GAME_OVER:
-                    gameOver(pkt);
+                    gameOverPacket = pkt;
+                    gameOverReceived = true;
                     break;
                 case B2DVars.NET_REMOVE_ME:
                     opponents.get(pkt.id).getBody().setTransform(B2DVars.VOID_X, B2DVars.VOID_Y, 0);
@@ -630,6 +632,9 @@ public class PlayState extends GameState {
                 gameOver(pkt);
                 Pooler.free(pkt);
             }
+        }
+        if (gameOverReceived){
+            gameOver(gameOverPacket);
         }
         handleInput();
     }
