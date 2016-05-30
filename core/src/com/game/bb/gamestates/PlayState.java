@@ -252,7 +252,7 @@ public class PlayState extends GameState {
                         grenade.setAnimation(pkt.color);
                         grenade.setId(pkt.id);
                         grenade.getBody().setTransform(pkt.pos, 0);
-                        grenade.getBody().setLinearVelocity(pkt.force);
+                        //grenade.getBody().setLinearVelocity(pkt.force);
                         grenade.initInterpolator();
                         opEntities.put(pkt.id, grenade);
                     } else if (pkt.miscString.equals("bullet")) {
