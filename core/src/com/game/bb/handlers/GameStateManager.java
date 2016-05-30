@@ -91,6 +91,7 @@ public class GameStateManager {
             case HOST_OFFLINE:
                 return new HostOfflineState(this);
             case GAME_OVER:
+                hosting = false;
                 if(server != null) server.stop();
                 if(client != null) client.stop();
                 return new GameOverState(this, killedByEntities, victoryOrder);
