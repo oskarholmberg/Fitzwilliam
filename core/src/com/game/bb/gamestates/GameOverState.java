@@ -18,7 +18,7 @@ public class GameOverState extends GameState {
 
     private SPButton backbutton;
     private World world;
-    private Texture background = new Texture("images/spaceBackground.png");
+    private Texture background = Assets.getBackground();
     private Texture gameOver = new Texture("images/font/gameOver.png");
     private Texture killedBy = new Texture("images/font/killedBy.png");
     private Texture[] placings;
@@ -114,6 +114,11 @@ public class GameOverState extends GameState {
 
     @Override
     public void dispose() {
-
+        gameOver.dispose();
+        killedBy.dispose();
+        backbutton.dispose();
+        for (Texture t : placings){
+            t.dispose();
+        }
     }
 }

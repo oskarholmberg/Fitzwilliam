@@ -4,12 +4,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Disposable;
 import com.game.bb.handlers.SPInput;
 
 /**
  * Created by erik on 12/05/16.
  */
-public class SPButton {
+public class SPButton implements Disposable{
     private Texture texture;
     private float xPos, yPos, texWidth, texHeight;
     private OrthographicCamera cam;
@@ -50,11 +51,17 @@ public class SPButton {
         sb.end();
     }
 
+
     public void setInfo(String server) {
         info = server;
     }
 
     public String getInfo(){
         return info;
+    }
+
+    @Override
+    public void dispose() {
+        texture.dispose();
     }
 }

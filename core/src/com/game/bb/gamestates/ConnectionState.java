@@ -23,7 +23,7 @@ public class ConnectionState extends GameState {
 
     private SPButton hostButton, joinButton;
     private World world;
-    private Texture background = new Texture("images/spaceBackground.png");
+    private Texture background = Assets.getBackground();
     private Array<FallingBody> itRains;
     private float newFallingBody = 0f;
 
@@ -101,6 +101,8 @@ public class ConnectionState extends GameState {
         for(FallingBody b : itRains){
             b.dispose();
         }
+        hostButton.dispose();
+        joinButton.dispose();
     }
 
     public class FallingBody implements Disposable{

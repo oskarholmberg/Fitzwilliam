@@ -92,6 +92,7 @@ public class StartScreenState extends GameState {
         for (FallingBody b : itRains){
             b.dispose();
         }
+        playButton.dispose();
     }
 
     public class FallingBody implements Disposable{

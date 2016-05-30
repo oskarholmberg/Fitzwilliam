@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
 
@@ -21,7 +22,7 @@ import com.game.bb.handlers.GameStateManager;
 public class HostOfflineState extends GameState {
 
     private World world;
-    private Texture background = new Texture("images/spaceBackground.png");
+    private Texture background = Assets.getBackground();
     private Texture hostOffline = new Texture("images/font/hostOffline.png");
     private float timeout = 0f;
 
@@ -61,7 +62,6 @@ public class HostOfflineState extends GameState {
 
     @Override
     public void dispose() {
-        background.dispose();
         hostOffline.dispose();
     }
 }

@@ -30,7 +30,7 @@ public class JoinServerState extends GameState {
 
     private HashMap<InetAddress, SPButton> joinButtons;
     private World world;
-    private Texture background = new Texture("images/spaceBackground.png");
+    private Texture background = Assets.getBackground();
     private Texture availableServers = new Texture("images/font/availableServers.png");
     private SPButton backbutton;
     private Array<FallingBody> itRains;
@@ -152,6 +152,8 @@ public class JoinServerState extends GameState {
         for (FallingBody b : itRains){
             b.dispose();
         }
+        availableServers.dispose();
+        backbutton.dispose();
     }
 
     private HashMap<InetAddress, SPButton> getJoinButtons() {
