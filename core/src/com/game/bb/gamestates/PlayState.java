@@ -668,6 +668,14 @@ public class PlayState extends GameState {
 
     @Override
     public void dispose() {
+        //Array<Body> bodies = new Array<Body>();
+        //world.getBodies(bodies);
+        //System.out.println("Amount of bodies in world: " + bodies.size + " disposing...");
+        //for (Body b : bodies){
+        //    world.destroyBody(b);
+        //}
+        //world.clearForces();
+        world.dispose();
     }
 
     private void gameOver(TCPEventPacket pkt) {
@@ -691,7 +699,6 @@ public class PlayState extends GameState {
         gsm.setVictoryOrder(pkt.miscString);
         gsm.setKilledByEntities(temp);
         gsm.setState(GameStateManager.GAME_OVER);
-        dispose();
     }
 
     private String constructVictoryOrderString() {
