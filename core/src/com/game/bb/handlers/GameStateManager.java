@@ -1,16 +1,19 @@
 package com.game.bb.handlers;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.game.bb.gamestates.ConnectionState;
 import com.game.bb.gamestates.GameOverState;
+import com.game.bb.gamestates.GameState;
 import com.game.bb.gamestates.HostOfflineState;
 import com.game.bb.gamestates.JoinServerState;
-import com.game.bb.gamestates.StartScreenState;
 import com.game.bb.gamestates.PlayState;
+import com.game.bb.gamestates.ServerFullScreen;
+import com.game.bb.gamestates.StartScreenState;
 import com.game.bb.handlers.pools.Pooler;
-import com.game.bb.main.Game;
-import com.game.bb.gamestates.GameState;
+import com.game.bb.main.MainGame;
 import com.game.bb.net.client.GameClient;
 import com.game.bb.net.server.GameServer;
 
@@ -21,8 +24,8 @@ import java.util.Stack;
 /**
  * Created by erik on 06/05/16.
  */
-public class GameStateManager {
-    private Game game;
+public class GameStateManager extends Game{
+    private MainGame mainGame;
     private Stack<GameState> states;
     private GameClient client;
     private GameServer server;
@@ -31,14 +34,17 @@ public class GameStateManager {
     public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, JOIN_SERVER = 4, HOST_OFFLINE = 5, GAME_OVER = 6;
     public ArrayMap<String, Array<String>> killedByEntities;
     public String victoryOrder;
+    public Screen screen;
 
 
-    public GameStateManager(Game game) {
-        this.game = game;
+    public GameStateManager(MainGame mainGame) {
+        this.mainGame = mainGame;
         states = new Stack<GameState>();
         Pooler.init();
         Assets.init();
-        pushState(START_SCREEN);
+//        pushState(START_SCREEN);
+        screen = new ServerFullScreen(this);
+        setScreen(new ServerFullScreen(this));
     }
 
     public void setMapSelection(int mapNbr) {
@@ -57,16 +63,22 @@ public class GameStateManager {
         return hosting;
     }
 
-    public Game game() {
-        return game;
+    public MainGame game() {
+        return mainGame;
     }
 
     public void update(float dt) {
-        states.peek().update(dt);
+//        states.peek().update(dt);
+        screen.render(dt);
+    }
+
+    @Override
+    public void create() {
+
     }
 
     public void render() {
-        states.peek().render();
+//        states.peek().render();
     }
 
     private GameState getState(int state) {

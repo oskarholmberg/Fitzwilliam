@@ -3,24 +3,24 @@ package com.game.bb.gamestates;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.game.bb.main.Game;
+import com.game.bb.main.MainGame;
 
 /**
  * Created by erik on 06/05/16.
  */
 public abstract class GameState {
     protected com.game.bb.handlers.GameStateManager gsm;
-    protected Game game;
+    protected MainGame mainGame;
     protected SpriteBatch sb;
     public OrthographicCamera cam;
     protected OrthographicCamera hudCam;
 
     protected GameState(com.game.bb.handlers.GameStateManager gsm){
         this.gsm=gsm;
-        game=gsm.game();
-        sb = game.getBatch();
-        cam = game.getCam();
-        hudCam = game.getHudCam();
+        mainGame =gsm.game();
+        sb = mainGame.getBatch();
+        cam = mainGame.getCam();
+        hudCam = mainGame.getHudCam();
 
     }
 

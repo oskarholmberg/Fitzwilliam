@@ -3,8 +3,12 @@ package com.game.bb.net.server;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+<<<<<<< Updated upstream
 import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.TimeUtils;
+=======
+import com.badlogic.gdx.utils.IntMap;
+>>>>>>> Stashed changes
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -16,7 +20,6 @@ import com.game.bb.net.packets.PlayerMovementPacket;
 import com.game.bb.net.packets.TCPEventPacket;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.HashMap;
 
 /**
@@ -51,16 +54,17 @@ public class GameServer extends Listener {
         try {
             kryoServer.bind(tcpPort, udpPort);
         } catch (IOException e) {
-            Gdx.app.log("NET_SERVER", "Server already running, joining local game.");
+            Gdx.app.log("NET_SERVER", "Server already running, joining local mainGame.");
         }
         kryoServer.addListener(this);
         kryoServer.start();
-        Gdx.app.log("NET_SERVER", "Game server started");
+        Gdx.app.log("NET_SERVER", "MainGame server started");
         Gdx.app.log("NET_SERVER", "Server running on UDP port: " + udpPort + ", TCP port: " + tcpPort);
     }
 
     @Override
     public void connected(Connection c){
+<<<<<<< Updated upstream
         Gdx.app.log("NET_SERVER", "Client @" + c.getRemoteAddressUDP().getAddress().toString().substring(1) + " connected.");
         connections.put(c, c.getRemoteAddressTCP().getAddress().toString().substring(1) + ":"
                 + c.getRemoteAddressTCP().getPort());
@@ -74,6 +78,28 @@ public class GameServer extends Listener {
         c.sendTCP(pkt);
         Pooler.free(pkt);
 
+=======
+        if(connections.size()<4) {
+            Gdx.app.log("NET_SERVER", "Client @" + c.getRemoteAddressUDP().getAddress().toString().substring(1) + " connected.");
+            connections.put(c, c.getRemoteAddressTCP().getAddress().toString().substring(1) + ":"
+                    + c.getRemoteAddressTCP().getPort());
+            int id = newPlayerId();
+            playerIds.put(c, id);
+            String color = newPlayerColor(id);
+            TCPEventPacket pkt = Pooler.tcpEventPacket();
+            pkt.action = B2DVars.NET_SERVER_INFO;
+            pkt.id = id;
+            pkt.color = color;
+            pkt.misc = mapNbr;
+            c.sendTCP(pkt);
+            Pooler.free(pkt);
+        }else{
+            TCPEventPacket pkt = Pooler.tcpEventPacket();
+            pkt.action = B2DVars.NET_SERVER_FULL;
+            c.sendTCP(pkt);
+            Pooler.free(pkt);
+        }
+>>>>>>> Stashed changes
     }
     private int newPlayerId(){
         playerId++;
@@ -114,8 +140,16 @@ public class GameServer extends Listener {
         TCPEventPacket packet = new TCPEventPacket();
         packet.action = B2DVars.NET_DISCONNECT;
         packet.id = playerIds.get(c);
+<<<<<<< Updated upstream
+=======
+        //Restore color to available.
+        String color = takenColors.get(playerIds.get(c));
+        availableColors.add(color);
+        //Remove player from records.
+>>>>>>> Stashed changes
         playerIds.remove(c);
         connections.remove(c);
+        //Notify other players of the disconnection
         for (Connection connection : kryoServer.getConnections()){
             connection.sendTCP(packet);
         }

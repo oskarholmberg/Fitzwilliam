@@ -9,7 +9,7 @@
 
 ##Functionality##
 	Add score screen with finish condition. Think SuperSmash!
-	Upon death, send cause to server for display after game.
+	Upon death, send cause to server for display after mainGame.
 
 ##Extra##
 

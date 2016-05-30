@@ -12,10 +12,10 @@ public class BBDesktop {
     public static void main(String[] args){
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 
-        config.title= Game.TITLE;
+        config.title= MainGame.TITLE;
         config.width= B2DVars.DEFAULT_GAME_WIDTH;
         config.height=B2DVars.DEFAULT_GAME_HEIGHT;
 
-        new LwjglApplication(new Game(), config);
+        new LwjglApplication(new MainGame(), config);
     }
 }

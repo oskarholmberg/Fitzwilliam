@@ -8,7 +8,7 @@ import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.SPInput;
 import com.game.bb.handlers.SPInputProcessor;
 
-public class Game extends ApplicationAdapter {
+public class MainGame extends ApplicationAdapter {
     public final static String TITLE = "Fitzwilliam";
 
     private SpriteBatch batch;

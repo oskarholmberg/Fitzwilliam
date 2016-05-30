@@ -1,7 +1,5 @@
 package com.game.bb.gamestates;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -19,11 +17,19 @@ import com.game.bb.entities.EnemyGrenade;
 import com.game.bb.entities.SPBullet;
 import com.game.bb.entities.SPGrenade;
 import com.game.bb.entities.SPOpponent;
+import com.game.bb.entities.SPPlayer;
 import com.game.bb.entities.SPPower;
 import com.game.bb.entities.SPSprite;
-import com.game.bb.handlers.*;
-import com.game.bb.entities.SPPlayer;
+import com.game.bb.handlers.Assets;
+import com.game.bb.handlers.B2DVars;
+import com.game.bb.handlers.GameStateManager;
+import com.game.bb.handlers.HUD;
 import com.game.bb.handlers.MapBuilder;
+import com.game.bb.handlers.PowerupHandler;
+import com.game.bb.handlers.PowerupSpawner;
+import com.game.bb.handlers.SPContactListener;
+import com.game.bb.handlers.SPInput;
+import com.game.bb.handlers.Tools;
 import com.game.bb.handlers.pools.Pooler;
 import com.game.bb.net.client.GameClient;
 import com.game.bb.net.packets.EntityCluster;
@@ -219,6 +225,9 @@ public class PlayState extends GameState {
                     B2DVars.setMyId(pkt.id);
                     B2DVars.setMyColor(pkt.color);
                     createPlayer(B2DVars.MY_COLOR);
+                    break;
+                case B2DVars.NET_SERVER_FULL:
+                    gsm.setState(GameStateManager.JOIN_SERVER);
                     break;
                 case B2DVars.NET_CONNECT:
                     if (!opponents.containsKey(pkt.id)) {

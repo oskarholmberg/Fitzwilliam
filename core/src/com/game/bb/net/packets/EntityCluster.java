@@ -2,8 +2,6 @@ package com.game.bb.net.packets;
 
 import com.badlogic.gdx.utils.Pool;
 
-import java.util.List;
-
 /**
  * Created by erik on 18/05/16.
  */
