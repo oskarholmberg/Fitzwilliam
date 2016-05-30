@@ -41,19 +41,19 @@ public class GameStateManager {
         pushState(START_SCREEN);
     }
 
-    public void setMapSelection(int mapNbr){
-        this.mapNbr=mapNbr;
+    public void setMapSelection(int mapNbr) {
+        this.mapNbr = mapNbr;
     }
 
-    public void setKilledByEntities(ArrayMap<String, Array<String>> entities){
+    public void setKilledByEntities(ArrayMap<String, Array<String>> entities) {
         killedByEntities = entities;
     }
 
-    public void setVictoryOrder(String order){
-        victoryOrder=order;
+    public void setVictoryOrder(String order) {
+        victoryOrder = order;
     }
 
-    public boolean isHosting(){
+    public boolean isHosting() {
         return hosting;
     }
 
@@ -70,9 +70,9 @@ public class GameStateManager {
     }
 
     private GameState getState(int state) {
-        switch (state){
+        switch (state) {
             case PLAY:
-                if(hosting){
+                if (hosting) {
                     server = new GameServer(mapNbr);
                     client = new GameClient();
                     try {
@@ -91,8 +91,8 @@ public class GameStateManager {
             case HOST_OFFLINE:
                 return new HostOfflineState(this);
             case GAME_OVER:
-                if(server != null) server.stop();
-                if(client != null) client.stop();
+                if (server != null) server.stop();
+                if (client != null) client.stop();
                 return new GameOverState(this, killedByEntities, victoryOrder);
             default:
                 return null;
@@ -116,8 +116,8 @@ public class GameStateManager {
         this.hosting = hosting;
     }
 
-    public void setClient(GameClient client){
-        this.client=client;
+    public void setClient(GameClient client) {
+        this.client = client;
     }
 
 }
