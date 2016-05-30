@@ -241,6 +241,7 @@ public class PlayState extends GameState {
                     if (opponents.containsKey(pkt.id)) {
                         SPOpponent opponent = opponents.remove(pkt.id);
                         world.destroyBody(opponent.getBody());
+                        killedByEntity.remove(pkt.id);
                         opponent.dispose();
                         hud.removeOpponentDeathCount(pkt.id);
                     }

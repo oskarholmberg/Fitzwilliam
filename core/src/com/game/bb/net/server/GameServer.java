@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -30,18 +31,15 @@ public class GameServer extends Listener {
     private HashMap<Connection, Integer> playerIds;
     private int playerId, mapNbr = 3;
     private Array<String> availableColors;
+    private IntMap<String> takenColors;
 
     public GameServer(int mapNbr){
         this.mapNbr=mapNbr;
         kryoServer = new Server();
         connections = new HashMap<Connection, String>();
         playerIds = new HashMap<Connection, Integer>();
-        playerId = 10;
-        availableColors = new Array<String>();
-        availableColors.add(B2DVars.COLOR_BLUE);
-        availableColors.add(B2DVars.COLOR_RED);
-        availableColors.add(B2DVars.COLOR_YELLOW);
-        availableColors.add(B2DVars.COLOR_GREEN);
+        takenColors = new IntMap<String>();
+        init();
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
             TCPEventPacket.class, EntityCluster.class, EntityPacket[].class, PlayerMovementPacket.class,
             String.class};
@@ -65,7 +63,8 @@ public class GameServer extends Listener {
         connections.put(c, c.getRemoteAddressTCP().getAddress().toString().substring(1) + ":"
                 + c.getRemoteAddressTCP().getPort());
         int id = newPlayerId();
-        String color = newPlayerColor();
+        playerIds.put(c, id);
+        String color = newPlayerColor(id);
         TCPEventPacket pkt = Pooler.tcpEventPacket();
         pkt.action = B2DVars.NET_SERVER_INFO;
         pkt.id=id;
@@ -79,10 +78,22 @@ public class GameServer extends Listener {
         playerId++;
         return playerId;
     }
-    private String newPlayerColor(){
+    private String newPlayerColor(int id){
         String color = availableColors.random();
         availableColors.removeValue(color, true);
+        takenColors.put(id, color);
         return color;
+    }
+
+    public void init(){
+        playerId = 10;
+        availableColors = new Array<String>();
+        availableColors.add(B2DVars.COLOR_BLUE);
+        availableColors.add(B2DVars.COLOR_RED);
+        availableColors.add(B2DVars.COLOR_YELLOW);
+        availableColors.add(B2DVars.COLOR_GREEN);
+        connections.clear();
+        playerIds.clear();
     }
 
     @Override
@@ -95,11 +106,6 @@ public class GameServer extends Listener {
                 }
             }
         } else if (packet instanceof TCPEventPacket){
-            if(((TCPEventPacket) packet).action == B2DVars.NET_CONNECT){
-                if(!playerIds.containsKey(c)){
-                    playerIds.put(c, ((TCPEventPacket) packet).id);
-                }
-            }
             for (Connection connect : kryoServer.getConnections()) {
                 if (!c.equals(connect)) {
                     connect.sendTCP(packet);
@@ -114,6 +120,9 @@ public class GameServer extends Listener {
         TCPEventPacket packet = new TCPEventPacket();
         packet.action = B2DVars.NET_DISCONNECT;
         packet.id = playerIds.get(c);
+        //Restore color to available.
+        String color = takenColors.get(playerIds.get(c));
+        availableColors.add(color);
         playerIds.remove(c);
         connections.remove(c);
         for (Connection connection : kryoServer.getConnections()){
