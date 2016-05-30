@@ -57,7 +57,6 @@ public class StartScreenState extends GameState {
     @Override
     public void handleInput() {
         if (playButton.isClicked()) {
-            dispose();
             Assets.getSound("menuSelect").play();
             gsm.setState(GameStateManager.CONNECT);
         }

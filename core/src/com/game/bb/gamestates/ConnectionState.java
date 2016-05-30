@@ -56,14 +56,12 @@ public class ConnectionState extends GameState {
     @Override
     public void handleInput() {
         if (hostButton.isClicked()) {
-            dispose();
             Assets.getSound("menuSelect").play();
             gsm.setMapSelection(3);
             gsm.hostGame(true);
             gsm.setState(GameStateManager.PLAY);
         }
         if(joinButton.isClicked()){
-            dispose();
             Assets.getSound("menuSelect").play();
             gsm.hostGame(false);
             gsm.setState(GameStateManager.JOIN_SERVER);
