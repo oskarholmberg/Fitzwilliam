@@ -36,12 +36,7 @@ public class GameServer extends Listener {
         kryoServer = new Server();
         connections = new HashMap<Connection, String>();
         playerIds = new HashMap<Connection, Integer>();
-        playerId = 10;
-        availableColors = new Array<String>();
-        availableColors.add(B2DVars.COLOR_BLUE);
-        availableColors.add(B2DVars.COLOR_RED);
-        availableColors.add(B2DVars.COLOR_YELLOW);
-        availableColors.add(B2DVars.COLOR_GREEN);
+        init();
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
             TCPEventPacket.class, EntityCluster.class, EntityPacket[].class, PlayerMovementPacket.class,
             String.class};
@@ -65,6 +60,7 @@ public class GameServer extends Listener {
         connections.put(c, c.getRemoteAddressTCP().getAddress().toString().substring(1) + ":"
                 + c.getRemoteAddressTCP().getPort());
         int id = newPlayerId();
+        playerIds.put(c, id);
         String color = newPlayerColor();
         TCPEventPacket pkt = Pooler.tcpEventPacket();
         pkt.action = B2DVars.NET_SERVER_INFO;
@@ -85,6 +81,17 @@ public class GameServer extends Listener {
         return color;
     }
 
+    public void init(){
+        playerId = 10;
+        availableColors = new Array<String>();
+        availableColors.add(B2DVars.COLOR_BLUE);
+        availableColors.add(B2DVars.COLOR_RED);
+        availableColors.add(B2DVars.COLOR_YELLOW);
+        availableColors.add(B2DVars.COLOR_GREEN);
+        connections.clear();
+        playerIds.clear();
+    }
+
     @Override
     public void received(Connection c, Object packet){
         //Gdx.app.log("NET_SERVER_PACKET_RECEIVED", packet.getClass().toString());
@@ -95,11 +102,6 @@ public class GameServer extends Listener {
                 }
             }
         } else if (packet instanceof TCPEventPacket){
-            if(((TCPEventPacket) packet).action == B2DVars.NET_CONNECT){
-                if(!playerIds.containsKey(c)){
-                    playerIds.put(c, ((TCPEventPacket) packet).id);
-                }
-            }
             for (Connection connect : kryoServer.getConnections()) {
                 if (!c.equals(connect)) {
                     connect.sendTCP(packet);
