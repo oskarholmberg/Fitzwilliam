@@ -246,10 +246,27 @@ public class PlayState extends GameState {
                     break;
                 case B2DVars.NET_DISCONNECT:
                     if (opponents.containsKey(pkt.id)) {
+                        //remove opponent
                         SPOpponent opponent = opponents.remove(pkt.id);
                         world.destroyBody(opponent.getBody());
+                        //clear opponents score
                         killedByEntity.remove(pkt.id);
+                        //remove all entities belonging to that opponent
+                        for (IntMap.Keys it = opEntities.keys(); it.hasNext;){
+                            int id = it.next();
+                            if(pkt.id == Tools.getPlayerId(id)){
+                                EnemyEntity e = opEntities.get(id);
+                                if(e instanceof EnemyGrenade){
+                                    Pooler.free((EnemyGrenade) e);
+                                }
+                                else if(e instanceof EnemyBullet){
+                                    Pooler.free((EnemyBullet) e);
+                                }
+                            }
+
+                        }
                         opponent.dispose();
+                        //remove from hud
                         hud.removeOpponentDeathCount(pkt.id);
                     }
                     break;
