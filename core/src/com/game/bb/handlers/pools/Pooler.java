@@ -28,6 +28,15 @@ public class Pooler {
         enemyBulletPool = new EnemyBulletPool();
     }
 
+    public static void reset(){
+        entityPacketPool.clear();
+        entityClusterPool.clear();
+        playerMovementPacketPool.clear();
+        tcpEventPacketPool.clear();
+        enemyBulletPool.clear();
+        enemyGrenadePool.clear();
+    }
+
 
     public static class EntityPacketPool extends CountingPool<EntityPacket> {
 

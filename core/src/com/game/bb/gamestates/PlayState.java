@@ -703,6 +703,7 @@ public class PlayState extends GameState {
         //    world.destroyBody(b);
         //}
         //world.clearForces();
+        Pooler.reset();
         world.dispose();
     }
 
