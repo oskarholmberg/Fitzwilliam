@@ -360,8 +360,7 @@ public class PlayState extends GameState {
         if (hud.getPlayerDeathCount() != 0) {
             Vector2 spawnLoc = spawnLocations.random();
             respawnTimer = 0;
-            player.revive();
-            player.jump(0, 0, spawnLoc.x, spawnLoc.y);
+            player.revive(spawnLoc,lastJumpDirection);
             amntBullets = B2DVars.AMOUNT_BULLET;
             amntGrenades = B2DVars.AMOUNT_GRENADE;
             hud.setAmountBulletsLeft(amntBullets);
