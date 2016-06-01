@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.game.bb.entities.EnemyBullet;
 import com.game.bb.entities.EnemyEntity;
@@ -56,9 +57,10 @@ public class PlayState extends GameState {
     private IntMap<SPPower> powerups;
     private IntMap<Integer> opponentEntitySequence;
     private IntMap<Array<String>> killedByEntity;
+    private IntMap<Long> timeOffset;
     private int entityAccum = 0;
     private int amntBullets = B2DVars.AMOUNT_BULLET, amntGrenades = B2DVars.AMOUNT_GRENADE;
-    private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh;
+    private float bulletRefresh, lastJumpDirection = 1, grenadeRefresh, updateMyTime = 0f;
     private IntMap<SPSprite> myEntities = new IntMap<SPSprite>();
     private IntMap<EnemyEntity> opEntities = new IntMap<EnemyEntity>();
     private float respawnTimer = 0;
@@ -99,6 +101,7 @@ public class PlayState extends GameState {
         opponents = new IntMap<SPOpponent>();
         opponentEntitySequence = new IntMap<Integer>();
         removedIds = new IntArray();
+        timeOffset = new IntMap<Long>();
 
         map = new MapBuilder(world, 4, false);
         map.buildMap();
@@ -237,12 +240,14 @@ public class PlayState extends GameState {
                         opponents.put(pkt.id, opponent);
                         hud.setColorToId(pkt.id, pkt.miscString);
                         killedByEntity.put(pkt.id, new Array<String>());
+                        timeOffset.put(pkt.id, TimeUtils.timeSinceMillis(pkt.time));
                         opponentEntitySequence.put(pkt.id, 0);
                         TCPEventPacket packet = new TCPEventPacket();
                         packet.action = B2DVars.NET_CONNECT;
                         packet.pos = player.getPosition();
                         packet.id = player.getId();
                         packet.miscString = player.getColor();
+                        packet.time = TimeUtils.millis();
                         hud.setOpponentDeath(pkt.id, B2DVars.AMOUNT_LIVES);
                         client.sendTCP(packet);
                     }
@@ -320,6 +325,11 @@ public class PlayState extends GameState {
                 case B2DVars.NET_REMOVE_ME:
                     opponents.get(pkt.id).getBody().setTransform(B2DVars.VOID_X, B2DVars.VOID_Y, 0);
                     break;
+                case B2DVars.NET_UPDATE_MY_TIME:
+                    long offset = (timeOffset.get(pkt.id) + TimeUtils.timeSinceMillis(pkt.time)) / 2;
+                    timeOffset.put(pkt.id, offset);
+                    System.out.println(timeOffset.get(pkt.id));
+                    break;
             }
         }
     }
@@ -327,7 +337,7 @@ public class PlayState extends GameState {
     private void opponentEntityEvents() {
         Array<EntityCluster> packets = client.getEntityClusters();
         for (EntityCluster cluster : packets) {
-            if (opponentEntitySequence != null && cluster.seq > opponentEntitySequence.get(cluster.id)) {
+            if (opponentEntitySequence.get(cluster.id) != null && cluster.seq > opponentEntitySequence.get(cluster.id)) {
                 opponentEntitySequence.put(cluster.id, cluster.seq);
                 for (EntityPacket pkt : cluster.pkts) {
                     if (opEntities.containsKey(pkt.id)) {
@@ -646,6 +656,12 @@ public class PlayState extends GameState {
         if (gameOverReceived) {
             gameOver(gameOverPacket);
         }
+        if (updateMyTime > 3f){
+            updateMyTime = 0f;
+            sendTimeUpdatePacket();
+        } else {
+            updateMyTime+=dt;
+        }
         handleInput();
     }
 
@@ -679,6 +695,15 @@ public class PlayState extends GameState {
         if (debuggingMode) {
             b2dr.render(world, b2dCam.combined); // Debug renderer. Hitboxes etc...
         }
+    }
+
+    private void sendTimeUpdatePacket(){
+        TCPEventPacket pkt = Pooler.tcpEventPacket();
+        pkt.id=B2DVars.MY_ID;
+        pkt.time = TimeUtils.millis();
+        pkt.action = B2DVars.NET_UPDATE_MY_TIME;
+        client.sendTCP(pkt);
+        Pooler.free(pkt);
     }
 
     @Override
