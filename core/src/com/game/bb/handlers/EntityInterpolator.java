@@ -53,8 +53,8 @@ public class EntityInterpolator {
 
     public float getAlpha(){
 
-        float alpha = TimeUtils.timeSinceMillis(lastPacketTime) / 40f;
-//        System.out.println("Alpha: " + alpha);
+        float alpha = TimeUtils.timeSinceMillis(lastPacketTime) / 35f;
+        System.out.println("Alpha: " + alpha);
         return MathUtils.clamp(alpha, 0f, 1.0f);
     }
 
