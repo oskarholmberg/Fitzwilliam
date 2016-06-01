@@ -152,6 +152,10 @@ small {
   font-size: 80%;
 }
 
+x-small {
+  font-size: 40%;
+}
+
 /**
  * Prevent `sub` and `sup` affecting `line-height` in all browsers.
  */
