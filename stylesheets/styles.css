@@ -282,6 +282,10 @@ small {
   font-size: 75%;
 }
 
+xsmall{
+  font-size: 30%;
+}
+
 /*
  * Prevents sub and sup affecting line-height in all browsers
  * gist.github.com/413930
