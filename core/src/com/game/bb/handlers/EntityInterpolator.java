@@ -15,7 +15,7 @@ public class EntityInterpolator {
     private Body body;
     private Array<EntityPacket> entityStates;
     private Vector2 targetPos, currentPos, interpolatedPos;
-    private long lastUpdateTime;
+    private float alpha;
 
     public EntityInterpolator(EnemyEntity entity){
         this.entity=entity;
@@ -26,7 +26,8 @@ public class EntityInterpolator {
     public void init(){
         body = entity.getBody();
         currentPos = body.getPosition();
-        lastUpdateTime = TimeUtils.millis();
+        targetPos = body.getPosition();
+        alpha = 0;
         entityStates = new Array<EntityPacket>();
     }
 
@@ -36,19 +37,24 @@ public class EntityInterpolator {
 
     public void updateEntityState(){
         if (entityStates.size > 0) {
-            EntityPacket pkt = entityStates.pop();
-            currentPos.set(body.getPosition());
-            targetPos.set(pkt.xp, pkt.yp);
-            interpolatedPos.set(currentPos).lerp(targetPos, getAlpha());
-            body.setTransform(interpolatedPos, 0);
-            body.setLinearVelocity(pkt.xf, pkt.yf);
+            if ((entityStates.peek().time + 100) <= TimeUtils.millis()) {
+                EntityPacket pkt = entityStates.pop();
+                //currentPos.set(body.getPosition());
+                targetPos.set(pkt.xp, pkt.yp);
+                alpha = 0;
+                body.setLinearVelocity(pkt.xf, pkt.yf);
+                //interpolatedPos.set(currentPos).lerp(targetPos, getAlpha());
+                //body.setTransform(interpolatedPos, 0);
+                //body.setLinearVelocity(pkt.xf, pkt.yf);
+            }
         }
+        currentPos.set(body.getPosition());
+        interpolatedPos.set(currentPos.lerp(targetPos, getAlpha()));
+        body.setTransform(interpolatedPos, 0);
     }
 
     public float getAlpha(){
-        long now = TimeUtils.millis();
-        float alpha = (now - lastUpdateTime) / 30f;
-        lastUpdateTime = now;
+        alpha += 0.25;
         return MathUtils.clamp(alpha, 0f, 1.0f);
     }
 
