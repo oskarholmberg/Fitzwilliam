@@ -90,7 +90,6 @@ public class EnemyPlayer extends EnemyEntity {
 
     @Override
     public void dispose() {
-        animation.dispose();
     }
 
     @Override

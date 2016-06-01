@@ -1,6 +1,5 @@
 package com.game.bb.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -34,7 +33,7 @@ public class SPPlayer extends SPSprite {
         this.color=color;
         createPlayerBody(xPos, yPos);
         dir = 0;
-        jetpackSound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
+        jetpackSound = Assets.getSound("jetpack");
         loadTexture(color);
         setTexture(textures[STAND_RIGHT]);
     }
@@ -168,6 +167,5 @@ public class SPPlayer extends SPSprite {
 
     @Override
     public void dispose() {
-        jetpackSound.dispose();
     }
 }
