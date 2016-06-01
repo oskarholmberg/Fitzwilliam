@@ -39,12 +39,12 @@ public class EntityInterpolator {
 
     public void updateEntityState(){
         if (entityStates.size > 0) {
-            if ((entityStates.peek().time + 100) <= TimeUtils.millis()) {
+//            if ((entityStates.peek().time + 100) <= TimeUtils.millis()) {
                 EntityPacket pkt = entityStates.pop();
                 targetPos.set(pkt.xp, pkt.yp);
                 body.setLinearVelocity(pkt.xf, pkt.yf);
                 lastPacketTime = TimeUtils.millis();
-            }
+//            }
         }
         currentPos.set(body.getPosition());
         interpolatedPos.set(currentPos.lerp(targetPos, getAlpha()));
@@ -54,7 +54,7 @@ public class EntityInterpolator {
     public float getAlpha(){
 
         float alpha = TimeUtils.timeSinceMillis(lastPacketTime) / 40f;
-        System.out.println("Alpha: " + alpha);
+//        System.out.println("Alpha: " + alpha);
         return MathUtils.clamp(alpha, 0f, 1.0f);
     }
 
