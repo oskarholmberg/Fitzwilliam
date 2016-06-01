@@ -56,7 +56,7 @@ public class GameServer extends Listener {
 
     @Override
     public void connected(Connection c){
-        Gdx.app.log("NET_SERVER", "Client @" + c.getRemoteAddressUDP().getAddress().toString().substring(1) + " connected.");
+        Gdx.app.log("NET_SERVER", "Client @" + c.getRemoteAddressUDP().getAddress().toString().substring(1) + ":" + c.getRemoteAddressTCP().getPort() + " connected.");
         connections.put(c, c.getRemoteAddressTCP().getAddress().toString().substring(1) + ":"
                 + c.getRemoteAddressTCP().getPort());
         int id = newPlayerId();

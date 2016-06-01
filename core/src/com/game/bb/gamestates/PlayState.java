@@ -630,7 +630,6 @@ public class PlayState extends GameState {
         powerupTaken();
         powerHandler.update(dt);
         if (!client.isConnected()) {
-            client.stop();
             gsm.setState(GameStateManager.HOST_OFFLINE);
         }
         if (hosting) {
