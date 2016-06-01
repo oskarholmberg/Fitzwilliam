@@ -37,6 +37,8 @@ import com.game.bb.net.packets.EntityPacket;
 import com.game.bb.net.packets.PlayerMovementPacket;
 import com.game.bb.net.packets.TCPEventPacket;
 
+import java.sql.Time;
+
 
 /**
  * TODO LIST --
@@ -215,6 +217,7 @@ public class PlayState extends GameState {
             System.out.println("Debug is clicked! printing the next debug event.");
             debugClick = true;
             debuggingMode = !debuggingMode;
+            System.out.println("CURRENT TIME: " + TimeUtils.millis() + " SystemCurrentTime: " + System.currentTimeMillis());
             System.out.println("HudCam pos: " + hudCam.position.x + " cam pos: " + cam.position.x);
         }
     }
@@ -258,7 +261,7 @@ public class PlayState extends GameState {
                         grenade.setAnimation(pkt.color);
                         grenade.setId(pkt.id);
                         grenade.getBody().setTransform(pkt.pos, 0);
-                        //grenade.getBody().setLinearVelocity(pkt.force);
+                        grenade.getBody().setLinearVelocity(pkt.force);
                         grenade.initInterpolator();
                         opEntities.put(pkt.id, grenade);
                     } else if (pkt.miscString.equals("bullet")) {

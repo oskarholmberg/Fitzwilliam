@@ -9,13 +9,15 @@ import com.game.bb.entities.EnemyEntity;
 import com.game.bb.net.packets.EntityPacket;
 import com.game.bb.net.packets.PlayerMovementPacket;
 
+import java.sql.Time;
+
 
 public class EntityInterpolator {
     private EnemyEntity entity;
     private Body body;
     private Array<EntityPacket> entityStates;
     private Vector2 targetPos, currentPos, interpolatedPos;
-    private float alpha;
+    private long lastPacketTime;
 
     public EntityInterpolator(EnemyEntity entity){
         this.entity=entity;
@@ -27,8 +29,8 @@ public class EntityInterpolator {
         body = entity.getBody();
         currentPos = body.getPosition();
         targetPos = body.getPosition();
-        alpha = 0;
         entityStates = new Array<EntityPacket>();
+        lastPacketTime = TimeUtils.millis();
     }
 
     public void addEntityPacket(EntityPacket pkt){
@@ -39,13 +41,9 @@ public class EntityInterpolator {
         if (entityStates.size > 0) {
             if ((entityStates.peek().time + 100) <= TimeUtils.millis()) {
                 EntityPacket pkt = entityStates.pop();
-                //currentPos.set(body.getPosition());
                 targetPos.set(pkt.xp, pkt.yp);
-                alpha = 0;
                 body.setLinearVelocity(pkt.xf, pkt.yf);
-                //interpolatedPos.set(currentPos).lerp(targetPos, getAlpha());
-                //body.setTransform(interpolatedPos, 0);
-                //body.setLinearVelocity(pkt.xf, pkt.yf);
+                lastPacketTime = TimeUtils.millis();
             }
         }
         currentPos.set(body.getPosition());
@@ -54,7 +52,9 @@ public class EntityInterpolator {
     }
 
     public float getAlpha(){
-        alpha += 0.25;
+
+        float alpha = TimeUtils.timeSinceMillis(lastPacketTime) / 40f;
+        System.out.println("Alpha: " + alpha);
         return MathUtils.clamp(alpha, 0f, 1.0f);
     }
 
