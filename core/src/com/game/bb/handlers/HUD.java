@@ -3,6 +3,11 @@ package com.game.bb.handlers;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ArrayMap;
+import com.badlogic.gdx.utils.IntMap;
+import com.game.bb.gamestates.PlayState;
+
 import java.util.HashMap;
 
 /**
@@ -10,21 +15,30 @@ import java.util.HashMap;
  */
 public class HUD {
     private TextureRegion[] font;
-    private String playerDeaths = "0";
-    private HashMap<String, String> opponentDeaths;
-    private Texture playerTexture, opponentTexture, bulletTexture;
+    private int playerDeaths = B2DVars.AMOUNT_LIVES;
+    private HashMap<Integer, Integer> opponentDeaths;
+    private IntMap<String> idsToColors;
+    private Texture bulletTexture;
     private TextureRegion grenadeTexture;
+    private Array<Integer> victoryOrder;
+    private ArrayMap<String, Texture> textureFromColor;
     private int bulletsLeft = B2DVars.AMOUNT_BULLET;
     private int grenadesLeft = B2DVars.AMOUNT_GRENADE;
+    private boolean gameOver = false;
 
     public HUD() {
 
         Texture hudTex = new Texture("images/hud.png");
-        playerTexture = new Texture("images/player/bluePlayerStandRight.png");
-        opponentTexture = new Texture("images/player/redPlayerStandRight.png");
-        bulletTexture = new Texture("images/weapons/blueBullet.png");
-        grenadeTexture = TextureRegion.split(new Texture("images/weapons/blueGrenade.png"), 30, 30)[0][0];
-        opponentDeaths = new HashMap<String, String>();
+        textureFromColor = new ArrayMap<String, Texture>();
+        textureFromColor.put(B2DVars.COLOR_BLUE, Assets.getTex("blueStandRight"));
+        textureFromColor.put(B2DVars.COLOR_RED, Assets.getTex("redStandRight"));
+        textureFromColor.put(B2DVars.COLOR_YELLOW, Assets.getTex("yellowStandRight"));
+        textureFromColor.put(B2DVars.COLOR_GREEN, Assets.getTex("greenStandRight"));
+        bulletTexture = Assets.getTex(B2DVars.MY_COLOR + "Bullet");
+        grenadeTexture = Assets.getAnimation(B2DVars.MY_COLOR + "Grenade")[0];
+        opponentDeaths = new HashMap<Integer, Integer>();
+        victoryOrder = new Array<Integer>();
+        idsToColors = new IntMap<String>();
 
         font = new TextureRegion[11];
         for (int i = 0; i < 6; i++) {
@@ -35,9 +49,62 @@ public class HUD {
         }
     }
 
+    public void setMyNewColor(String color){
+        bulletTexture = Assets.getTex(color + "Bullet");
+        grenadeTexture = Assets.getAnimation(color + "Grenade")[0];
+    }
+
+    public void setColorToId(int id, String color){
+        idsToColors.put(id, color);
+    }
+
+    private void checkGameOver(){
+        int amountPlayersAlive = opponentDeaths.size() + 1;
+        for (Integer id : opponentDeaths.keySet()){
+            if (opponentDeaths.get(id) == 0){
+                amountPlayersAlive--;
+                if (!victoryOrder.contains(id, true)){
+                    victoryOrder.add(id);
+                }
+            }
+        }
+        if (playerDeaths == 0){
+            amountPlayersAlive--;
+            if (!victoryOrder.contains(B2DVars.MY_ID, true)){
+                victoryOrder.add(B2DVars.MY_ID);
+            }
+        }
+        if (amountPlayersAlive <= 1 && opponentDeaths.size() > 0){
+            if (!victoryOrder.contains(B2DVars.MY_ID, true)){
+                victoryOrder.add(B2DVars.MY_ID);
+            }
+            for (Integer id : opponentDeaths.keySet()){
+                if (!victoryOrder.contains(id, true)){
+                    victoryOrder.add(id);
+                }
+            }
+            gameOver=true;
+        } else if (opponentDeaths.size() == 0 && amountPlayersAlive == 0){
+            if (!victoryOrder.contains(B2DVars.MY_ID, true)){
+                victoryOrder.add(B2DVars.MY_ID);
+            }
+            for (Integer id : opponentDeaths.keySet()){
+                if (!victoryOrder.contains(id, true)){
+                    victoryOrder.add(id);
+                }
+            }
+            gameOver= true;
+        }
+    }
+
+    public Array<Integer> getVictoryOrder(){
+
+        return victoryOrder;
+    }
+
     public void addPlayerDeath() {
-        int temp = Integer.valueOf(playerDeaths) + 1;
-        playerDeaths = Integer.toString(temp);
+        playerDeaths--;
+        checkGameOver();
     }
 
     public void setAmountBulletsLeft(int amount){
@@ -46,39 +113,47 @@ public class HUD {
 
     public void setAmountGrenadesLeft(int amount) { grenadesLeft = amount;}
 
-    public void setOpponentDeath(String id,String deaths) {
+    public void setOpponentDeath(int id,int deaths) {
         opponentDeaths.put(id, deaths);
+        checkGameOver();
     }
 
-    public void removeOpponentDeathCount(String id){
+    public void removeOpponentDeathCount(int id){
         opponentDeaths.remove(id);
     }
 
     public void render(SpriteBatch sb) {
+        float camHeight = PlayState.playState.cam.viewportHeight;
+        float camWidth = PlayState.playState.cam.viewportWidth;
         sb.begin();
-        sb.draw(playerTexture, 50, B2DVars.CAM_HEIGHT - 70, 45, 40);
-        for (int i = 0; i < playerDeaths.length(); i++) {
-            sb.draw(font[Integer.valueOf(playerDeaths.substring(i, i + 1))], 100 + i * 50, B2DVars.CAM_HEIGHT - 70, 40, 40);
+        sb.draw(textureFromColor.get(B2DVars.MY_COLOR), 50, camHeight - 70, 45, 40);
+        String playerDeathString = Integer.toString(playerDeaths);
+        for (int i = 0; i < playerDeathString.length(); i++) {
+            sb.draw(font[Integer.valueOf(playerDeathString.substring(i, i + 1))], 100 + i * 50, camHeight - 70, 40, 40);
         }
         int offset=0;
-        for (String id : opponentDeaths.keySet()) {
-            String deaths = opponentDeaths.get(id);
+        for (int id : opponentDeaths.keySet()) {
+            String deaths = Integer.toString(opponentDeaths.get(id));
             for (int i = 0; i < deaths.length(); i++) {
-                sb.draw(opponentTexture, B2DVars.CAM_WIDTH - 200-offset, B2DVars.CAM_HEIGHT - 70, 45, 40);
-                sb.draw(font[Integer.valueOf(deaths.substring(i, i + 1))], B2DVars.CAM_WIDTH - (150+offset) + i * 50, B2DVars.CAM_HEIGHT - 70, 40, 40);
+                sb.draw(textureFromColor.get(idsToColors.get(id)), camWidth - 200-offset, camHeight - 70, 45, 40);
+                sb.draw(font[Integer.valueOf(deaths.substring(i, i + 1))], camWidth - (150+offset) + i * 50, camHeight - 70, 40, 40);
             }
             offset+=200;
         }
         for (int i = 0; i < bulletsLeft; i++) {
-            sb.draw(bulletTexture, 50 + i*50, B2DVars.CAM_HEIGHT-90, 25, 10);
+            sb.draw(bulletTexture, 50 + i*50, camHeight-90, 25, 10);
         }
         for (int i = 0; i < grenadesLeft; i++) {
-            sb.draw(grenadeTexture, 50 + i*50, B2DVars.CAM_HEIGHT-120, 20, 20);
+            sb.draw(grenadeTexture, 50 + i*50, camHeight-120, 20, 20);
         }
         sb.end();
     }
 
-    public String getDeathCount() {
+    public int getPlayerDeathCount() {
         return playerDeaths;
+    }
+
+    public boolean gameOver() {
+        return gameOver;
     }
 }

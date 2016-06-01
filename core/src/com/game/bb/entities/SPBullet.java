@@ -1,38 +1,26 @@
 package com.game.bb.entities;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 
-/**
- * Created by erik on 11/05/16.
- */
+
 public class SPBullet extends SPSprite {
 
-    private int offset = 0, ID;
-    private float posYoffset = 5/B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
+    private int offset = 0;
+    private float posYoffset = 5/B2DVars.PPM, posXoffset = B2DVars.PLAYER_WIDTH+(20/B2DVars.PPM);
+    private PolygonShape shape;
 
-    public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful, String ID) {
+    public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful, int ID) {
         super(world, ID);
         this.dir=dir;
-        createBullet(xPos+dir*getPosXoffset, yPos-posYoffset, dir, harmful);
-        Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav"));
-        sound.play();
-        if (harmful) {
-            // set enemy color texture
-            setTexture(new Texture("images/weapons/redBullet.png"));
-        } else {
-            // set friendly color texture
-            setTexture(new Texture("images/weapons/blueBullet.png"));
-        }
+        createBullet(xPos+dir* posXoffset, yPos-posYoffset, dir, harmful);
+        Assets.getSound("lasershot").play();
+        setTexture(Assets.getTex(B2DVars.MY_COLOR + "Bullet"));
     }
 
     @Override
@@ -65,5 +53,11 @@ public class SPBullet extends SPSprite {
         body.createFixture(fdef).setUserData(B2DVars.ID_BULLET);
         body.setLinearVelocity(B2DVars.PH_BULLET_SPEED * dir / B2DVars.PPM, 0);
         body.setUserData(this);
+        shape.dispose();
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }

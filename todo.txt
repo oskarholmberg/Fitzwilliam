@@ -1,27 +1,17 @@
 ##HighPrio unsorted##
-	Check direction for bouncing grenades through getLinearVelocity.x
-	and fix proper death texture.
-	Remove own grenades when they hit.
-	Create content/assets class for startup load.
-	Read about real time game synch.
 
 ##Network##
-	Send relevant information when connecting.
-		- Server settings (map, nbr of players) 
+
 
 ##Code##
+	Consider using Object Pools for memory management.
 	Add start screen. Score screen. etc.
-	Change reload functionality to work as IRL.
 
 ##Functionality##
-	Multiple layers in maps for functionality such as bullet proof
-	domes etc.
 	Add score screen with finish condition. Think SuperSmash!
 	Upon death, send cause to server for display after game.
 
 ##Extra##
-	Add functionality for Tiled.map and level select.
-	Add spawn location list for different maps.
 
 	#Powerups#
 		Sabotage - Change enemy gravity scale

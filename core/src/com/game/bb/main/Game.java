@@ -23,9 +23,9 @@ public class Game extends ApplicationAdapter {
 
 		batch = new SpriteBatch();
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, B2DVars.CAM_WIDTH, B2DVars.CAM_HEIGHT);
+        cam.setToOrtho(false, B2DVars.DEFAULT_GAME_WIDTH, B2DVars.DEFAULT_GAME_HEIGHT);
         hudCam = new OrthographicCamera();
-        hudCam.setToOrtho(false, B2DVars.CAM_WIDTH, B2DVars.CAM_HEIGHT);
+        hudCam.setToOrtho(false, B2DVars.DEFAULT_GAME_WIDTH, B2DVars.DEFAULT_GAME_HEIGHT);
 
         Gdx.input.setInputProcessor(new SPInputProcessor());
 
@@ -36,9 +36,10 @@ public class Game extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-            gsm.update(Gdx.graphics.getDeltaTime());
-            gsm.render();
-            SPInput.update();
+        Gdx.graphics.setTitle(TITLE + " -- FPS: " + Gdx.graphics.getFramesPerSecond());
+        gsm.update(Gdx.graphics.getDeltaTime());
+        gsm.render();
+        SPInput.update();
 	}
 
 	public void dispose(){

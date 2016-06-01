@@ -1,12 +1,11 @@
 package com.game.bb.entities;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.SPAnimation;
 
@@ -15,30 +14,21 @@ import com.game.bb.handlers.SPAnimation;
  */
 public class SPGrenade extends SPSprite {
 
-    private int offset = 15, amountBounces = 0;
+    private int offset = 15;
     private float posYoffset = 5 / B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH + (20 / B2DVars.PPM);
     private SPAnimation animation;
-    private TextureRegion[] regions;
-    private Texture grenade;
     private boolean opponentGrenade;
+    private CircleShape shape;
     private float lifetime = 0f;
 
-    public SPGrenade(World world, float xPos, float yPos, float dir, boolean opponentGrenade, String ID) {
+    public SPGrenade(World world, float xPos, float yPos, float dir, boolean opponentGrenade, int ID) {
         super(world, ID);
         this.dir = dir;
         this.opponentGrenade=opponentGrenade;
         createGrenadeBody(xPos + dir * getPosXoffset, yPos - posYoffset, dir);
-        if(opponentGrenade){
-            grenade = new Texture("images/weapons/redGrenade.png");
-        }
-        else{
-            grenade = new Texture("images/weapons/blueGrenade.png");
-        }
-        regions = new TextureRegion[4];
-        for (int i = 0; i < regions.length; i++) {
-            regions[i] = new TextureRegion(grenade, i * 30, 0, 30, 30);
-        }
-        animation = new SPAnimation(regions, 0.2f);
+        Assets.getSound("grenade").play();
+        animation = new SPAnimation(Assets.getAnimation(B2DVars.MY_COLOR + "Grenade"), 0.2f);
+
     }
 
     public float getDir() {
@@ -68,7 +58,7 @@ public class SPGrenade extends SPSprite {
     }
 
     private void createGrenadeBody(float xPos, float yPos, float dir) {
-        CircleShape shape = new CircleShape();
+        shape = new CircleShape();
         shape.setRadius(15 / B2DVars.PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
@@ -85,7 +75,13 @@ public class SPGrenade extends SPSprite {
             body.createFixture(fdef).setUserData(B2DVars.ID_ENEMY_GRENADE);
         else
             body.createFixture(fdef).setUserData(B2DVars.ID_GRENADE);
-        body.setLinearVelocity(B2DVars.PH_GRENADE_X * dir / B2DVars.PPM, B2DVars.PH_GRENADE_Y / B2DVars.PPM);
+        if (!opponentGrenade)
+            body.setLinearVelocity(B2DVars.PH_GRENADE_X * dir / B2DVars.PPM, B2DVars.PH_GRENADE_Y / B2DVars.PPM);
         body.setUserData(this);
+    }
+
+    @Override
+    public void dispose() {
+        shape.dispose();
     }
 }

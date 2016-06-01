@@ -1,26 +1,26 @@
 package com.game.bb.handlers;
 
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Array;
+import com.game.bb.entities.EnemyEntity;
+import com.game.bb.entities.SPPower;
 import com.game.bb.entities.SPSprite;
 
 /**
  * Created by erik on 08/05/16.
  */
 public class SPContactListener implements ContactListener {
-    private int footContact = 0, amntJumps = 0;
-    private boolean playerHit = false, playerPowerUp = false;
-    private Array<Body> bodiesToRemove, grenadeBounces;
-    private Fixture killingEntity, lastPowerUp;
+    private int footContact = 0, amntJumps = 0, killingEntityID;
+    private boolean playerHit = false, playerPowerUp = false, bounceMe = false;
+    private Fixture  lastPowerUp;
+    private Array<Integer> idsToRemove;
 
     public SPContactListener() {
-        bodiesToRemove = new Array<Body>();
-        grenadeBounces = new Array<Body>();
+        idsToRemove = new Array<Integer>();
     }
 
 
@@ -30,52 +30,62 @@ public class SPContactListener implements ContactListener {
         Fixture fb = contact.getFixtureB();
 
 
-        // if a foot touches ground
-        if (fa.getUserData().equals(B2DVars.ID_FOOT) || fb.getUserData().equals(B2DVars.ID_FOOT)) {
+        // if player touches bouncy ground
+        if (fa.getUserData().equals(B2DVars.ID_BOUNCE) && fb.getUserData().equals(B2DVars.ID_PLAYER)) {
+            footContact++;
+            bounceMe = true;
+            amntJumps = 0;
+        } else if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BOUNCE)) {
+            footContact++;
+            bounceMe = true;
+            amntJumps = 0;
+            // if a foot touches ground
+        } else if (fa.getUserData().equals(B2DVars.ID_FOOT) || fb.getUserData().equals(B2DVars.ID_FOOT)) {
             footContact++;
             amntJumps = 0;
             //If the player is hit by an enemy bullet
         } else if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
-            killingEntity = fb;
+            killingEntityID = ((SPSprite) fb.getBody().getUserData()).getId();
             playerHit = true;
-            bodiesToRemove.add(fb.getBody());
             // - || -
         } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_PLAYER)) {
-            killingEntity = fa;
+            killingEntityID = ((SPSprite) fa.getBody().getUserData()).getId();
             playerHit = true;
-            bodiesToRemove.add(fa.getBody());
             // If a bullet touches ground
         } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && (fb.getUserData().equals(B2DVars.ID_GROUND)
                 || fb.getUserData().equals(B2DVars.ID_DOME))) {
-            killingEntity = fa;
-            bodiesToRemove.add(fa.getBody());
+            killingEntityID = ((SPSprite) fa.getBody().getUserData()).getId();
+            idsToRemove.add(((SPSprite) fa.getBody().getUserData()).getId());
             // - || -
         } else if ((fa.getUserData().equals(B2DVars.ID_GROUND)  || fa.getUserData().equals(B2DVars.ID_DOME))
                 && fb.getUserData().equals(B2DVars.ID_BULLET)) {
-            killingEntity = fb;
-            bodiesToRemove.add(fb.getBody());
+            killingEntityID = ((SPSprite) fb.getBody().getUserData()).getId();
+            idsToRemove.add(((SPSprite) fb.getBody().getUserData()).getId());
             // If a grenade touches player
         } else if ((fa.getUserData().equals(B2DVars.ID_GRENADE) || fa.getUserData().equals(B2DVars.ID_ENEMY_GRENADE))
                 && fb.getUserData().equals(B2DVars.ID_PLAYER)){
-            killingEntity = fa;
+            killingEntityID = ((SPSprite) fa.getBody().getUserData()).getId();
             playerHit = true;
-            bodiesToRemove.add(fa.getBody());
             // - || -
         } else if ((fb.getUserData().equals(B2DVars.ID_GRENADE) || fb.getUserData().equals(B2DVars.ID_ENEMY_GRENADE))
                 && fa.getUserData().equals(B2DVars.ID_PLAYER)){
-            killingEntity = fb;
+            killingEntityID = ((SPSprite) fb.getBody().getUserData()).getId();
             playerHit = true;
-            bodiesToRemove.add(fb.getBody());
             // If a player catches a powerup
         } else if (fa.getUserData().equals(B2DVars.ID_POWERUP) && fb.getUserData().equals(B2DVars.ID_PLAYER)){
             lastPowerUp = fa;
             playerPowerUp = true;
-            bodiesToRemove.add(fa.getBody());
             // - || -
         } else if (fb.getUserData().equals(B2DVars.ID_POWERUP) && fa.getUserData().equals(B2DVars.ID_PLAYER)){
             lastPowerUp = fb;
             playerPowerUp = true;
-            bodiesToRemove.add(fb.getBody());
+        } else if ((fa.getUserData().equals(B2DVars.ID_PLAYER) || fb.getUserData().equals(B2DVars.ID_PLAYER)) &&
+                (fa.getUserData().equals(B2DVars.ID_ENEMY_ENTITY) || fb.getUserData().equals(B2DVars.ID_ENEMY_ENTITY))){
+            if (fa.getUserData().equals(B2DVars.ID_ENEMY_ENTITY))
+                killingEntityID = ((EnemyEntity) fa.getBody().getUserData()).getId();
+            else if (fb.getUserData().equals(B2DVars.ID_ENEMY_ENTITY))
+                killingEntityID = ((EnemyEntity) fb.getBody().getUserData()).getId();
+            playerHit = true;
         }
     }
 
@@ -86,24 +96,16 @@ public class SPContactListener implements ContactListener {
 
         if (fa.getUserData().equals(B2DVars.ID_FOOT) || fb.getUserData().equals(B2DVars.ID_FOOT)) {
             footContact--;
-        }else if (fa.getUserData().equals(B2DVars.ID_GRENADE) && fb.getUserData().equals(B2DVars.ID_GROUND)){
-            if (!grenadeBounces.contains(fa.getBody(), true)){
-                grenadeBounces.add(fa.getBody());
-            }
-            // - || -
-        } else if (fb.getUserData().equals(B2DVars.ID_GRENADE) && fa.getUserData().equals(B2DVars.ID_GROUND)) {
-            if (!grenadeBounces.contains(fb.getBody(), true)) {
-                grenadeBounces.add(fb.getBody());
-            }
+        } else if (fa.getUserData().equals(B2DVars.ID_BOUNCE) && fb.getUserData().equals(B2DVars.ID_PLAYER)) {
+            footContact--;
+        } else if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BOUNCE)) {
+            footContact--;
         }
     }
 
-    public Array<Body> getFriendlyGrenadeBounces(){
-        return grenadeBounces;
-    }
 
-    public Array<Body> getBodiesToRemove() {
-        return bodiesToRemove;
+    public Array<Integer> getIdsToRemove() {
+        return idsToRemove;
     }
 
     public boolean isPlayerHit() {
@@ -112,6 +114,18 @@ public class SPContactListener implements ContactListener {
             return true;
         }
         return false;
+    }
+
+    public boolean bouncePlayer(){
+        if (bounceMe){
+            bounceMe = false;
+            return true;
+        }
+        return false;
+    }
+
+    public SPPower getLastPowerTaken(){
+        return (SPPower) lastPowerUp.getBody().getUserData();
     }
 
     public boolean powerTaken() {
@@ -126,8 +140,8 @@ public class SPContactListener implements ContactListener {
         playerHit = false;
     }
 
-    public SPSprite getKillingEntity() {
-        return (SPSprite) killingEntity.getBody().getUserData();
+    public int getKillingEntityID() {
+        return killingEntityID;
     }
 
     public boolean canJump() {
@@ -152,13 +166,8 @@ public class SPContactListener implements ContactListener {
         amntJumps = 0;
     }
 
-    public void clearBulletList() {
-        if (bodiesToRemove.size > 0)
-            bodiesToRemove.clear();
-    }
-
-    public void clearGrenadeList(){
-        if (grenadeBounces.size > 0)
-            grenadeBounces.clear();
+    public void clearIdList() {
+        if (idsToRemove.size > 0)
+            idsToRemove.clear();
     }
 }

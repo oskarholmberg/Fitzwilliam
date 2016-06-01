@@ -32,6 +32,8 @@ public class SPInputProcessor extends InputAdapter{
             SPInput.setKey(SPInput.BUTTON_RIGHT, true);
         if (k == Input.Keys.LEFT)
             SPInput.setKey(SPInput.BUTTON_LEFT, true);
+        if (k == Input.Keys.Y)
+            SPInput.setKey(SPInput.BUTTON_Y, true);
         return true;
     }
 
@@ -44,6 +46,8 @@ public class SPInputProcessor extends InputAdapter{
             SPInput.setKey(SPInput.BUTTON_RIGHT, false);
         if (k == Input.Keys.LEFT)
             SPInput.setKey(SPInput.BUTTON_LEFT, false);
+        if (k == Input.Keys.Y)
+            SPInput.setKey(SPInput.BUTTON_Y, false);
         return true;
     }
 

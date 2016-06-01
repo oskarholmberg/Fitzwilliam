@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="20" tilewidth="32" tileheight="32" nextobjectid="39">
+ <tileset firstgid="1" name="tileset1" tilewidth="32" tileheight="32" tilecount="7" columns="7">
+  <image source="tileset/mapTileSet3.png" width="224" height="32"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="50" height="20">
+  <data encoding="base64" compression="zlib">
+   eJztVNEKgDAIXK3a//9xeygQmWBOZzUPfBl4d+LNlAKBwIwowr4FlYWGtg9LjRE+/gjLbIzQ9do71o3czQnO3r2zwb2fXK4W71uAvVB3Rtuz9j3AvRSn9hx74+3o4JPkaq21XZWFutpz9HqA2k/yATnuLHvNURja8L9Rf+JrdQJ75QDo
+  </data>
+ </layer>
+ <objectgroup name="ground">
+  <object id="2" x="0" y="608" width="1600" height="32"/>
+  <object id="3" x="285.261" y="-203.381"/>
+  <object id="5" x="4.13679" y="4.13679" width="2.75786" height="605.35"/>
+  <object id="6" x="8.8968" y="5.33808" width="1573.57" height="6.83478"/>
+  <object id="8" x="1591.6" y="12.1729" width="9.12964" height="599.513"/>
+  <object id="9" x="1377.13" y="288.856" width="189.717" height="30.1924"/>
+  <object id="10" x="1345.14" y="544.815" width="94.1823" height="29.2912"/>
+  <object id="11" x="1153.2" y="417.283" width="93.2228" height="29.5946"/>
+  <object id="12" x="1024.96" y="385.716" width="63.135" height="29.5946"/>
+  <object id="13" x="1056.53" y="385.716" width="31.0743" height="156.358"/>
+  <object id="14" x="864.161" y="481.898" width="95.6891" height="29.1013"/>
+  <object id="15" x="736.904" y="385.716" width="61.6553" height="30.0878"/>
+  <object id="16" x="735.425" y="417.776" width="32.0608" height="124.79"/>
+  <object id="17" x="1184.1" y="192.308" width="127.125" height="31.6912"/>
+  <object id="18" x="896.716" y="192.668" width="126.404" height="31.6912"/>
+  <object id="19" x="607.704" y="160.026" width="128.286" height="31.0795"/>
+  <object id="20" x="416.544" y="289.821" width="126.723" height="28.7474"/>
+  <object id="21" x="447.918" y="416.656" width="127.354" height="31.262"/>
+  <object id="22" x="95.8137" y="191.627" width="127.844" height="32.3093"/>
+  <object id="23" x="95.7657" y="480.117" width="191.531" height="31.3493"/>
+ </objectgroup>
+ <objectgroup name="dome">
+  <object id="25" x="1152.19" y="512.682" width="5.78213" height="94.8269"/>
+  <object id="26" x="1152.57" y="512.297" width="126.821" height="5.78213"/>
+  <object id="27" x="1272.84" y="513.453" width="6.93856" height="94.056"/>
+  <object id="28" x="96.3688" y="512.682" width="5.78213" height="94.056"/>
+  <object id="29" x="282.168" y="512.297" width="5.78213" height="95.5979"/>
+ </objectgroup>
+ <objectgroup name="spawn">
+  <object id="30" x="165.941" y="135.686" width="15.5856" height="14.2104"/>
+  <object id="31" x="198.029" y="553.289" width="16.9608" height="14.6688"/>
+  <object id="32" x="488.082" y="233.293" width="14.5413" height="12.6446"/>
+  <object id="33" x="968.242" y="137.254" width="11.4857" height="12.6342"/>
+  <object id="34" x="968.242" y="137.254" width="11.4857" height="12.6342"/>
+  <object id="35" x="871.188" y="425.544" width="13.2085" height="11.4857"/>
+  <object id="36" x="1222.65" y="554.758" width="15.5057" height="14.3571"/>
+  <object id="37" x="1508.64" y="552.461" width="18.9514" height="14.9314"/>
+  <object id="38" x="1445.47" y="228.565" width="16.0799" height="16.0799"/>
+ </objectgroup>
+</map>

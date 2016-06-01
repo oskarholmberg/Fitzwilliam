@@ -1,7 +1,8 @@
 package com.game.bb.gamestates;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -12,42 +13,44 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
-import com.sun.org.apache.xpath.internal.SourceTree;
+import com.game.bb.net.client.GameClient;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by erik on 12/05/16.
  */
 public class JoinServerState extends GameState {
 
-    private Array<SPButton> joinButtons;
-    private Array<String> servers;
+    private HashMap<InetAddress, SPButton> joinButtons;
     private World world;
-    private Texture background = new Texture("images/spaceBackground.png");
+    private Texture background = Assets.getBackground();
     private Texture availableServers = new Texture("images/font/availableServers.png");
     private SPButton backbutton;
-    private Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
     private Array<FallingBody> itRains;
-    private float newFallingBody = 0f;
-    private GameServerSearcher searcher;
+    private float newFallingBody = 0f, refresh = 5f;
+    private GameClient client;
+    private ServerSearcher searcher;
     private TextureRegion[] font;
 
 
     public JoinServerState(GameStateManager gsm) {
         super(gsm);
         world = new World(new Vector2(0, -9.81f), true);
+        client = new GameClient();
+        searcher = new ServerSearcher();
+        searcher.start();
         itRains = new Array<FallingBody>();
-        joinButtons = new Array<SPButton>();
-        backbutton = new SPButton(new Texture("images/button/backButton.png"), B2DVars.CAM_WIDTH - 100, B2DVars.CAM_HEIGHT - 100, 40f, 40f, cam);
-        servers = new Array<String>();
+        joinButtons = new HashMap<InetAddress, SPButton>();
+        backbutton = new SPButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
+                cam.viewportHeight - 100, 40f, 40f, cam);
         font = new TextureRegion[11];
         Texture hudTex = new Texture("images/hud.png");
         for (int i = 0; i < 6; i++) {
@@ -56,8 +59,6 @@ public class JoinServerState extends GameState {
         for (int i = 0; i < 5; i++) {
             font[i + 6] = new TextureRegion(hudTex, 32 + i * 9, 25, 9, 9);
         }
-        searcher = new GameServerSearcher();
-        searcher.start();
         fallingBody();
     }
 
@@ -67,28 +68,27 @@ public class JoinServerState extends GameState {
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         BodyDef bdef = new BodyDef();
-        bdef.position.set((float) (B2DVars.CAM_WIDTH * Math.random()), B2DVars.CAM_HEIGHT);
+        bdef.position.set((float) (cam.viewportWidth * Math.random()), cam.viewportHeight);
         bdef.type = BodyDef.BodyType.DynamicBody;
         Body body = world.createBody(bdef);
         itRains.add(new FallingBody(body));
+        shape.dispose();
     }
 
 
     @Override
     public void handleInput() {
         if (backbutton.isClicked()) {
-            System.out.println("Button clicked");
+            Assets.getSound("menuSelect").play();
             searcher.stopSearch();
-            System.out.println("Search stopped");
-            sound.play();
-            System.out.println("Returning to connect mode");
             gsm.setState(GameStateManager.CONNECT);
         }
-        for (SPButton joinButton : joinButtons) {
-            if (joinButton.isClicked()) {
-                gsm.setIpAddress(joinButton.getInfo());
+        for (InetAddress address : joinButtons.keySet()) {
+            if (joinButtons.get(address).isClicked()) {
+                Assets.getSound("menuSelect").play();
+                client.connectToServer(address);
+                gsm.setClient(client);
                 searcher.stopSearch();
-                sound.play();
                 gsm.setState(GameStateManager.PLAY);
             }
         }
@@ -97,8 +97,12 @@ public class JoinServerState extends GameState {
     @Override
     public void update(float dt) {
         handleInput();
-        servers = searcher.getServerList();
-        joinButtons = getJoinButtons(servers);
+        if (refresh > 0.5f) {
+            joinButtons = getJoinButtons();
+            refresh = 0;
+        } else {
+            refresh += dt;
+        }
         backbutton.update(dt);
         if (newFallingBody > 1f) {
             fallingBody();
@@ -107,8 +111,8 @@ public class JoinServerState extends GameState {
             newFallingBody += dt;
         }
         world.step(dt, 6, 2);
-        for (SPButton button : joinButtons) {
-            button.update(dt);
+        for (InetAddress address : joinButtons.keySet()) {
+            joinButtons.get(address).update(dt);
         }
     }
 
@@ -117,50 +121,59 @@ public class JoinServerState extends GameState {
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         sb.draw(background, 0, 0);
-        int k = 0;
         sb.end();
         for (FallingBody body : itRains)
             body.render(sb);
-        for (SPButton button : joinButtons) {
-            button.render(sb);
+        for (InetAddress address : joinButtons.keySet()) {
+            joinButtons.get(address).render(sb);
         }
         backbutton.render(sb);
         sb.begin();
-        for(SPButton button : joinButtons){
+        int k = 0;
+        for (InetAddress address : joinButtons.keySet()) {
+            SPButton button = joinButtons.get(address);
             int j = 0;
             String[] ip = button.getInfo().split("\\.");
             for (int e = 0; e < ip.length; e++) {
                 for (int i = 0; i < ip[e].length(); i++) {
-                    sb.draw(font[Integer.valueOf(ip[e].substring(i, i+1))], 100 + j * 22, (B2DVars.CAM_HEIGHT - 180) - 50 * k, 20, 20);
+                    sb.draw(font[Integer.valueOf(ip[e].substring(i, i + 1))], 100 + j * 22, (cam.viewportHeight - 180) - 50 * k, 20, 20);
                     j++;
                 }
                 j++;
             }
             k++;
         }
-        sb.draw(availableServers, 100, B2DVars.CAM_HEIGHT-120, 600, 30);
+        sb.draw(availableServers, 100, cam.viewportHeight - 120, 600, 30);
         sb.end();
     }
 
     @Override
     public void dispose() {
-
+        for (FallingBody b : itRains) {
+            b.dispose();
+        }
+        availableServers.dispose();
+        backbutton.dispose();
     }
 
-    private Array<SPButton> getJoinButtons(Array<String> servers) {
-        Array<SPButton> buttons = new Array<SPButton>();
+    private HashMap<InetAddress, SPButton> getJoinButtons() {
+        HashMap<InetAddress, SPButton> buttons = new HashMap<InetAddress, SPButton>();
         int i = 0;
-        for (String server : servers) {
-            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), B2DVars.CAM_WIDTH-350, (B2DVars.CAM_HEIGHT - 170) - 50 * i, 100f, 20f, cam);
-            button.setInfo(server);
-            buttons.add(button);
+        int offset = 0;
+        List<InetAddress> servers = searcher.getServers();
+        for (InetAddress server : servers) {
+            if (servers.size() > 2) offset = 120;
+            else offset = 170;
+            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth - 350, (cam.viewportHeight - offset) - (50 * i), 100, 20, cam);
+            button.setInfo(server.getHostAddress());
+            buttons.put(server, button);
             i++;
         }
         return buttons;
     }
 
-    public class FallingBody {
-        private Texture texture = new Texture("images/player/redPlayerJumpLeft.png");
+    public class FallingBody implements Disposable {
+        private Texture texture = Assets.getTex("redJumpLeft");
         private Body body;
 
         public FallingBody(Body body) {
@@ -172,86 +185,39 @@ public class JoinServerState extends GameState {
             sb.draw(texture, body.getPosition().x, body.getPosition().y, 50, 44);
             sb.end();
         }
-    }
 
-    private class GameServerSearcher extends Thread {
-
-        private DatagramSocket socket;
-        private String serverAddress;
-        private Array<String> serverList;
-        private GameServerProbe probe;
-
-        private GameServerSearcher() {
-            serverList = new Array<String>();
-            try {
-                socket = new DatagramSocket();
-                probe = new GameServerProbe(socket);
-                probe.start();
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void run() {
-            while (!socket.isClosed()) {
-                try {
-                    byte[] serverInfo = new byte[1024];
-                    DatagramPacket received = new DatagramPacket(serverInfo, serverInfo.length);
-                    socket.receive(received);
-                    serverAddress = new String(received.getData()).trim();
-                    if (!serverList.contains(serverAddress, false)) {
-                        serverList.add(serverAddress);
-                        System.out.println("Server found!");
-                    }
-                } catch (SocketException e) {
-                    stopSearch();
-                } catch (UnknownHostException e) {
-                    stopSearch();
-                } catch (IOException e) {
-                    stopSearch();
-                }
-            }
-        }
-
-        public synchronized void stopSearch() {
-            socket.close();
-            probe.stopSearch();
-            System.out.println("Server search stopped, socket closed.");
-        }
-
-        public synchronized Array<String> getServerList() {
-            return serverList;
+        @Override
+        public void dispose() {
         }
     }
 
-    private class GameServerProbe extends Thread {
+    private class ServerSearcher extends Thread {
 
-        private DatagramSocket socket;
-        private boolean search = true;
+        private boolean searching = true;
+        private List<InetAddress> serverAddresses;
 
-        private GameServerProbe(DatagramSocket socket) {
-            this.socket = socket;
+        private ServerSearcher() {
+            serverAddresses = new ArrayList<InetAddress>();
         }
 
         public void run() {
-            while (search) {
+            while (searching) {
+                serverAddresses = client.getLocalServers();
                 try {
-                    byte[] hello = "HELLO".getBytes();
-                    DatagramPacket packet = new DatagramPacket(hello, hello.length, InetAddress.getByName("224.0.13.37"), 8081);
-                    socket.send(packet);
-                    sleep(2000);
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }
 
-        public void stopSearch(){
-            search = false;
+        private List<InetAddress> getServers() {
+            return serverAddresses;
+        }
+
+        private void stopSearch() {
+            searching = false;
         }
     }
 }
+

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" nextobjectid="29">
+ <tileset firstgid="1" name="tileset_gutter" tilewidth="32" tileheight="32" tilecount="7" columns="7">
+  <image source="tileset/mapTileSet3.png" width="224" height="32"/>
+ </tileset>
+ <layer name="tiles" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBh5gH0A7GREw9jAQLgLBHC5hxhAbzejhyMlbh+pYDiG4UCnQ1LAQLt1uMT5QABQuLFAMTOJ+iiJA2S1bCTooxTQ0l58+YARSQ0l9sLswBX+tMYAxmcAlw==
+  </data>
+ </layer>
+ <objectgroup name="ground">
+  <object id="1" x="0" y="608" width="960" height="32"/>
+  <object id="3" x="288.674" y="128.041" width="30.8462" height="31.4282"/>
+  <object id="4" x="1.76382" y="96.5694" width="125.672" height="31.3079"/>
+  <object id="5" x="128.526" y="352.033" width="126.91" height="31.5253"/>
+  <object id="6" x="319.779" y="480.221" width="31.7023" height="127.912"/>
+  <object id="7" x="416.185" y="256.247" width="159.938" height="31.814"/>
+  <object id="8" x="704.472" y="160.747" width="159.373" height="31.2564"/>
+  <object id="9" x="543.83" y="383.465" width="191.94" height="32.4055"/>
+  <object id="10" x="768.522" y="479.773" width="190.655" height="32.8207"/>
+ </objectgroup>
+ <objectgroup name="dome">
+  <object id="13" x="351.559" y="480.193" width="96.0988" height="5.72375"/>
+  <object id="15" x="441.633" y="486.519" width="5.72375" height="121.103"/>
+ </objectgroup>
+ <objectgroup name="spawn">
+  <object id="21" x="609.423" y="323.883" width="26.9223" height="26.1065"/>
+  <object id="22" x="769.231" y="98.2861" width="26.8053" height="26.3992"/>
+  <object id="23" x="900.129" y="548.65" width="20.3601" height="23.5748"/>
+  <object id="24" x="390.056" y="550.793" width="21.4316" height="24.6464"/>
+  <object id="25" x="99.6571" y="549.721" width="22.5032" height="25.718"/>
+  <object id="26" x="292.542" y="67.5096" width="22.5032" height="22.5032"/>
+  <object id="27" x="35.3622" y="37.5054" width="22.5032" height="20.3601"/>
+  <object id="28" x="196.099" y="291.47" width="20.3601" height="23.5748"/>
+ </objectgroup>
+</map>

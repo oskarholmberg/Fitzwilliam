@@ -1,7 +1,5 @@
 package com.game.bb.gamestates;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -11,6 +9,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
 
@@ -21,8 +21,7 @@ public class ConnectionState extends GameState {
 
     private SPButton hostButton, joinButton;
     private World world;
-    private Texture background = new Texture("images/spaceBackground.png");
-    private Sound sound = Gdx.audio.newSound(Gdx.files.internal("sfx/levelselect.wav"));
+    private Texture background = Assets.getBackground();
     private Array<FallingBody> itRains;
     private float newFallingBody = 0f;
 
@@ -32,9 +31,8 @@ public class ConnectionState extends GameState {
 
         world = new World(new Vector2(0, -9.81f), true);
         itRains = new Array<FallingBody>();
-
-        hostButton = new SPButton(new Texture("images/button/hostGameButton.png"), B2DVars.CAM_WIDTH/2, (B2DVars.CAM_HEIGHT/2)+100, 289f, 28f, cam);
-        joinButton = new SPButton(new Texture("images/button/joinGameButton.png"), B2DVars.CAM_WIDTH/2, (B2DVars.CAM_HEIGHT/2), 289f, 28f, cam);
+        hostButton = new SPButton(new Texture("images/button/hostGameButton.png"), cam.viewportWidth/2, (cam.viewportHeight/2)+100, 289f, 28f, cam);
+        joinButton = new SPButton(new Texture("images/button/joinGameButton.png"), cam.viewportWidth/2, (cam.viewportHeight/2), 289f, 28f, cam);
         fallingBody();
     }
 
@@ -44,22 +42,24 @@ public class ConnectionState extends GameState {
         FixtureDef fdef = new FixtureDef();
         fdef.shape=shape;
         BodyDef bdef = new BodyDef();
-        bdef.position.set( (float) (B2DVars.CAM_WIDTH*Math.random()) , B2DVars.CAM_HEIGHT );
+        bdef.position.set( (float) (cam.viewportWidth*Math.random()) , cam.viewportHeight );
         bdef.type= BodyDef.BodyType.DynamicBody;
         Body body = world.createBody(bdef);
         itRains.add(new FallingBody(body));
+        shape.dispose();
     }
 
 
     @Override
     public void handleInput() {
         if (hostButton.isClicked()) {
-            sound.play();
+            Assets.getSound("menuSelect").play();
+            gsm.setMapSelection(3);
             gsm.hostGame(true);
             gsm.setState(GameStateManager.PLAY);
         }
         if(joinButton.isClicked()){
-            sound.play();
+            Assets.getSound("menuSelect").play();
             gsm.hostGame(false);
             gsm.setState(GameStateManager.JOIN_SERVER);
         }
@@ -93,10 +93,14 @@ public class ConnectionState extends GameState {
 
     @Override
     public void dispose() {
-
+        for(FallingBody b : itRains){
+            b.dispose();
+        }
+        hostButton.dispose();
+        joinButton.dispose();
     }
 
-    public class FallingBody{
+    public class FallingBody implements Disposable{
         private Texture texture = new Texture("images/player/bluePlayerJumpLeft.png");
         private Body body;
         public FallingBody(Body body){
@@ -107,6 +111,11 @@ public class ConnectionState extends GameState {
             sb.begin();
             sb.draw(texture, body.getPosition().x, body.getPosition().y, 50, 44);
             sb.end();
+        }
+
+        @Override
+        public void dispose() {
+            texture.dispose();
         }
     }
 }

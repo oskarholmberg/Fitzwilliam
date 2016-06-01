@@ -1,6 +1,7 @@
 package com.game.bb;
 
 import android.os.Bundle;
+import android.view.View;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;

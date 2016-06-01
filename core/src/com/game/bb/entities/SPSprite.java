@@ -5,22 +5,22 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
-import com.game.bb.handlers.B2DVars;
+import com.badlogic.gdx.utils.Disposable;
 
 /**
  * Created by erik on 09/05/16.
  */
-public abstract class SPSprite {
+public abstract class SPSprite implements Disposable {
     protected World world;
     protected Body body;
     protected float height, width;
     protected Texture texture;
-    protected String ID;
+    protected int ID;
     protected float dir;
     // maybe add animation, check the tutorial
     // protected SPAnimation animation;
 
-    public SPSprite(World world, String ID){
+    public SPSprite(World world, int ID){
         this.ID=ID;
         this.world=world;
     }
@@ -39,7 +39,7 @@ public abstract class SPSprite {
 
     }
 
-    public String getID(){return ID;}
+    public int getId(){return ID;}
 
     public void render(SpriteBatch sb){
 
