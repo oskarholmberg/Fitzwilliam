@@ -73,11 +73,19 @@ public class SPPlayer extends SPSprite {
         }
     }
 
-    public void revive() {
+    public void revive(Vector2 pos, float dir) {
         isDead = false;
-        setTexture(textures[STAND_RIGHT]);
-        PlayState.playState.currentTexture=STAND_RIGHT;
+        body.setTransform(pos.x, pos.y, 0);
+        body.setAwake(true);
+        if(dir < 0) {
+            setTexture(textures[STAND_LEFT]);
+            PlayState.playState.currentTexture = STAND_LEFT;
+        }else{
+            setTexture(textures[STAND_RIGHT]);
+            PlayState.playState.currentTexture = STAND_RIGHT;
+        }
     }
+
 
     public String getColor(){
         return color;

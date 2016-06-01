@@ -25,9 +25,6 @@ public class GameClient extends Listener {
     private Array<TCPEventPacket> tcpPackets;
     private Array<EntityCluster> entityClusters;
     private Array<PlayerMovementPacket> movementPackets;
-    private List<InetAddress> addresses;
-    private int lastEntitySeq = 0;
-    private int lastMovementSeq = 0;
 
     public GameClient() {
         tcpPackets = new Array<TCPEventPacket>();
