@@ -213,6 +213,7 @@ public class PlayState extends GameState {
         }
         if (SPInput.isPressed(SPInput.BUTTON_Y)) {
             System.out.println("Debug is clicked! printing the next debug event.");
+            System.out.println("CurrentTime: " + TimeUtils.millis() + "\t" + System.currentTimeMillis());
             debugClick = true;
             debuggingMode = !debuggingMode;
             System.out.println("HudCam pos: " + hudCam.position.x + " cam pos: " + cam.position.x);
@@ -323,7 +324,7 @@ public class PlayState extends GameState {
     private void opponentEntityEvents() {
         Array<EntityCluster> packets = client.getEntityClusters();
         for (EntityCluster cluster : packets) {
-            if (cluster.seq > opponentEntitySequence.get(cluster.id)) {
+            if (opponentEntitySequence != null && cluster.seq > opponentEntitySequence.get(cluster.id)) {
                 opponentEntitySequence.put(cluster.id, cluster.seq);
                 for (EntityPacket pkt : cluster.pkts) {
                     if (opEntities.containsKey(pkt.id)) {
@@ -572,10 +573,6 @@ public class PlayState extends GameState {
 
     @Override
     public void update(float dt) {
-        if (!client.isConnected()) {
-            client.stop();
-            gsm.setState(GameStateManager.HOST_OFFLINE);
-        }
         world.step(dt, 6, 2);
         if (player != null) {
             player.update(dt);
@@ -629,6 +626,10 @@ public class PlayState extends GameState {
         bulletsHittingWall();
         powerupTaken();
         powerHandler.update(dt);
+        if (!client.isConnected()) {
+            client.stop();
+            gsm.setState(GameStateManager.HOST_OFFLINE);
+        }
         if (hosting) {
             powerupSpawner.update(dt);
             if (hud.gameOver()) {
@@ -640,7 +641,7 @@ public class PlayState extends GameState {
                 Pooler.free(pkt);
             }
         }
-        if (gameOverReceived){
+        if (gameOverReceived) {
             gameOver(gameOverPacket);
         }
         handleInput();
