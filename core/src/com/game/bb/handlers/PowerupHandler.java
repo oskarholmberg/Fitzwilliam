@@ -2,6 +2,8 @@ package com.game.bb.handlers;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.IntMap;
+import com.game.bb.entities.SPPower;
 import com.game.bb.gamestates.PlayState;
 import com.game.bb.handlers.pools.Pooler;
 import com.game.bb.net.packets.TCPEventPacket;
@@ -14,11 +16,14 @@ public class PowerupHandler {
     private static final float AMMO_DUR = 10f, TILT_DUR = 10f, SHIELD_DUR = 15f;
     private float rotationAngle = 0f;
     private boolean shielded;
+    private IntMap<SPPower> powerups;
     private int xOffset = 25, yOffset = 30;
+    private PlayState ps;
     private SPAnimation shield = new SPAnimation(Assets.getAnimation("shield"), 0.2f);
 
-    public PowerupHandler(){
-
+    public PowerupHandler(PlayState ps){
+        this.ps=ps;
+        powerups = new IntMap<SPPower>();
     }
 
     public boolean unlimitedAmmo(){
@@ -26,6 +31,20 @@ public class PowerupHandler {
             return true;
         }
         return false;
+    }
+
+    public void addPower(int id, SPPower power){
+        powerups.put(id, power);
+    }
+
+    public boolean containsPower(int id){
+        return powerups.containsKey(id);
+    }
+
+    public void removePower(int id){
+        SPPower power = powerups.remove(id);
+        ps.world.destroyBody(power.getBody());
+        power.dispose();
     }
 
     public void applyPowerup(int powerupType){
@@ -65,17 +84,43 @@ public class PowerupHandler {
         return shielded;
     }
 
-    public void render(SpriteBatch sb){
-        if(shielded){
-            Vector2 pos = PlayState.playState.player.getPosition();
-            sb.begin();
-            sb.draw(shield.getFrame(), pos.x*B2DVars.PPM-xOffset, pos.y*B2DVars.PPM-yOffset, 50, 60);
-            sb.end();
+    private void powerTaken(){
+        if (ps.cl.powerTaken() && ps.cl.getLastPowerTaken() != null){
+            SPPower power = powerups.remove(ps.cl.getLastPowerTaken().getId());
+            int powerType = power.getPowerType();
+            ps.world.destroyBody(power.getBody());
+            power.dispose();
+
+            TCPEventPacket pkt = Pooler.tcpEventPacket();
+            pkt.action = B2DVars.NET_DESTROY_BODY;
+            pkt.id = power.getId();
+            ps.client.sendTCP(pkt);
+            Pooler.free(pkt);
+
+            switch (powerType) {
+                case B2DVars.POWERTYPE_AMMO:
+                    applyPowerup(powerType);
+                    break;
+                case B2DVars.POWERTYPE_TILTSCREEN:
+                    TCPEventPacket pkt2 = Pooler.tcpEventPacket();
+                    pkt2.action = B2DVars.NET_APPLY_ANTIPOWER;
+                    pkt2.misc = powerType;
+                    ps.client.sendTCP(pkt2);
+                    Pooler.free(pkt2);
+                    break;
+                case B2DVars.POWERTYPE_SHIELD:
+                    applyPowerup(powerType);
+                    break;
+            }
         }
     }
 
     public void update(float dt){
+        powerTaken();
         shield.update(dt);
+        for (IntMap.Keys it = powerups.keys(); it.hasNext;){
+            powerups.get(it.next()).update(dt);
+        }
         if (shieldAccum < SHIELD_DUR){
             shieldAccum += dt;
             if (shieldAccum > SHIELD_DUR){
@@ -109,4 +154,17 @@ public class PowerupHandler {
             }
         }
     }
+
+    public void render(SpriteBatch sb){
+        for (IntMap.Keys it = powerups.keys(); it.hasNext;){
+            powerups.get(it.next()).render(sb);
+        }
+        if(shielded){
+            sb.begin();
+            Vector2 pos = PlayState.playState.player.getPosition();
+            sb.draw(shield.getFrame(), pos.x*B2DVars.PPM-xOffset, pos.y*B2DVars.PPM-yOffset, 50, 60);
+            sb.end();
+        }
+    }
+
 }

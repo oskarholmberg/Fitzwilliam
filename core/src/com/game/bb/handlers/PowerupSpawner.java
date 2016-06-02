@@ -18,11 +18,13 @@ public class PowerupSpawner {
     private String powerId = "123123";
     private int powerIdAccum = 0;
     private float mapWidth;
+    private PowerupHandler powerHandler;
 
-    public PowerupSpawner(World world, GameClient client, float mapWidth){
+    public PowerupSpawner(World world, GameClient client, float mapWidth, PowerupHandler powerHandler){
         this.world=world;
         this.client=client;
         this.mapWidth=mapWidth;
+        this.powerHandler=powerHandler;
         randomTime = 5f;
         timeCheck = 0;
     }
@@ -34,10 +36,10 @@ public class PowerupSpawner {
         int id = Integer.valueOf(powerId + Integer.toString(powerIdAccum));
         int powerType = MathUtils.random(1, B2DVars.POWERTYPE_AMOUNT);
         SPPower power = new SPPower(world, powerPos.x, powerPos.y, id, powerType);
-        PlayState.playState.addPowerup(power, id);
+        powerHandler.addPower(id, power);
         TCPEventPacket pkt = Pooler.tcpEventPacket();
         pkt.id = id;
-        pkt.action = B2DVars.NET_POWER;
+        pkt.action = B2DVars.NET_SPAWN_POWER;
         pkt.pos = powerPos;
         pkt.misc = powerType;
         client.sendTCP(pkt);
