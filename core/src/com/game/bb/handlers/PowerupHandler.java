@@ -1,5 +1,6 @@
 package com.game.bb.handlers;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntMap;
@@ -162,7 +163,7 @@ public class PowerupHandler {
             PlayState.playState.cam.rotate(1f * tiltDirection);
             rotationAngle+=1f*tiltDirection;
             if (tiltAccum >= TILT_DUR) {
-                PlayState.playState.cam.setToOrtho(false);
+                PlayState.playState.cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 rotationAngle = 0;
                 float camX = PlayState.playState.player.getPosition().x * B2DVars.PPM;
                 if ((camX + PlayState.playState.cam.viewportWidth / 2) > PlayState.playState.map.getMapWidth()){

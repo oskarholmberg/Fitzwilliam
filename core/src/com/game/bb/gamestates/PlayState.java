@@ -1,5 +1,6 @@
 package com.game.bb.gamestates;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -93,7 +94,7 @@ public class PlayState extends GameState {
 
         // set up box2d cam
         b2dCam = new OrthographicCamera();
-        b2dCam.setToOrtho(false, cam.viewportWidth / B2DVars.PPM, cam.viewportHeight / B2DVars.PPM);
+        b2dCam.setToOrtho(false, Gdx.graphics.getWidth() / B2DVars.PPM, Gdx.graphics.getHeight() / B2DVars.PPM);
 
     }
 
@@ -130,20 +131,27 @@ public class PlayState extends GameState {
     }
 
     public void handleInput() {
-        if (SPInput.isPressed(SPInput.BUTTON_RIGHT) && cl.canJump() ||
-                SPInput.isPressed() && SPInput.x > touchNbrs[1] && cl.canJump()) {
+        if (SPInput.isPressed(SPInput.BUTTON_RIGHT)  ||
+                SPInput.isPressed() && SPInput.x > touchNbrs[1] ) {
             SPInput.down = false;
             if (!player.isDead()) {
-                player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
-                lastJumpDirection = 1;
+                    lastJumpDirection = 1;
+                if (cl.canJump()) {
+                    player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
+                } else {
+                    currentTexture = SPPlayer.STAND_RIGHT;
+                }
             }
         }
-        if (SPInput.isPressed(SPInput.BUTTON_LEFT) && cl.canJump() ||
-                SPInput.isPressed() && SPInput.x < touchNbrs[0] && cl.canJump()) {
+        if (SPInput.isPressed(SPInput.BUTTON_LEFT) || SPInput.isPressed() && SPInput.x < touchNbrs[0] ) {
             SPInput.down = false;
             if (!player.isDead()) {
-                player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
-                lastJumpDirection = -1;
+                    lastJumpDirection = -1;
+                if (cl.canJump()) {
+                    player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
+                } else {
+                    currentTexture = SPPlayer.STAND_LEFT;
+                }
             }
         }
         if (SPInput.isPressed(SPInput.BUTTON_W) ||
@@ -535,7 +543,7 @@ public class PlayState extends GameState {
                 }
             }
         }
-        cam.setToOrtho(false);
+        cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         gsm.setVictoryOrder(pkt.miscString);
         gsm.setKilledByEntities(temp);
         gsm.setState(GameStateManager.GAME_OVER);

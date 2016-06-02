@@ -12,9 +12,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.game.bb.gamestates.PlayState;
 import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
-import com.game.bb.net.packets.PlayerMovementPacket;
-import com.sun.media.jfxmedia.events.PlayerStateEvent;
-
 
 public class SPPlayer extends SPSprite {
 
@@ -94,7 +91,7 @@ public class SPPlayer extends SPSprite {
                 if (PlayState.playState.currentTexture == JUMP_LEFT) {
                     PlayState.playState.currentTexture=STAND_LEFT;
                     xOffset = 30;
-                } else {
+                } else if (PlayState.playState.currentTexture == JUMP_RIGHT){
                     PlayState.playState.currentTexture=STAND_RIGHT;
                     xOffset = 23;
                 }

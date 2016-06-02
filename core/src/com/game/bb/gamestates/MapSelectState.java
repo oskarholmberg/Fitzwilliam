@@ -3,8 +3,9 @@ package com.game.bb.gamestates;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.IntMap;
 import com.game.bb.handlers.Assets;
+
+import java.util.HashMap;
 
 /**
  * Created by erik on 02/06/16.
@@ -14,7 +15,7 @@ public class MapSelectState extends GameState {
     private World world;
     private SPButton backButton;
     private Texture background = Assets.getBackground();
-    private IntMap<SPButton> mapButtons;
+    private HashMap<Integer, SPButton> mapButtons;
 
     protected MapSelectState(GameStateManager gsm) {
         super(gsm);
@@ -25,12 +26,14 @@ public class MapSelectState extends GameState {
     }
 
     private void populateMapSelection(){
-        mapButtons = new IntMap<SPButton>();
-        for (int i = 2; i <= 4; i++){
-            SPButton mapButton = new SPButton(Assets.getTex("heart"), 200 + 80*i, cam.viewportHeight - 400,
-                    50, 50, cam);
+        mapButtons = new HashMap<Integer, SPButton>();
+        int index = 0;
+        for (int i = 3; i <= 4; i++){
+            SPButton mapButton = new SPButton(new Texture("maps/mapicons/level" +  i + "icon.png")
+                    , 350 + 220*index, cam.viewportHeight - 300, 200, 70, cam);
             mapButton.setInfo(Integer.toString(i));
             mapButtons.put(i, mapButton);
+            index++;
         }
     }
 
@@ -42,10 +45,9 @@ public class MapSelectState extends GameState {
             Assets.getSound("menuSelect").play();
             gsm.setState(GameStateManager.CONNECT);
         }
-        for (IntMap.Keys it = mapButtons.keys(); it.hasNext; ){
-            int mapIndex = it.next();
-            if (mapButtons.get(mapIndex).isClicked()){
-                gsm.setMapSelection(mapIndex);
+        for (int index : mapButtons.keySet()){
+            if (mapButtons.get(index).isClicked()){
+                gsm.setMapSelection(Integer.valueOf(mapButtons.get(index).getInfo()));
                 gsm.setState(GameStateManager.PLAY);
             }
         }
@@ -55,8 +57,8 @@ public class MapSelectState extends GameState {
     public void update(float dt) {
         world.step(dt, 6, 2);
         backButton.update(dt);
-        for (IntMap.Keys it = mapButtons.keys(); it.hasNext;){
-            mapButtons.get(it.next()).update(dt);
+        for (int index : mapButtons.keySet()){
+            mapButtons.get(index).update(dt);
         }
         handleInput();
     }
@@ -67,14 +69,18 @@ public class MapSelectState extends GameState {
         sb.draw(background, 0, 0);
         sb.end();
         backButton.render(sb);
-        for (IntMap.Keys it = mapButtons.keys(); it.hasNext;){
-            mapButtons.get(it.next()).render(sb);
+        for (int index : mapButtons.keySet()){
+            mapButtons.get(index).render(sb);
         }
 
     }
 
     @Override
     public void dispose() {
+        backButton.dispose();
+        for (int index : mapButtons.keySet()){
+            mapButtons.get(index).dispose();
+        }
 
     }
 }

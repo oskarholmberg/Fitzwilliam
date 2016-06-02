@@ -26,7 +26,7 @@ public class B2DVars {
     public static final short BIT_GROUND = 2, BIT_PLAYER = 4, BIT_OPPONENT = 8, BIT_BULLET = 16,
             BIT_GRENADE = 32, BIT_DOME = 64, BIT_ENEMY_ENTITY = 128, BIT_BOUNCE = 256;
 
-    public static final int POWERTYPE_AMMO = 1, POWERTYPE_TILTSCREEN = 2, POWERTYPE_SHIELD = 3
+    public static final int POWERTYPE_TILTSCREEN = 1, POWERTYPE_AMMO = 2,  POWERTYPE_SHIELD = 3
             , POWERTYPE_GHOST = 4;
     public static final int POWERTYPE_AMOUNT = 4;
 

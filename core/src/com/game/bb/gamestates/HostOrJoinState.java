@@ -2,6 +2,7 @@ package com.game.bb.gamestates;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -54,8 +55,7 @@ public class HostOrJoinState extends GameState {
         if (hostButton.isClicked()) {
             Assets.getSound("menuSelect").play();
             gsm.hostGame(true);
-            gsm.setMapSelection(4);
-            gsm.setState(GameStateManager.PLAY);
+            gsm.setState(GameStateManager.MAP_SELECTION);
         }
         if(joinButton.isClicked()){
             Assets.getSound("menuSelect").play();
@@ -100,10 +100,19 @@ public class HostOrJoinState extends GameState {
     }
 
     public class FallingBody implements Disposable{
-        private Texture texture = new Texture("images/player/bluePlayerJumpLeft.png");
+        private Texture texture;
         private Body body;
         public FallingBody(Body body){
             this.body=body;
+            int randomColor = MathUtils.random(1,4);
+            if (randomColor == 1)
+                texture = Assets.getTex("blueJumpLeft");
+            else if (randomColor == 2)
+                texture = Assets.getTex("redJumpLeft");
+            else if (randomColor == 3)
+                texture = Assets.getTex("greenJumpRight");
+            else
+                texture = Assets.getTex("yellowJumpRight");
         }
 
         public void render(SpriteBatch sb){
@@ -114,7 +123,7 @@ public class HostOrJoinState extends GameState {
 
         @Override
         public void dispose() {
-            texture.dispose();
+
         }
     }
 }

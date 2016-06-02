@@ -2,6 +2,7 @@ package com.game.bb.gamestates;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -92,10 +93,19 @@ public class StartScreenState extends GameState {
     }
 
     public class FallingBody implements Disposable{
-        private Texture texture = Assets.getTex("blueJumpRight");
+        private Texture texture;
         private Body body;
         public FallingBody(Body body){
             this.body=body;
+            int randomColor = MathUtils.random(1,4);
+            if (randomColor == 1)
+                texture = Assets.getTex("blueJumpLeft");
+            else if (randomColor == 2)
+                texture = Assets.getTex("redJumpLeft");
+            else if (randomColor == 3)
+                texture = Assets.getTex("greenJumpRight");
+            else
+                texture = Assets.getTex("yellowJumpRight");
         }
 
         public void render(SpriteBatch sb){
