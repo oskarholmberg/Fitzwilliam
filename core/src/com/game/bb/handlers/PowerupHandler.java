@@ -12,10 +12,10 @@ import com.game.bb.net.packets.TCPEventPacket;
  * Created by erik on 25/05/16.
  */
 public class PowerupHandler {
-    private float ammoAccum = 20f, tiltAccum = 20f, shieldAccum = 20f, tiltDirection = 1f;
-    private static final float AMMO_DUR = 10f, TILT_DUR = 10f, SHIELD_DUR = 10f;
+    private float ammoAccum = 20f, tiltAccum = 20f, shieldAccum = 20f, tiltDirection = 1f, ghostAccum = 20f;
+    private static final float AMMO_DUR = 10f, TILT_DUR = 10f, SHIELD_DUR = 10f, GHOST_DUR = 5f;
     private float rotationAngle = 0f;
-    private boolean shielded;
+    private boolean shielded = false, ghosted = false;
     private IntMap<SPPower> powerups;
     private int xOffset = 25, yOffset = 30;
     private PlayState ps;
@@ -66,6 +66,10 @@ public class PowerupHandler {
                 Pooler.free(pkt);
                 shieldAccum = 0f;
                 break;
+            case B2DVars.POWERTYPE_GHOST:
+                ghostAccum = 0f;
+                ghosted = true;
+                break;
         }
     }
 
@@ -82,6 +86,9 @@ public class PowerupHandler {
 
     public boolean isShielded(){
         return shielded;
+    }
+    public boolean isGhosted(){
+        return ghosted;
     }
 
     private void powerTaken(){
@@ -111,6 +118,8 @@ public class PowerupHandler {
                 case B2DVars.POWERTYPE_SHIELD:
                     applyPowerup(powerType);
                     break;
+                case B2DVars.POWERTYPE_GHOST:
+                    applyPowerup(powerType);
             }
         }
     }
@@ -120,6 +129,12 @@ public class PowerupHandler {
         shield.update(dt);
         for (IntMap.Keys it = powerups.keys(); it.hasNext;){
             powerups.get(it.next()).update(dt);
+        }
+        if (ghostAccum < GHOST_DUR){
+            ghostAccum += dt;
+            if (ghostAccum > GHOST_DUR){
+                ghosted = false;
+            }
         }
         if (shieldAccum < SHIELD_DUR){
             shieldAccum += dt;
@@ -158,6 +173,9 @@ public class PowerupHandler {
     public void render(SpriteBatch sb){
         for (IntMap.Keys it = powerups.keys(); it.hasNext;){
             powerups.get(it.next()).render(sb);
+        }
+        if (ghosted){
+
         }
         if(shielded){
             sb.begin();

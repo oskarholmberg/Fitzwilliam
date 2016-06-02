@@ -338,7 +338,11 @@ public class PlayState extends GameState {
         pkt.yv = player.getBody().getLinearVelocity().y;
         pkt.seq = playerPktSequence++;
         pkt.sound = 0;
-        pkt.tex = currentTexture;
+        if (!powerHandler.isGhosted()) {
+            pkt.tex = currentTexture;
+        } else {
+            
+        }
         pkt.id = player.getId();
         pkt.time = TimeUtils.millis();
         client.sendUDP(pkt);

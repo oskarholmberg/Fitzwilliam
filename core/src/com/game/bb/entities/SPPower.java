@@ -28,6 +28,8 @@ public class SPPower extends SPSprite {
             animation = new SPAnimation(Assets.getAnimation("shakeWorld"), 0.1f);
         } else if (powerType == B2DVars.POWERTYPE_SHIELD) {
             animation = new SPAnimation(Assets.getAnimation("shieldPower"), 0.1f);
+        } else if (powerType == B2DVars.POWERTYPE_GHOST) {
+            animation = new SPAnimation(Assets.getAnimation("ghost"), 0.1f);
         }
     }
 

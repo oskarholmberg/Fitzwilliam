@@ -94,12 +94,13 @@ public class Assets {
         texRegions.put("greenGrenade", TextureRegion.split(new Texture("images/weapons/greenGrenade.png"), 30, 30)[0]);
         texRegions.put("yellowGrenade", TextureRegion.split(new Texture("images/weapons/yellowGrenade.png"), 30, 30)[0]);
 
-        //power ups
-        //shield
-        texRegions.put("shieldPower", TextureRegion.split(new Texture("images/powerups/shieldPower.png"), 17, 17)[0]);
+        //power up boxes
         texRegions.put("shield", TextureRegion.split(new Texture("images/powerups/shield.png"), 28, 32)[0]);
         texRegions.put("unlimitedAmmo", TextureRegion.split(new Texture("images/powerups/unlimitedAmmoPower.png"), 17, 17)[0]);
         texRegions.put("shakeWorld", TextureRegion.split(new Texture("images/powerups/shakeWorldPower.png"), 17, 17)[0]);
+        texRegions.put("ghost", TextureRegion.split(new Texture("images/powerups/ghost.png"), 17, 17)[0]);
+        //shield
+        texRegions.put("shieldPower", TextureRegion.split(new Texture("images/powerups/shieldPower.png"), 17, 17)[0]);
 
         //sounds
         sounds.put("lasershot", Gdx.audio.newSound(Gdx.files.internal("sfx/laser.wav")));

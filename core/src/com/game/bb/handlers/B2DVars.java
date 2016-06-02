@@ -11,7 +11,7 @@ public class B2DVars {
 
     public static final int SCALE = 1;
     public final static int DEFAULT_GAME_WIDTH = 960*SCALE, DEFAULT_GAME_HEIGHT = 640*SCALE;
-    public final static int AMOUNT_BULLET = 3, AMOUNT_GRENADE = 1, AMOUNT_LIVES = 2;
+    public final static int AMOUNT_BULLET = 3, AMOUNT_GRENADE = 1, AMOUNT_LIVES = 10;
 
     public final static float VOID_X = 200f, VOID_Y = 200f;
 
@@ -25,8 +25,9 @@ public class B2DVars {
     public static final short BIT_GROUND = 2, BIT_PLAYER = 4, BIT_OPPONENT = 8, BIT_BULLET = 16,
             BIT_GRENADE = 32, BIT_DOME = 64, BIT_ENEMY_ENTITY = 128, BIT_BOUNCE = 256;
 
-    public static final int POWERTYPE_AMMO = 1, POWERTYPE_TILTSCREEN = 2, POWERTYPE_SHIELD = 3;
-    public static final int POWERTYPE_AMOUNT = 3;
+    public static final int POWERTYPE_AMMO = 1, POWERTYPE_TILTSCREEN = 2, POWERTYPE_SHIELD = 3
+            , POWERTYPE_GHOST = 4;
+    public static final int POWERTYPE_AMOUNT = 4;
 
     public static final float PLAYER_HEIGHT = 22f/PPM, PLAYER_WIDTH = 18f/PPM;
 
