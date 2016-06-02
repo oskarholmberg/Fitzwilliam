@@ -20,9 +20,9 @@ public class SPPlayer extends SPSprite {
 
     protected Sound jetpackSound;
     protected Texture[] textures;
-    protected int xOffset = 23, yOffset = 25;
-    private boolean onGround = true, isDead = false;
-    private float textureTimer = 0;
+    protected int xOffset = 23, yOffset = 25, invulnerableBlink = 0;
+    private boolean onGround = true, isDead = false, invulnerable = false;
+    private float textureTimer = 0, invulnerabilityTimer = 8f;
     private String color;
     private PolygonShape shape;
     public static int STAND_RIGHT = 0, STAND_LEFT = 1, JUMP_RIGHT = 2, JUMP_LEFT = 3,
@@ -39,21 +39,20 @@ public class SPPlayer extends SPSprite {
     }
 
     public void jump(float xForce, float yForce, float xPos, float yPos) {
-        if (!isDead) {
-            body.setTransform(xPos, yPos, 0);
-            body.setLinearVelocity(0, 0);
-            body.applyForceToCenter(xForce, yForce, true);
-            textureTimer = 0;
-            onGround = false;
-            if (xForce < 0) {
-                setTexture(textures[JUMP_LEFT]);
-                PlayState.playState.currentTexture=JUMP_LEFT;
-            } else {
-                setTexture(textures[JUMP_RIGHT]);
-                PlayState.playState.currentTexture=JUMP_RIGHT;
-            }
-            jetpackSound.play();
+        body.setTransform(xPos, yPos, 0);
+        body.setLinearVelocity(0, 0);
+        body.applyForceToCenter(xForce, yForce, true);
+        textureTimer = 0;
+        onGround = false;
+        if (xForce < 0) {
+            setTexture(textures[JUMP_LEFT]);
+            PlayState.playState.currentTexture=JUMP_LEFT;
+        } else {
+            setTexture(textures[JUMP_RIGHT]);
+            PlayState.playState.currentTexture=JUMP_RIGHT;
         }
+        jetpackSound.play();
+
     }
 
     /**
@@ -76,6 +75,7 @@ public class SPPlayer extends SPSprite {
         isDead = false;
         body.setTransform(pos.x, pos.y, 0);
         body.setAwake(true);
+        invulnerabilityTimer = 0f;
         if(dir < 0) {
             setTexture(textures[STAND_LEFT]);
             PlayState.playState.currentTexture = STAND_LEFT;
@@ -110,7 +110,16 @@ public class SPPlayer extends SPSprite {
                     onGround = true;
                 }
             }
-            sb.draw(texture, x - xOffset, y - yOffset, 54, 48);
+            if (!invulnerable) {
+                sb.draw(texture, x - xOffset, y - yOffset, 54, 48);
+            } else {
+                if (invulnerableBlink < 5){
+                    sb.draw(texture, x - xOffset, y - yOffset, 54, 48);
+                    invulnerableBlink++;
+                } else {
+                    invulnerableBlink = 0;
+                }
+            }
             sb.end();
         }
     }
@@ -118,6 +127,16 @@ public class SPPlayer extends SPSprite {
     @Override
     public void update(float dt) {
         textureTimer += dt;
+        if (invulnerabilityTimer < 3f ) {
+            invulnerable = true;
+            invulnerabilityTimer += dt;
+        } else {
+            invulnerable = false;
+        }
+    }
+
+    public boolean invulnerable(){
+        return invulnerable;
     }
 
     public boolean isDead() {

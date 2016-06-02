@@ -76,6 +76,9 @@ public class Assets {
         tex.put("yellowBullet", new Texture("images/weapons/yellowBullet.png"));
         tex.put("greenBullet", new Texture("images/weapons/greenBullet.png"));
 
+        //misc
+        tex.put("heart", new Texture("images/heart.png"));
+
         //animations
         //grenades
         texRegions.put("blueGrenade", TextureRegion.split(new Texture("images/weapons/blueGrenade.png"), 30, 30)[0]);

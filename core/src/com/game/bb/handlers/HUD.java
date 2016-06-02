@@ -15,7 +15,7 @@ import java.util.HashMap;
  */
 public class HUD {
     private TextureRegion[] font;
-    private int playerDeaths = B2DVars.AMOUNT_LIVES;
+    private int playerDeaths = B2DVars.AMOUNT_LIVES, playerKills = 0;
     private HashMap<Integer, Integer> opponentDeaths;
     private IntMap<String> idsToColors;
     private Texture bulletTexture;
@@ -107,6 +107,10 @@ public class HUD {
         checkGameOver();
     }
 
+    public void addPlayerKill() {
+        playerKills++;
+    }
+
     public void setAmountBulletsLeft(int amount){
         bulletsLeft = amount;
     }
@@ -128,8 +132,17 @@ public class HUD {
         sb.begin();
         sb.draw(textureFromColor.get(B2DVars.MY_COLOR), 50, camHeight - 70, 45, 40);
         String playerDeathString = Integer.toString(playerDeaths);
+        int j = 0;
         for (int i = 0; i < playerDeathString.length(); i++) {
             sb.draw(font[Integer.valueOf(playerDeathString.substring(i, i + 1))], 100 + i * 50, camHeight - 70, 40, 40);
+            j++;
+
+        }
+        sb.draw(Assets.getTex("heart"), 100 + 50*j, camHeight - 70, 40, 40);
+        String playerKillString = Integer.toString(playerKills);
+        for (int i = 0; i < playerKillString.length(); i++) {
+            sb.draw(font[Integer.valueOf(playerKillString.substring(i, i + 1))], 150 + j * 50 + i * 50,
+                    camHeight - 70, 40, 40);
         }
         int offset=0;
         for (int id : opponentDeaths.keySet()) {
