@@ -344,7 +344,7 @@ public class PlayState extends GameState {
         if (!powerHandler.isGhosted()) {
             pkt.tex = currentTexture;
         } else {
-            
+            pkt.tex = SPPlayer.BLANK;
         }
         pkt.id = player.getId();
         pkt.time = TimeUtils.millis();

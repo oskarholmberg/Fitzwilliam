@@ -175,7 +175,7 @@ public class PowerupHandler {
             powerups.get(it.next()).render(sb);
         }
         if (ghosted){
-
+            //Add texture to write above player when ghosted.
         }
         if(shielded){
             sb.begin();
