@@ -69,6 +69,7 @@ public class PowerupHandler {
             case B2DVars.POWERTYPE_GHOST:
                 ghostAccum = 0f;
                 ghosted = true;
+                PlayState.playState.player.setGhost(true);
                 break;
         }
     }
@@ -86,6 +87,7 @@ public class PowerupHandler {
 
     public void removeGhost(){
         ghosted = false;
+        PlayState.playState.player.setGhost(false);
     }
 
     public boolean isShielded(){
@@ -138,6 +140,7 @@ public class PowerupHandler {
             ghostAccum += dt;
             if (ghostAccum > GHOST_DUR){
                 ghosted = false;
+                PlayState.playState.player.setGhost(false);
             }
         }
         if (shieldAccum < SHIELD_DUR){
@@ -177,9 +180,6 @@ public class PowerupHandler {
     public void render(SpriteBatch sb){
         for (IntMap.Keys it = powerups.keys(); it.hasNext;){
             powerups.get(it.next()).render(sb);
-        }
-        if (ghosted){
-            //Add texture to write above player when ghosted.
         }
         if(shielded){
             sb.begin();

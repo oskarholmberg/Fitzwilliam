@@ -19,9 +19,9 @@ import com.game.bb.handlers.B2DVars;
 public class SPPlayer extends SPSprite {
 
     protected Sound jetpackSound;
-    protected Texture[] textures;
+    protected Texture[] textures, ghostTex;
     protected int xOffset = 23, yOffset = 25, invulnerableBlink = 0;
-    private boolean onGround = true, isDead = false, invulnerable = false;
+    private boolean onGround = true, isDead = false, invulnerable = false, ghosted = false;
     private float textureTimer = 0, invulnerabilityTimer = 8f;
     private String color;
     private PolygonShape shape;
@@ -35,7 +35,7 @@ public class SPPlayer extends SPSprite {
         dir = 0;
         jetpackSound = Assets.getSound("jetpack");
         loadTexture(color);
-        setTexture(textures[STAND_RIGHT]);
+        PlayState.playState.currentTexture = STAND_RIGHT;
     }
 
     public void jump(float xForce, float yForce, float xPos, float yPos) {
@@ -45,10 +45,8 @@ public class SPPlayer extends SPSprite {
         textureTimer = 0;
         onGround = false;
         if (xForce < 0) {
-            setTexture(textures[JUMP_LEFT]);
             PlayState.playState.currentTexture=JUMP_LEFT;
         } else {
-            setTexture(textures[JUMP_RIGHT]);
             PlayState.playState.currentTexture=JUMP_RIGHT;
         }
         jetpackSound.play();
@@ -63,10 +61,8 @@ public class SPPlayer extends SPSprite {
     public void kill(float dir) {
         isDead = true;
         if (dir < 0) {
-            setTexture(textures[DEAD_RIGHT]);
             PlayState.playState.currentTexture=DEAD_RIGHT;
         } else {
-            setTexture(textures[DEAD_LEFT]);
             PlayState.playState.currentTexture=DEAD_LEFT;
         }
     }
@@ -77,10 +73,8 @@ public class SPPlayer extends SPSprite {
         body.setAwake(true);
         invulnerabilityTimer = 0f;
         if(dir < 0) {
-            setTexture(textures[STAND_LEFT]);
             PlayState.playState.currentTexture = STAND_LEFT;
         }else{
-            setTexture(textures[STAND_RIGHT]);
             PlayState.playState.currentTexture = STAND_RIGHT;
         }
     }
@@ -99,11 +93,9 @@ public class SPPlayer extends SPSprite {
             if (!isDead) {
                 if (textureTimer >= 0.5f && !onGround) {
                     if (texture.equals(textures[JUMP_LEFT])) {
-                        setTexture(textures[STAND_LEFT]);
                         PlayState.playState.currentTexture=STAND_LEFT;
                         xOffset = 30;
                     } else {
-                        setTexture(textures[STAND_RIGHT]);
                         PlayState.playState.currentTexture=STAND_RIGHT;
                         xOffset = 23;
                     }
@@ -111,10 +103,11 @@ public class SPPlayer extends SPSprite {
                 }
             }
             if (!invulnerable) {
-                sb.draw(texture, x - xOffset, y - yOffset, 54, 48);
+                if(ghosted) sb.draw(ghostTex[PlayState.playState.currentTexture], x-xOffset, y-yOffset, 54, 48);
+                else sb.draw(textures[PlayState.playState.currentTexture], x - xOffset, y - yOffset, 54, 48);
             } else {
                 if (invulnerableBlink < 5){
-                    sb.draw(texture, x - xOffset, y - yOffset, 54, 48);
+                    sb.draw(textures[PlayState.playState.currentTexture], x - xOffset, y - yOffset, 54, 48);
                     invulnerableBlink++;
                 } else {
                     sb.draw(textures[BLANK], x - xOffset, y - yOffset, 54, 48);
@@ -138,6 +131,10 @@ public class SPPlayer extends SPSprite {
 
     public boolean isInvulnerable(){
         return invulnerable;
+    }
+
+    public void setGhost(boolean ghost){
+        ghosted = ghost;
     }
 
     public boolean isDead() {
@@ -184,6 +181,12 @@ public class SPPlayer extends SPSprite {
         textures[DEAD_RIGHT] = Assets.getTex(color + "DeadRight");
         textures[DEAD_LEFT] = Assets.getTex(color + "DeadLeft");
         textures[BLANK] = Assets.getTex("blank");
+
+        ghostTex = new Texture[4];
+        ghostTex[STAND_RIGHT] = Assets.getTex(color + "StandRight");
+        ghostTex[STAND_LEFT] = Assets.getTex(color + "StandLeft");
+        ghostTex[JUMP_RIGHT] = Assets.getTex(color + "JumpRight");
+        ghostTex[JUMP_LEFT] = Assets.getTex(color + "JumpLeft");
     }
 
     @Override

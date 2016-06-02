@@ -78,6 +78,12 @@ public class Assets {
         tex.put("greenVictory", new Texture("images/player/greenPlayerVictory.png"));
         tex.put("greenHeart", new Texture("images/greenHeart.png"));
         tex.put("greenBlaster", new Texture("images/weapons/greenBlaster.png"));
+        //ghost
+        tex.put("ghostJumpLeft", new Texture("images/player/ghostJumpLeft.png"));
+        tex.put("ghostJumpRight", new Texture("images/player/ghostJumpRight.png"));
+        tex.put("ghostStandLeft", new Texture("images/player/ghostStandLeft.png"));
+        tex.put("ghostStandRight", new Texture("images/player/ghostStandRight.png"));
+
         //bullets
         tex.put("blueBullet", new Texture("images/weapons/blueBullet.png"));
         tex.put("redBullet", new Texture("images/weapons/redBullet.png"));

@@ -17,8 +17,6 @@ public abstract class SPSprite implements Disposable {
     protected Texture texture;
     protected int ID;
     protected float dir;
-    // maybe add animation, check the tutorial
-    // protected SPAnimation animation;
 
     public SPSprite(World world, int ID){
         this.ID=ID;

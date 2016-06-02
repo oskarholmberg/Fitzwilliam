@@ -34,7 +34,7 @@ public class PowerupSpawner {
                 630 / B2DVars.PPM);
         powerIdAccum++;
         int id = Integer.valueOf(powerId + Integer.toString(powerIdAccum));
-        int powerType = MathUtils.random(1, B2DVars.POWERTYPE_AMOUNT);
+        int powerType = MathUtils.random(4, B2DVars.POWERTYPE_AMOUNT);
         SPPower power = new SPPower(world, powerPos.x, powerPos.y, id, powerType);
         powerHandler.addPower(id, power);
         TCPEventPacket pkt = Pooler.tcpEventPacket();
