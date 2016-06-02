@@ -3,7 +3,6 @@ package com.game.bb.gamestates;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
@@ -14,12 +13,9 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.game.bb.entities.EnemyBullet;
 import com.game.bb.entities.EnemyEntity;
 import com.game.bb.entities.EnemyGrenade;
-import com.game.bb.entities.SPBullet;
-import com.game.bb.entities.SPGrenade;
 import com.game.bb.entities.SPOpponent;
 import com.game.bb.entities.SPPlayer;
 import com.game.bb.entities.SPPower;
-import com.game.bb.entities.SPSprite;
 import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.GameStateManager;
@@ -52,7 +48,6 @@ public class PlayState extends GameState {
     private Array<Vector2> spawnLocations;
     private PowerupSpawner powerupSpawner;
     private WeaponHandler weapons;
-    private IntMap<SPPower> powerups;
     private IntMap<Integer> opponentEntitySequence;
     private IntMap<Array<String>> killedByEntity;
     public float lastJumpDirection = 1;
@@ -90,9 +85,7 @@ public class PlayState extends GameState {
         hud = new HUD();
         weapons = new WeaponHandler(hud, this);
 
-        powerups = new IntMap<SPPower>();
-
-        powerHandler = new PowerupHandler();
+        powerHandler = new PowerupHandler(this);
 
         opponents = new IntMap<SPOpponent>();
         opponentEntitySequence = new IntMap<Integer>();
@@ -105,7 +98,7 @@ public class PlayState extends GameState {
 
         if (gsm.isHosting()) {
             hosting = true;
-            powerupSpawner = new PowerupSpawner(world, client, map.getMapWidth());
+            powerupSpawner = new PowerupSpawner(world, client, map.getMapWidth(), powerHandler);
         }
         // set up box2d cam
         b2dCam = new OrthographicCamera();
@@ -251,10 +244,8 @@ public class PlayState extends GameState {
                             Pooler.free((EnemyGrenade) opEntity); // return it to the pool
                     } else if (weapons.isMyWeapon(pkt.id)) {
                         weapons.removeGrenade(pkt.id);
-                    } else if (powerups.containsKey(pkt.id)) {
-                        SPPower powerup = powerups.remove(pkt.id);
-                        world.destroyBody(powerup.getBody());
-                        powerup.dispose();
+                    } else if (powerHandler.containsPower(pkt.id)) {
+                        powerHandler.removePower(pkt.id);
                     }
                     break;
                 case B2DVars.NET_DEATH:
@@ -265,8 +256,8 @@ public class PlayState extends GameState {
                         }
                     }
                     break;
-                case B2DVars.NET_POWER:
-                    powerups.put(pkt.id, new SPPower(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.misc));
+                case B2DVars.NET_SPAWN_POWER:
+                    powerHandler.addPower(pkt.id, new SPPower(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.misc));
                     break;
                 case B2DVars.NET_APPLY_ANTIPOWER:
                     if (pkt.misc == B2DVars.POWERTYPE_TILTSCREEN) {
@@ -398,40 +389,6 @@ public class PlayState extends GameState {
         }
     }
 
-    private void powerupTaken() {
-        if (cl.powerTaken() && cl.getLastPowerTaken() != null) {
-            SPPower power = powerups.remove(cl.getLastPowerTaken().getId());
-            int powerType = power.getPowerType();
-            world.destroyBody(power.getBody());
-            power.dispose();
-
-            TCPEventPacket pkt = Pooler.tcpEventPacket();
-            pkt.action = B2DVars.NET_DESTROY_BODY;
-            pkt.id = power.getId();
-            client.sendTCP(pkt);
-            Pooler.free(pkt);
-
-            switch (powerType) {
-                case B2DVars.POWERTYPE_AMMO:
-                    powerHandler.applyPowerup(powerType);
-                    break;
-                case B2DVars.POWERTYPE_TILTSCREEN:
-                    TCPEventPacket pkt2 = Pooler.tcpEventPacket();
-                    pkt2.action = B2DVars.NET_APPLY_ANTIPOWER;
-                    pkt2.misc = powerType;
-                    client.sendTCP(pkt2);
-                    Pooler.free(pkt2);
-                    break;
-                case B2DVars.POWERTYPE_SHIELD:
-                    powerHandler.applyPowerup(powerType);
-            }
-        }
-    }
-
-    public void addPowerup(SPPower power, int id) {
-        powerups.put(id, power);
-    }
-
     private void updateCamPosition() {
         //if the player moves far right
         float camX = cam.position.x;
@@ -475,9 +432,6 @@ public class PlayState extends GameState {
         for (IntMap.Keys it = opEntities.keys(); it.hasNext; ) {
             opEntities.get(it.next()).update(dt);
         }
-        for (IntMap.Keys it = powerups.keys(); it.hasNext; ) {
-            powerups.get(it.next()).update(dt);
-        }
         opponentTCPEvents();
         opponentEntityEvents();
         opponentMovementEvents();
@@ -489,7 +443,6 @@ public class PlayState extends GameState {
         if (cl.bouncePlayer()) {
             player.bouncePlayer();
         }
-        powerupTaken();
         powerHandler.update(dt);
         if (!client.isConnected()) {
             gsm.setState(GameStateManager.HOST_OFFLINE);
@@ -523,9 +476,6 @@ public class PlayState extends GameState {
         }
         for (IntMap.Keys it = opponents.keys(); it.hasNext; ) {
             opponents.get(it.next()).render(sb);
-        }
-        for (IntMap.Keys it = powerups.keys(); it.hasNext; ) {
-            powerups.get(it.next()).render(sb);
         }
         powerHandler.render(sb);
         weapons.render(sb);
@@ -598,13 +548,5 @@ public class PlayState extends GameState {
 
     public IntMap<EnemyEntity> getOpponentEntities() {
         return opEntities;
-    }
-
-    public boolean containsPowerup(int id) {
-        return powerups.containsKey(id);
-    }
-
-    public IntMap<SPPower> getPowerups() {
-        return powerups;
     }
 }
