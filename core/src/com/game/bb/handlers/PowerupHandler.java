@@ -84,6 +84,10 @@ public class PowerupHandler {
         shielded = false;
     }
 
+    public void removeGhost(){
+        ghosted = false;
+    }
+
     public boolean isShielded(){
         return shielded;
     }

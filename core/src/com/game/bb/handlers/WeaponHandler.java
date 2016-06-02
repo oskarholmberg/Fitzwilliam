@@ -37,7 +37,7 @@ public class WeaponHandler {
 
     public void refresh(){
         amountBullets = B2DVars.AMOUNT_BULLET;
-        amountBullets = B2DVars.AMOUNT_GRENADE;
+        amountGrenades = B2DVars.AMOUNT_GRENADE;
         hud.setAmountBulletsLeft(amountBullets);
         hud.setAmountGrenadesLeft(amountGrenades);
     }

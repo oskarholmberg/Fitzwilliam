@@ -359,6 +359,7 @@ public class PlayState extends GameState {
                 if (!powerHandler.isShielded()) {
                     player.kill(1);
                     hud.addPlayerDeath();
+                    powerHandler.removeGhost();
                 }
                 TCPEventPacket pkt = Pooler.tcpEventPacket(); // grab it from the pool
                 pkt.action = B2DVars.NET_DESTROY_BODY;
