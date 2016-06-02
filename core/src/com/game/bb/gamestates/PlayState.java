@@ -42,33 +42,32 @@ public class PlayState extends GameState {
 
     private Box2DDebugRenderer b2dr;
     private OrthographicCamera b2dCam;
-    public SPContactListener cl;
-    public SPPlayer player;
     private IntMap<SPOpponent> opponents;
     private Array<Vector2> spawnLocations;
     private PowerupSpawner powerupSpawner;
     private WeaponHandler weapons;
     private IntMap<Integer> opponentEntitySequence;
     private IntMap<Array<String>> killedByEntity;
-    public float lastJumpDirection = 1;
     private IntMap<EnemyEntity> opEntities = new IntMap<EnemyEntity>();
-    private float respawnTimer = 0;
+    private float respawnTimer = 0, sendPlayerInfo = 0f;
     private TCPEventPacket gameOverPacket;
-    public GameClient client;
     private HUD hud;
-    public PowerupHandler powerHandler;
-    public com.game.bb.handlers.MapBuilder map;
     private IntArray removedIds;
     private Texture backGround = Assets.getBackground();
     private float[] touchNbrs = {(cam.viewportWidth / 5), cam.viewportWidth * 4 / 5};
     private int playerPktSequence = 0;
     private boolean debugClick = false, hosting = false,
             removeMeMessageSent = false, debuggingMode = false, gameOverReceived = false;
-    private float sendPlayerInfo = 0f;
 
     public int currentTexture = SPOpponent.STAND_LEFT;
     public World world;
     public static PlayState playState;
+    public float lastJumpDirection = 1;
+    public GameClient client;
+    public PowerupHandler powerHandler;
+    public com.game.bb.handlers.MapBuilder map;
+    public SPContactListener cl;
+    public SPPlayer player;
 
     public PlayState(GameStateManager gsm, GameClient client) {
         super(gsm);

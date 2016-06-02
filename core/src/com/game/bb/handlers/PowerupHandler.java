@@ -13,7 +13,7 @@ import com.game.bb.net.packets.TCPEventPacket;
  */
 public class PowerupHandler {
     private float ammoAccum = 20f, tiltAccum = 20f, shieldAccum = 20f, tiltDirection = 1f;
-    private static final float AMMO_DUR = 10f, TILT_DUR = 10f, SHIELD_DUR = 15f;
+    private static final float AMMO_DUR = 10f, TILT_DUR = 10f, SHIELD_DUR = 10f;
     private float rotationAngle = 0f;
     private boolean shielded;
     private IntMap<SPPower> powerups;
