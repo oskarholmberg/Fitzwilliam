@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Pool;
 public class TCPEventPacket implements Pool.Poolable{
     public int action;
     public Vector2 pos, force;
-    public int id, misc, misc2;
+    public int id, misc, misc2, misc3;
     public String miscString, color;
 
     @Override
@@ -18,6 +18,7 @@ public class TCPEventPacket implements Pool.Poolable{
         miscString="";
         misc = 0;
         misc2 = 0;
+        misc3 = 0;
         action=-1;
     }
 }

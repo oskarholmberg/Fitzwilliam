@@ -26,7 +26,7 @@ public class SPPlayer extends SPSprite {
     private String color;
     private PolygonShape shape;
     public static int STAND_RIGHT = 0, STAND_LEFT = 1, JUMP_RIGHT = 2, JUMP_LEFT = 3,
-            DEAD_RIGHT = 4, DEAD_LEFT = 5;
+            DEAD_RIGHT = 4, DEAD_LEFT = 5, BLANK=6;
 
     public SPPlayer(World world, float xPos, float yPos, int id, String color) {
         super(world, id);
@@ -117,6 +117,7 @@ public class SPPlayer extends SPSprite {
                     sb.draw(texture, x - xOffset, y - yOffset, 54, 48);
                     invulnerableBlink++;
                 } else {
+                    sb.draw(textures[BLANK], x - xOffset, y - yOffset, 54, 48);
                     invulnerableBlink = 0;
                 }
             }
@@ -127,7 +128,7 @@ public class SPPlayer extends SPSprite {
     @Override
     public void update(float dt) {
         textureTimer += dt;
-        if (invulnerabilityTimer < 3f ) {
+        if (invulnerabilityTimer < 2f ) {
             invulnerable = true;
             invulnerabilityTimer += dt;
         } else {
@@ -135,7 +136,7 @@ public class SPPlayer extends SPSprite {
         }
     }
 
-    public boolean invulnerable(){
+    public boolean isInvulnerable(){
         return invulnerable;
     }
 
@@ -174,7 +175,7 @@ public class SPPlayer extends SPSprite {
     }
 
     public void loadTexture(String color) {
-        textures = new Texture[6];
+        textures = new Texture[7];
 
         textures[STAND_RIGHT] = Assets.getTex(color + "StandRight");
         textures[STAND_LEFT] = Assets.getTex(color + "StandLeft");
@@ -182,6 +183,7 @@ public class SPPlayer extends SPSprite {
         textures[JUMP_LEFT] = Assets.getTex(color + "JumpLeft");
         textures[DEAD_RIGHT] = Assets.getTex(color + "DeadRight");
         textures[DEAD_LEFT] = Assets.getTex(color + "DeadLeft");
+        textures[BLANK] = Assets.getTex("blank");
     }
 
     @Override

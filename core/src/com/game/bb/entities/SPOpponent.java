@@ -16,6 +16,7 @@ public class SPOpponent extends SPPlayer {
     private SPAnimation shield;
     private boolean shielded = false;
     private int lastMovementSeq = 0;
+    private float invulnerableTimer = 0, invulnerableTime = 0;
 
     public SPOpponent(World world, float xPos, float yPos, int id, String color) {
         super(world, xPos, yPos, id, color);
@@ -28,6 +29,11 @@ public class SPOpponent extends SPPlayer {
 
     public void removeShield(){
         shielded = false;
+    }
+
+    public void setInvulnerable(float time){
+        invulnerableTimer = time + B2DVars.RESPAWN_TIME;
+        invulnerableTime = time;
     }
 
     /**
@@ -61,13 +67,26 @@ public class SPOpponent extends SPPlayer {
             float y = body.getPosition().y * B2DVars.PPM - B2DVars.PLAYER_HEIGHT;
             if (shielded)
                 sb.draw(shield.getFrame(), x - 25, y - 30, 50, 60);
-            sb.draw(texture, x - xOffset, y - yOffset, 54, 48);
+            if(invulnerableTimer <= invulnerableTime && invulnerableTimer > 0){
+                if (invulnerableBlink < 5){
+                    sb.draw(texture, x - xOffset, y - yOffset, 54, 48);
+                    invulnerableBlink++;
+                } else {
+                    sb.draw(textures[BLANK], x - xOffset, y - yOffset, 54, 48);
+                    invulnerableBlink = 0;
+                }
+            }
+            else
+                sb.draw(texture, x - xOffset, y - yOffset, 54, 48);
             sb.end();
         }
     }
 
     public void update(float dt){
         shield.update(dt);
+        if(invulnerableTimer > 0){
+            invulnerableTimer -= dt;
+        }
     }
 
     protected void createPlayerBody(float xPos, float yPos) {
