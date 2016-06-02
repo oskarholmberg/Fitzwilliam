@@ -146,11 +146,11 @@ public class PlayState extends GameState {
         if (SPInput.isPressed(SPInput.BUTTON_W) ||
                 SPInput.isPressed() && SPInput.x > touchNbrs[0] && SPInput.x < touchNbrs[1]) {
             SPInput.down = false;
-            if (!player.isInvulnerable() && !player.isDead())
+            if (!player.isDead())
                 weapons.shoot();
         }
         if (SPInput.isPressed(SPInput.BUTTON_E)) {
-            if (!player.isInvulnerable() && !player.isDead())
+            if (!player.isDead())
                 weapons.throwGrenade();
         }
         if (SPInput.isPressed(SPInput.BUTTON_Y)) {

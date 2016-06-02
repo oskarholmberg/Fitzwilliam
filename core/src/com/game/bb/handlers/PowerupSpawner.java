@@ -25,7 +25,7 @@ public class PowerupSpawner {
         this.client=client;
         this.mapWidth=mapWidth;
         this.powerHandler=powerHandler;
-        randomTime = 5f;
+        randomTime = 20f;
         timeCheck = 0;
     }
 
@@ -34,7 +34,7 @@ public class PowerupSpawner {
                 630 / B2DVars.PPM);
         powerIdAccum++;
         int id = Integer.valueOf(powerId + Integer.toString(powerIdAccum));
-        int powerType = MathUtils.random(4, B2DVars.POWERTYPE_AMOUNT);
+        int powerType = MathUtils.random(1, B2DVars.POWERTYPE_AMOUNT);
         SPPower power = new SPPower(world, powerPos.x, powerPos.y, id, powerType);
         powerHandler.addPower(id, power);
         TCPEventPacket pkt = Pooler.tcpEventPacket();
@@ -48,7 +48,7 @@ public class PowerupSpawner {
 
     public void update(float dt){
         if (timeCheck > randomTime){
-            randomTime = MathUtils.random(25.0f, 40.0f);
+            randomTime = MathUtils.random(20.0f, 30.0f);
             timeCheck = 0f;
             generatePowerup();
         } else {
