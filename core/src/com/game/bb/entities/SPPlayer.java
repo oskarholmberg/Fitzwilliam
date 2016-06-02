@@ -159,7 +159,7 @@ public class SPPlayer extends SPSprite {
         body.setUserData(this);
 
         //add foot
-        shape.setAsBox(B2DVars.PLAYER_WIDTH - 2 / B2DVars.PPM, 2 / B2DVars.PPM, new Vector2(0, -B2DVars.PLAYER_HEIGHT), 0);
+        shape.setAsBox(B2DVars.PLAYER_WIDTH - 1 / B2DVars.PPM, 2 / B2DVars.PPM, new Vector2(0, -B2DVars.PLAYER_HEIGHT), 0);
         fdef.shape = shape;
         fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
         fdef.filter.maskBits = B2DVars.BIT_GROUND;

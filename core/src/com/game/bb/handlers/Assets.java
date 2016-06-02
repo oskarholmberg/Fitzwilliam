@@ -46,6 +46,8 @@ public class Assets {
         tex.put("blueStandLeft", new Texture("images/player/bluePlayerStandLeft.png"));
         tex.put("blueStandRight", new Texture("images/player/bluePlayerStandRight.png"));
         tex.put("blueVictory", new Texture("images/player/bluePlayerVictory.png"));
+        tex.put("blueHeart", new Texture("images/blueHeart.png"));
+        tex.put("blueBlaster", new Texture("images/weapons/blueBlaster.png"));
         //red player
         tex.put("redDeadLeft", new Texture("images/player/redPlayerDeadLeft.png"));
         tex.put("redDeadRight", new Texture("images/player/redPlayerDeadRight.png"));
@@ -54,6 +56,8 @@ public class Assets {
         tex.put("redStandLeft", new Texture("images/player/redPlayerStandLeft.png"));
         tex.put("redStandRight", new Texture("images/player/redPlayerStandRight.png"));
         tex.put("redVictory", new Texture("images/player/redPlayerVictory.png"));
+        tex.put("redHeart", new Texture("images/redHeart.png"));
+        tex.put("redBlaster", new Texture("images/weapons/redBlaster.png"));
         //yellow player
         tex.put("yellowDeadLeft", new Texture("images/player/yellowPlayerDeadLeft.png"));
         tex.put("yellowDeadRight", new Texture("images/player/yellowPlayerDeadRight.png"));
@@ -62,6 +66,8 @@ public class Assets {
         tex.put("yellowStandLeft", new Texture("images/player/yellowPlayerStandLeft.png"));
         tex.put("yellowStandRight", new Texture("images/player/yellowPlayerStandRight.png"));
         tex.put("yellowVictory", new Texture("images/player/yellowPlayerVictory.png"));
+        tex.put("yellowHeart", new Texture("images/yellowHeart.png"));
+        tex.put("yellowBlaster", new Texture("images/weapons/yellowBlaster.png"));
         //green player
         tex.put("greenDeadLeft", new Texture("images/player/greenPlayerDeadLeft.png"));
         tex.put("greenDeadRight", new Texture("images/player/greenPlayerDeadRight.png"));
@@ -70,6 +76,8 @@ public class Assets {
         tex.put("greenStandLeft", new Texture("images/player/greenPlayerStandLeft.png"));
         tex.put("greenStandRight", new Texture("images/player/greenPlayerStandRight.png"));
         tex.put("greenVictory", new Texture("images/player/greenPlayerVictory.png"));
+        tex.put("greenHeart", new Texture("images/greenHeart.png"));
+        tex.put("greenBlaster", new Texture("images/weapons/greenBlaster.png"));
         //bullets
         tex.put("blueBullet", new Texture("images/weapons/blueBullet.png"));
         tex.put("redBullet", new Texture("images/weapons/redBullet.png"));
