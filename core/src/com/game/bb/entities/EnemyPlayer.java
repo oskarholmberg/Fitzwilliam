@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.game.bb.gamestates.PlayState;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.SPAnimation;
 import com.game.bb.net.packets.PlayerMovementPacket;
@@ -27,7 +28,7 @@ public class EnemyPlayer extends EnemyEntity {
     public EnemyPlayer(float xPos, float yPos){
         super();
         createPlayerBody(xPos, yPos);
-        jetPackSound = Gdx.audio.newSound(Gdx.files.internal("sfx/jetpackFire.wav"));
+        jetPackSound = Assets.getSound("jetpack");
     }
 
 
