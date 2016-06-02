@@ -146,11 +146,11 @@ public class PlayState extends GameState {
         if (SPInput.isPressed(SPInput.BUTTON_W) ||
                 SPInput.isPressed() && SPInput.x > touchNbrs[0] && SPInput.x < touchNbrs[1]) {
             SPInput.down = false;
-            if (!player.invulnerable() && !player.isDead())
+            if (!player.isInvulnerable() && !player.isDead())
                 weapons.shoot();
         }
         if (SPInput.isPressed(SPInput.BUTTON_E)) {
-            if (!player.invulnerable() && !player.isDead())
+            if (!player.isInvulnerable() && !player.isDead())
                 weapons.throwGrenade();
         }
         if (SPInput.isPressed(SPInput.BUTTON_Y)) {
@@ -249,9 +249,12 @@ public class PlayState extends GameState {
                     break;
                 case B2DVars.NET_DEATH:
                     if (opponents.containsKey(pkt.id)) {
-                        hud.setOpponentDeath(pkt.id, pkt.misc);
-                        if (pkt.misc2 == B2DVars.MY_ID){
-                            hud.addPlayerKill();
+                        if(pkt.misc3 == 0) {
+                            opponents.get(pkt.id).setInvulnerable(2f);
+                            hud.setOpponentDeath(pkt.id, pkt.misc);
+                            if (pkt.misc2 == B2DVars.MY_ID) {
+                                hud.addPlayerKill();
+                            }
                         }
                     }
                     break;
@@ -350,7 +353,7 @@ public class PlayState extends GameState {
     }
 
     private void playerHit() {
-        if (!player.invulnerable()) {
+        if (!player.isInvulnerable()) {
             if (!player.isDead()) {
                 int id = cl.getKillingEntityID();
                 if (!powerHandler.isShielded()) {
@@ -365,6 +368,7 @@ public class PlayState extends GameState {
                 pkt.id = player.getId();
                 pkt.misc = hud.getPlayerDeathCount();
                 pkt.misc2 = Tools.getPlayerId(id);
+                if(powerHandler.isShielded()) pkt.misc3 = 1;
                 client.sendTCP(pkt);
                 Pooler.free(pkt); //return it to the pool
                 if (weapons.isMyWeapon(id)) {

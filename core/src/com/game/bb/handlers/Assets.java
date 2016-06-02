@@ -86,6 +86,7 @@ public class Assets {
 
         //misc
         tex.put("heart", new Texture("images/heart.png"));
+        tex.put("blank", new Texture("images/blank.png"));
 
         //animations
         //grenades

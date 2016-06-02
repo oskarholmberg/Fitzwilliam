@@ -140,7 +140,6 @@ public class HUD {
         for (int i = 0; i < playerDeathString.length(); i++) {
             sb.draw(font[Integer.valueOf(playerDeathString.substring(i, i + 1))], 100 + i * 50, camHeight - 70, 40, 40);
             j++;
-
         }
         sb.draw(blaster, 140 + 50*j, camHeight-55, 40, 13);
         String playerKillString = Integer.toString(playerKills);
