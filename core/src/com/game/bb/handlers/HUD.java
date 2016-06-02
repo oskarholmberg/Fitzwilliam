@@ -18,7 +18,7 @@ public class HUD {
     private int playerDeaths = B2DVars.AMOUNT_LIVES, playerKills = 0;
     private HashMap<Integer, Integer> opponentDeaths;
     private IntMap<String> idsToColors;
-    private Texture bulletTexture;
+    private Texture bulletTexture, heart, blaster;
     private TextureRegion grenadeTexture;
     private Array<Integer> victoryOrder;
     private ArrayMap<String, Texture> textureFromColor;
@@ -34,6 +34,8 @@ public class HUD {
         textureFromColor.put(B2DVars.COLOR_RED, Assets.getTex("redStandRight"));
         textureFromColor.put(B2DVars.COLOR_YELLOW, Assets.getTex("yellowStandRight"));
         textureFromColor.put(B2DVars.COLOR_GREEN, Assets.getTex("greenStandRight"));
+        heart = Assets.getTex(B2DVars.MY_COLOR + "Heart");
+        blaster = Assets.getTex(B2DVars.MY_COLOR + "Blaster");
         bulletTexture = Assets.getTex(B2DVars.MY_COLOR + "Bullet");
         grenadeTexture = Assets.getAnimation(B2DVars.MY_COLOR + "Grenade")[0];
         opponentDeaths = new HashMap<Integer, Integer>();
@@ -52,6 +54,8 @@ public class HUD {
     public void setMyNewColor(String color){
         bulletTexture = Assets.getTex(color + "Bullet");
         grenadeTexture = Assets.getAnimation(color + "Grenade")[0];
+        heart = Assets.getTex(color + "Heart");
+        blaster = Assets.getTex(color + "Blaster");
     }
 
     public void setColorToId(int id, String color){
@@ -130,7 +134,7 @@ public class HUD {
         float camHeight = PlayState.playState.cam.viewportHeight;
         float camWidth = PlayState.playState.cam.viewportWidth;
         sb.begin();
-        sb.draw(textureFromColor.get(B2DVars.MY_COLOR), 50, camHeight - 70, 45, 40);
+        sb.draw(heart, 43, camHeight - 70, 40, 40);
         String playerDeathString = Integer.toString(playerDeaths);
         int j = 0;
         for (int i = 0; i < playerDeathString.length(); i++) {
@@ -138,10 +142,10 @@ public class HUD {
             j++;
 
         }
-        sb.draw(Assets.getTex("heart"), 100 + 50*j, camHeight - 70, 40, 40);
+        sb.draw(blaster, 140 + 50*j, camHeight-55, 40, 13);
         String playerKillString = Integer.toString(playerKills);
         for (int i = 0; i < playerKillString.length(); i++) {
-            sb.draw(font[Integer.valueOf(playerKillString.substring(i, i + 1))], 150 + j * 50 + i * 50,
+            sb.draw(font[Integer.valueOf(playerKillString.substring(i, i + 1))], 200 + j * 50 + i * 50,
                     camHeight - 70, 40, 40);
         }
         int offset=0;
