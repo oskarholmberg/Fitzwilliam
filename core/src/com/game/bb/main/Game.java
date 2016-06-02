@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.game.bb.gamestates.GameStateManager;
 import com.game.bb.handlers.B2DVars;
 import com.game.bb.handlers.SPInput;
 import com.game.bb.handlers.SPInputProcessor;
@@ -16,7 +17,7 @@ public class Game extends ApplicationAdapter {
     private OrthographicCamera hudCam;
 
 
-    private com.game.bb.handlers.GameStateManager gsm;
+    private GameStateManager gsm;
 
 	@Override
 	public void create () {
@@ -29,7 +30,7 @@ public class Game extends ApplicationAdapter {
 
         Gdx.input.setInputProcessor(new SPInputProcessor());
 
-        gsm = new com.game.bb.handlers.GameStateManager(this);
+        gsm = new GameStateManager(this);
 	}
 
 

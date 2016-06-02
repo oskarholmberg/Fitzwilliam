@@ -1,6 +1,7 @@
 package com.game.bb.handlers;
 
 
+
 /**
  * Created by erik on 06/05/16.
  */
@@ -18,7 +19,7 @@ public class B2DVars {
     public final static float PH_JUMPX = 70f, PH_JUMPY = 200f, RESPAWN_TIME= 3f, PH_BULLET_SPEED = 300f,
             PH_GRENADE_X = 220f, PH_GRENADE_Y = -150f;
 
-    public static int MY_ID = -123;
+    public static int MY_ID = -123, MAP_NBR = -1;
     public static String MY_COLOR = "blue";
 
     // collision bits
@@ -53,5 +54,8 @@ public class B2DVars {
     }
     public static void setMyColor(String color){
         MY_COLOR = color;
+    }
+    public static void setMapNbr(int nbr) {
+        MAP_NBR = nbr;
     }
 }

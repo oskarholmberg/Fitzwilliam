@@ -1,14 +1,8 @@
-package com.game.bb.handlers;
+package com.game.bb.gamestates;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
-import com.game.bb.gamestates.ConnectionState;
-import com.game.bb.gamestates.GameOverState;
-import com.game.bb.gamestates.GameState;
-import com.game.bb.gamestates.HostOfflineState;
-import com.game.bb.gamestates.JoinServerState;
-import com.game.bb.gamestates.PlayState;
-import com.game.bb.gamestates.StartScreenState;
+import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.pools.Pooler;
 import com.game.bb.main.Game;
 import com.game.bb.net.client.GameClient;
@@ -28,7 +22,8 @@ public class GameStateManager {
     private GameServer server;
     private int mapNbr;
     private boolean hosting = false;
-    public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, JOIN_SERVER = 4, HOST_OFFLINE = 5, GAME_OVER = 6;
+    public static final int PLAY = 1, START_SCREEN = 2, CONNECT = 3, JOIN_SERVER = 4, HOST_OFFLINE = 5,
+            GAME_OVER = 6, MAP_SELECTION = 7;
     public ArrayMap<String, Array<String>> killedByEntities;
     public String victoryOrder;
 
@@ -85,7 +80,7 @@ public class GameStateManager {
             case START_SCREEN:
                 return new StartScreenState(this);
             case CONNECT:
-                return new ConnectionState(this);
+                return new HostOrJoinState(this);
             case JOIN_SERVER:
                 return new JoinServerState(this);
             case HOST_OFFLINE:
@@ -95,6 +90,8 @@ public class GameStateManager {
                 if(server != null) server.stop();
                 if(client != null) client.stop();
                 return new GameOverState(this, killedByEntities, victoryOrder);
+            case MAP_SELECTION:
+                return new MapSelectState(this);
             default:
                 return null;
         }

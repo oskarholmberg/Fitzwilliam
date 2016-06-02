@@ -6,7 +6,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.game.bb.handlers.Assets;
-import com.game.bb.handlers.GameStateManager;
 
 /**
  * Created by erik on 12/05/16.

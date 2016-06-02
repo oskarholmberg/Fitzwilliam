@@ -18,7 +18,6 @@ import com.game.bb.entities.SPPlayer;
 import com.game.bb.entities.SPPower;
 import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
-import com.game.bb.handlers.GameStateManager;
 import com.game.bb.handlers.HUD;
 import com.game.bb.handlers.MapBuilder;
 import com.game.bb.handlers.PowerupHandler;
@@ -52,12 +51,12 @@ public class PlayState extends GameState {
     private float respawnTimer = 0, sendPlayerInfo = 0f;
     private TCPEventPacket gameOverPacket;
     private HUD hud;
-    private IntArray removedIds;
     private Texture backGround = Assets.getBackground();
     private float[] touchNbrs = {(cam.viewportWidth / 5), cam.viewportWidth * 4 / 5};
     private int playerPktSequence = 0;
     private boolean debugClick = false, hosting = false,
-            removeMeMessageSent = false, debuggingMode = false, gameOverReceived = false;
+            removeMeMessageSent = false, debuggingMode = false, gameOverReceived = false,
+            mapHasBeenCreated = false;
 
     public int currentTexture = SPOpponent.STAND_LEFT;
     public World world;
@@ -88,21 +87,25 @@ public class PlayState extends GameState {
 
         opponents = new IntMap<SPOpponent>();
         opponentEntitySequence = new IntMap<Integer>();
-        removedIds = new IntArray();
 
-        map = new MapBuilder(world, 4, false);
-        map.buildMap();
-        spawnLocations = map.getSpawnLocations();
         killedByEntity = new IntMap<Array<String>>();
 
-        if (gsm.isHosting()) {
-            hosting = true;
-            powerupSpawner = new PowerupSpawner(world, client, map.getMapWidth(), powerHandler);
-        }
+
         // set up box2d cam
         b2dCam = new OrthographicCamera();
         b2dCam.setToOrtho(false, cam.viewportWidth / B2DVars.PPM, cam.viewportHeight / B2DVars.PPM);
 
+    }
+
+    private void createMap(){
+        map = new MapBuilder(world, B2DVars.MAP_NBR, false);
+        map.buildMap();
+        spawnLocations = map.getSpawnLocations();
+        if (gsm.isHosting()) {
+            hosting = true;
+            powerupSpawner = new PowerupSpawner(world, client, map.getMapWidth(), powerHandler);
+        }
+        mapHasBeenCreated = true;
     }
 
     private void createPlayer() {
@@ -169,6 +172,8 @@ public class PlayState extends GameState {
                 case B2DVars.NET_SERVER_INFO:
                     B2DVars.setMyId(pkt.id);
                     B2DVars.setMyColor(pkt.color);
+                    B2DVars.setMapNbr(pkt.misc);
+                    createMap();
                     createPlayer();
                     break;
                 case B2DVars.NET_CONNECT:
@@ -235,7 +240,6 @@ public class PlayState extends GameState {
                     break;
                 case B2DVars.NET_DESTROY_BODY:
                     if (opEntities.containsKey(pkt.id)) {
-                        removedIds.add(pkt.id);
                         EnemyEntity opEntity = opEntities.remove(pkt.id);
                         if (opEntity instanceof EnemyBullet)
                             Pooler.free((EnemyBullet) opEntity); // return it to the pool
@@ -378,7 +382,6 @@ public class PlayState extends GameState {
                         killedByEntity.get(B2DVars.MY_ID).add("grenade");
                 } else if (opEntities.containsKey(id)) {
                     EnemyEntity entity = opEntities.remove(id);
-                    removedIds.add(id);
                     if (entity instanceof EnemyGrenade) {
                         entity.getBody().setTransform(400f, 400f, 0); //Was not moved when freed, so done manually.
                         Pooler.free((EnemyGrenade) entity);
@@ -478,7 +481,9 @@ public class PlayState extends GameState {
         sb.begin();
         sb.draw(backGround, cam.position.x - cam.viewportWidth / 2, 0);
         sb.end();
-        map.render();
+        if (mapHasBeenCreated) {
+            map.render();
+        }
         for (IntMap.Keys it = opEntities.keys(); it.hasNext; ) {
             opEntities.get(it.next()).render(sb);
         }

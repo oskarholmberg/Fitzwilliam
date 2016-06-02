@@ -12,12 +12,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
-import com.game.bb.handlers.GameStateManager;
 
 /**
  * Created by erik on 12/05/16.
  */
-public class ConnectionState extends GameState {
+public class HostOrJoinState extends GameState {
 
     private SPButton hostButton, joinButton;
     private World world;
@@ -26,7 +25,7 @@ public class ConnectionState extends GameState {
     private float newFallingBody = 0f;
 
 
-    public ConnectionState(GameStateManager gsm) {
+    public HostOrJoinState(GameStateManager gsm) {
         super(gsm);
 
         world = new World(new Vector2(0, -9.81f), true);
@@ -54,8 +53,8 @@ public class ConnectionState extends GameState {
     public void handleInput() {
         if (hostButton.isClicked()) {
             Assets.getSound("menuSelect").play();
-            gsm.setMapSelection(3);
             gsm.hostGame(true);
+            gsm.setMapSelection(4);
             gsm.setState(GameStateManager.PLAY);
         }
         if(joinButton.isClicked()){

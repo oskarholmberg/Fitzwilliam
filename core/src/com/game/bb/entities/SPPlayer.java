@@ -102,10 +102,10 @@ public class SPPlayer extends SPSprite {
             }
         }
         if (!invulnerable) {
-            if(!ghosted && PlayState.playState.currentTexture <= 3) {
-                sb.draw(textures[PlayState.playState.currentTexture], x - xOffset, y - yOffset, 54, 48);
-            } else {
+            if(ghosted && PlayState.playState.currentTexture <= 3) {
                 sb.draw(ghostTex[PlayState.playState.currentTexture], x-xOffset, y-yOffset, 54, 48);
+            } else {
+                sb.draw(textures[PlayState.playState.currentTexture], x - xOffset, y - yOffset, 54, 48);
             }
         } else {
             if (invulnerableBlink < 5){
