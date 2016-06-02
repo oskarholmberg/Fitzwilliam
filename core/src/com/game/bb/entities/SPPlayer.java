@@ -12,10 +12,10 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.game.bb.gamestates.PlayState;
 import com.game.bb.handlers.Assets;
 import com.game.bb.handlers.B2DVars;
+import com.game.bb.net.packets.PlayerMovementPacket;
+import com.sun.media.jfxmedia.events.PlayerStateEvent;
 
-/**
- * Created by erik on 09/05/16.
- */
+
 public class SPPlayer extends SPSprite {
 
     protected Sound jetpackSound;
@@ -86,36 +86,37 @@ public class SPPlayer extends SPSprite {
 
     @Override
     public void render(SpriteBatch sb) {
-        if (texture != null) {
-            sb.begin();
-            float x = body.getPosition().x * B2DVars.PPM - B2DVars.PLAYER_WIDTH;
-            float y = body.getPosition().y * B2DVars.PPM - B2DVars.PLAYER_HEIGHT;
-            if (!isDead) {
-                if (textureTimer >= 0.5f && !onGround) {
-                    if (texture.equals(textures[JUMP_LEFT])) {
-                        PlayState.playState.currentTexture=STAND_LEFT;
-                        xOffset = 30;
-                    } else {
-                        PlayState.playState.currentTexture=STAND_RIGHT;
-                        xOffset = 23;
-                    }
-                    onGround = true;
-                }
-            }
-            if (!invulnerable) {
-                if(ghosted) sb.draw(ghostTex[PlayState.playState.currentTexture], x-xOffset, y-yOffset, 54, 48);
-                else sb.draw(textures[PlayState.playState.currentTexture], x - xOffset, y - yOffset, 54, 48);
-            } else {
-                if (invulnerableBlink < 5){
-                    sb.draw(textures[PlayState.playState.currentTexture], x - xOffset, y - yOffset, 54, 48);
-                    invulnerableBlink++;
+        sb.begin();
+        float x = body.getPosition().x * B2DVars.PPM - B2DVars.PLAYER_WIDTH;
+        float y = body.getPosition().y * B2DVars.PPM - B2DVars.PLAYER_HEIGHT;
+        if (!isDead) {
+            if (textureTimer >= 0.5f && !onGround) {
+                if (PlayState.playState.currentTexture == JUMP_LEFT) {
+                    PlayState.playState.currentTexture=STAND_LEFT;
+                    xOffset = 30;
                 } else {
-                    sb.draw(textures[BLANK], x - xOffset, y - yOffset, 54, 48);
-                    invulnerableBlink = 0;
+                    PlayState.playState.currentTexture=STAND_RIGHT;
+                    xOffset = 23;
                 }
+                onGround = true;
             }
-            sb.end();
         }
+        if (!invulnerable) {
+            if(!ghosted && PlayState.playState.currentTexture <= 3) {
+                sb.draw(textures[PlayState.playState.currentTexture], x - xOffset, y - yOffset, 54, 48);
+            } else {
+                sb.draw(ghostTex[PlayState.playState.currentTexture], x-xOffset, y-yOffset, 54, 48);
+            }
+        } else {
+            if (invulnerableBlink < 5){
+                sb.draw(textures[PlayState.playState.currentTexture], x - xOffset, y - yOffset, 54, 48);
+                invulnerableBlink++;
+            } else {
+                sb.draw(textures[BLANK], x - xOffset, y - yOffset, 54, 48);
+                invulnerableBlink = 0;
+            }
+        }
+        sb.end();
     }
 
     @Override
@@ -183,10 +184,10 @@ public class SPPlayer extends SPSprite {
         textures[BLANK] = Assets.getTex("blank");
 
         ghostTex = new Texture[4];
-        ghostTex[STAND_RIGHT] = Assets.getTex(color + "StandRight");
-        ghostTex[STAND_LEFT] = Assets.getTex(color + "StandLeft");
-        ghostTex[JUMP_RIGHT] = Assets.getTex(color + "JumpRight");
-        ghostTex[JUMP_LEFT] = Assets.getTex(color + "JumpLeft");
+        ghostTex[STAND_RIGHT] = Assets.getTex("ghostStandRight");
+        ghostTex[STAND_LEFT] = Assets.getTex("ghostStandLeft");
+        ghostTex[JUMP_RIGHT] = Assets.getTex("ghostJumpRight");
+        ghostTex[JUMP_LEFT] = Assets.getTex("ghostJumpLeft");
     }
 
     @Override

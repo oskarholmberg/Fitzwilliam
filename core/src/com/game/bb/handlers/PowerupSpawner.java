@@ -25,7 +25,7 @@ public class PowerupSpawner {
         this.client=client;
         this.mapWidth=mapWidth;
         this.powerHandler=powerHandler;
-        randomTime = 20f;
+        randomTime = 2f;
         timeCheck = 0;
     }
 
