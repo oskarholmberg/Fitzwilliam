@@ -157,11 +157,11 @@ public class PlayState extends GameState {
         if (SPInput.isPressed(SPInput.BUTTON_W) ||
                 SPInput.isPressed() && SPInput.x > touchNbrs[0] && SPInput.x < touchNbrs[1]) {
             SPInput.down = false;
-            if (!player.isDead())
+            if (!player.isDead() && !player.spectateMode())
                 weapons.shoot();
         }
         if (SPInput.isPressed(SPInput.BUTTON_E)) {
-            if (!player.isDead())
+            if (!player.isDead() && !player.spectateMode())
                 weapons.throwGrenade();
         }
         if (SPInput.isPressed(SPInput.BUTTON_Y)) {
@@ -334,8 +334,10 @@ public class PlayState extends GameState {
                 cam.position.x = camX;
             }
         } else if (!removeMeMessageSent) {
-            player.dispose();
-            player.getBody().setTransform(B2DVars.VOID_X, B2DVars.VOID_Y, 0);
+            player.setSpectateMode();
+            player.revive(spawnLocations.random(), lastJumpDirection);
+            cl.resetJumps();
+            cl.revivePlayer();
             TCPEventPacket pkt = Pooler.tcpEventPacket();
             pkt.action = B2DVars.NET_REMOVE_ME;
             pkt.id = player.getId();
@@ -346,22 +348,24 @@ public class PlayState extends GameState {
     }
 
     private void sendPlayerInfo() {
-        PlayerMovementPacket pkt = Pooler.playerMovementPacket(); //grab it from the pool
-        pkt.xp = player.getPosition().x;
-        pkt.yp = player.getPosition().y;
-        pkt.xv = player.getBody().getLinearVelocity().x;
-        pkt.yv = player.getBody().getLinearVelocity().y;
-        pkt.seq = playerPktSequence++;
-        pkt.sound = 0;
-        if (!powerHandler.isGhosted()) {
-            pkt.tex = currentTexture;
-        } else {
-            pkt.tex = SPPlayer.BLANK;
+        if (!player.spectateMode()) {
+            PlayerMovementPacket pkt = Pooler.playerMovementPacket(); //grab it from the pool
+            pkt.xp = player.getPosition().x;
+            pkt.yp = player.getPosition().y;
+            pkt.xv = player.getBody().getLinearVelocity().x;
+            pkt.yv = player.getBody().getLinearVelocity().y;
+            pkt.seq = playerPktSequence++;
+            pkt.sound = 0;
+            if (!powerHandler.isGhosted()) {
+                pkt.tex = currentTexture;
+            } else {
+                pkt.tex = SPPlayer.BLANK;
+            }
+            pkt.id = player.getId();
+            pkt.time = TimeUtils.millis();
+            client.sendUDP(pkt);
+            Pooler.free(pkt); //return it to the pool
         }
-        pkt.id = player.getId();
-        pkt.time = TimeUtils.millis();
-        client.sendUDP(pkt);
-        Pooler.free(pkt); //return it to the pool
     }
 
     private void playerHit() {
@@ -437,9 +441,7 @@ public class PlayState extends GameState {
             }
             if (sendPlayerInfo > B2DVars.MOVEMENT_UPDATE_FREQ) {
                 sendPlayerInfo = 0f;
-                if (hud.getPlayerDeathCount() != 0) {
-                    sendPlayerInfo();
-                }
+                sendPlayerInfo();
             } else {
                 sendPlayerInfo += dt;
             }

@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -18,7 +20,8 @@ public class SPPlayer extends SPSprite {
     protected Sound jetpackSound;
     protected Texture[] textures, ghostTex;
     protected int xOffset = 23, yOffset = 25, invulnerableBlink = 0;
-    private boolean onGround = true, isDead = false, invulnerable = false, ghosted = false;
+    private boolean onGround = true, isDead = false, invulnerable = false, ghosted = false,
+            spectateMode = false;
     private float textureTimer = 0, invulnerabilityTimer = 8f;
     private String color;
     private PolygonShape shape;
@@ -98,8 +101,8 @@ public class SPPlayer extends SPSprite {
                 onGround = true;
             }
         }
-        if (!invulnerable) {
-            if(ghosted && PlayState.playState.currentTexture <= 3) {
+        if (!invulnerable || spectateMode) {
+            if((ghosted || spectateMode) && PlayState.playState.currentTexture <= 3) {
                 sb.draw(ghostTex[PlayState.playState.currentTexture], x-xOffset, y-yOffset, 54, 48);
             } else {
                 sb.draw(textures[PlayState.playState.currentTexture], x - xOffset, y - yOffset, 54, 48);
@@ -189,5 +192,18 @@ public class SPPlayer extends SPSprite {
 
     @Override
     public void dispose() {
+    }
+
+    public void setSpectateMode() {
+        for (Fixture f : body.getFixtureList()){
+            Filter filter = f.getFilterData();
+            filter.maskBits = B2DVars.BIT_GROUND | B2DVars.BIT_BOUNCE;
+            f.setFilterData(filter);
+        }
+        spectateMode = true;
+    }
+
+    public boolean spectateMode(){
+        return spectateMode;
     }
 }

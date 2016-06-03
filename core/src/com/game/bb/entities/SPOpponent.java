@@ -14,7 +14,7 @@ import com.game.bb.handlers.SPAnimation;
  */
 public class SPOpponent extends SPPlayer {
     private SPAnimation shield;
-    private boolean shielded = false;
+    private boolean shielded = false, lost = false;
     private int lastMovementSeq = 0;
     private float invulnerableTimer = 0, invulnerableTime = 0;
 
@@ -57,7 +57,6 @@ public class SPOpponent extends SPPlayer {
             }
         }
     }
-
 
     @Override
     public void render(SpriteBatch sb) {
