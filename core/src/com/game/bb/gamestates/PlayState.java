@@ -94,7 +94,7 @@ public class PlayState extends GameState {
 
         // set up box2d cam
         b2dCam = new OrthographicCamera();
-        b2dCam.setToOrtho(false, Gdx.graphics.getWidth() / B2DVars.PPM, Gdx.graphics.getHeight() / B2DVars.PPM);
+        b2dCam.setToOrtho(false, cam.viewportWidth / B2DVars.PPM, cam.viewportHeight / B2DVars.PPM);
 
     }
 
@@ -543,7 +543,7 @@ public class PlayState extends GameState {
                 }
             }
         }
-        cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam.setToOrtho(false);
         gsm.setVictoryOrder(pkt.miscString);
         gsm.setKilledByEntities(temp);
         gsm.setState(GameStateManager.GAME_OVER);

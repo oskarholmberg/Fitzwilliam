@@ -163,7 +163,7 @@ public class PowerupHandler {
             PlayState.playState.cam.rotate(1f * tiltDirection);
             rotationAngle+=1f*tiltDirection;
             if (tiltAccum >= TILT_DUR) {
-                PlayState.playState.cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                PlayState.playState.cam.setToOrtho(false);
                 rotationAngle = 0;
                 float camX = PlayState.playState.player.getPosition().x * B2DVars.PPM;
                 if ((camX + PlayState.playState.cam.viewportWidth / 2) > PlayState.playState.map.getMapWidth()){

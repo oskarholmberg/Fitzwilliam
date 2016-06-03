@@ -24,9 +24,9 @@ public class Game extends ApplicationAdapter {
 
 		batch = new SpriteBatch();
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam.setToOrtho(false, B2DVars.DEFAULT_GAME_WIDTH, B2DVars.DEFAULT_GAME_HEIGHT);
         hudCam = new OrthographicCamera();
-        hudCam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        hudCam.setToOrtho(false, B2DVars.DEFAULT_GAME_WIDTH, B2DVars.DEFAULT_GAME_HEIGHT);
 
         Gdx.input.setInputProcessor(new SPInputProcessor());
 
