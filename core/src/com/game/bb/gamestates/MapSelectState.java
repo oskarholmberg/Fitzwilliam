@@ -7,9 +7,7 @@ import com.game.bb.handlers.Assets;
 
 import java.util.HashMap;
 
-/**
- * Created by erik on 02/06/16.
- */
+
 public class MapSelectState extends GameState {
 
     private World world;
