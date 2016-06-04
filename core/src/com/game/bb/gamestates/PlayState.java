@@ -415,12 +415,12 @@ public class PlayState extends GameState {
     private void updateCamPosition() {
         //if the player moves far right
         float camX = cam.position.x;
-        if ((player.getPosition().x * B2DVars.PPM) > (camX + 200f)) {
+        if ((player.getPosition().x * B2DVars.PPM) > (camX + 100f)) {
             if ((camX + cam.viewportWidth / 2) < map.getMapWidth()) {
                 cam.position.x = camX + 2f;
             }
             //if the player moves far left
-        } else if ((player.getPosition().x * B2DVars.PPM) < (camX - 200f)) {
+        } else if ((player.getPosition().x * B2DVars.PPM) < (camX - 100f)) {
             if ((camX - cam.viewportWidth / 2) > 0) {
                 cam.position.x = camX - 2f;
             }
