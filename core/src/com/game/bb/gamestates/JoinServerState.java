@@ -3,6 +3,8 @@ package com.game.bb.gamestates;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -19,6 +21,7 @@ import com.game.bb.handlers.B2DVars;
 import com.game.bb.net.client.GameClient;
 
 import java.util.HashMap;
+import java.util.concurrent.RunnableFuture;
 
 /**
  * Created by erik on 12/05/16.
@@ -31,9 +34,9 @@ public class JoinServerState extends GameState {
     private Texture availableServers = new Texture("images/font/availableServers.png");
     private SPButton backbutton;
     private Array<FallingBody> itRains;
+    private Array<InetAddress> serverAddresses;
     private float newFallingBody = 0f, refresh = 5f;
     private GameClient client;
-    private ServerSearcher searcher;
     private TextureRegion[] font;
 
 
@@ -41,10 +44,9 @@ public class JoinServerState extends GameState {
         super(gsm);
         world = new World(new Vector2(0, -9.81f), true);
         client = new GameClient();
-        searcher = new ServerSearcher();
-        searcher.start();
         itRains = new Array<FallingBody>();
         joinButtons = new HashMap<InetAddress, SPButton>();
+        serverAddresses = new Array<InetAddress>();
         backbutton = new SPButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
                 cam.viewportHeight - 100, 40f, 40f, cam);
         font = new TextureRegion[11];
@@ -56,6 +58,22 @@ public class JoinServerState extends GameState {
             font[i + 6] = new TextureRegion(hudTex, 32 + i * 9, 25, 9, 9);
         }
         fallingBody();
+
+        //Anonymous Thread to find local servers.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                serverAddresses.clear();
+                //Used to avoid interference with ApplicationListeners threads.
+                //Is run before each render() call for this class.
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (InetAddress a : client.getLocalServers()) serverAddresses.add(a);
+                    }
+                });
+            }
+        }).start();
     }
 
     public void fallingBody() {
@@ -76,7 +94,6 @@ public class JoinServerState extends GameState {
     public void handleInput() {
         if (backbutton.isClicked()) {
             Assets.getSound("menuSelect").play();
-            searcher.stopSearch();
             gsm.setState(GameStateManager.CONNECT);
         }
         for (InetAddress address : joinButtons.keySet()) {
@@ -84,7 +101,6 @@ public class JoinServerState extends GameState {
                 Assets.getSound("menuSelect").play();
                 client.connectToServer(address);
                 gsm.setClient(client);
-                searcher.stopSearch();
                 gsm.setState(GameStateManager.PLAY);
             }
         }
@@ -93,7 +109,7 @@ public class JoinServerState extends GameState {
     @Override
     public void update(float dt) {
         handleInput();
-        if (refresh > 0.5f) {
+        if (refresh > 1f) {
             joinButtons = getJoinButtons();
             refresh = 0;
         } else {
@@ -156,9 +172,8 @@ public class JoinServerState extends GameState {
         HashMap<InetAddress, SPButton> buttons = new HashMap<InetAddress, SPButton>();
         int i = 0;
         int offset = 0;
-        List<InetAddress> servers = searcher.getServers();
-        for (InetAddress server : servers) {
-            if (servers.size() > 2) offset = 120;
+        for (InetAddress server : serverAddresses) {
+            if (serverAddresses.size > 2) offset = 120;
             else offset = 170;
             SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth - 350, (cam.viewportHeight - offset) - (50 * i), 100, 20, cam);
             button.setInfo(server.getHostAddress());
@@ -184,35 +199,6 @@ public class JoinServerState extends GameState {
 
         @Override
         public void dispose() {
-        }
-    }
-
-    private class ServerSearcher extends Thread {
-
-        private boolean searching = true;
-        private List<InetAddress> serverAddresses;
-
-        private ServerSearcher() {
-            serverAddresses = new ArrayList<InetAddress>();
-        }
-
-        public void run() {
-            while (searching) {
-                serverAddresses = client.getLocalServers();
-                try {
-                    sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        private List<InetAddress> getServers() {
-            return serverAddresses;
-        }
-
-        private void stopSearch() {
-            searching = false;
         }
     }
 }
