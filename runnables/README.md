@@ -8,10 +8,10 @@ Below are quick notes of what the last few commits included for each release. In
 
 
 ## Build 1.2 2016-06-02
-Added hearts to HUD, added kills to HUD.
-New powerup - Ghost.
-Added respawn invulnerability to prevent spawn camping.
-Hopefully stabilized the game.
+* Added hearts to HUD, added kills to HUD.
+* New powerup - Ghost.
+* Added respawn invulnerability to prevent spawn camping.
+* Hopefully stabilized the game.
 
 ## Build 1.1 2016-06-01
 --Before we started adding patchnotes
