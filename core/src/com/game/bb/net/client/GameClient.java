@@ -30,6 +30,7 @@ public class GameClient extends Listener {
         tcpPackets = new Array<TCPEventPacket>();
         entityClusters = new Array<EntityCluster>();
         movementPackets = new Array<PlayerMovementPacket>();
+        System.setProperty("java.net.preferIPv4Stack", "true");
         kryoClient = new Client();
         Class[] classes = {String.class, Vector2.class, EntityPacket.class, int.class,
                 TCPEventPacket.class, EntityCluster.class, EntityPacket[].class, PlayerMovementPacket.class,

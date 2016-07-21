@@ -53,7 +53,7 @@ public class PlayState extends GameState {
     private TCPEventPacket gameOverPacket;
     private HUD hud;
     private Texture backGround = Assets.getBackground();
-    private float[] touchNbrs = {(cam.viewportWidth / 5), cam.viewportWidth * 4 / 5};
+    private float[] touchNbrs = {(Gdx.graphics.getWidth() / 4), (Gdx.graphics.getWidth() / 4) * 3, Gdx.graphics.getHeight() / 2};
     private int playerPktSequence = 0;
     private boolean debugClick = false, hosting = false,
             removeMeMessageSent = false, debuggingMode = false, gameOverReceived = false,
@@ -98,7 +98,7 @@ public class PlayState extends GameState {
 
     }
 
-    private void createMap(){
+    private void createMap() {
         map = new MapBuilder(world, B2DVars.MAP_NBR, false);
         map.buildMap();
         spawnLocations = map.getSpawnLocations();
@@ -131,11 +131,11 @@ public class PlayState extends GameState {
     }
 
     public void handleInput() {
-        if (SPInput.isPressed(SPInput.BUTTON_RIGHT)  ||
-                SPInput.isPressed() && SPInput.x > touchNbrs[1] ) {
+        if (SPInput.isPressed(SPInput.BUTTON_RIGHT) ||
+                SPInput.isPressed() && SPInput.x > touchNbrs[1]) {
             SPInput.down = false;
             if (!player.isDead()) {
-                    lastJumpDirection = 1;
+                lastJumpDirection = 1;
                 if (cl.canJump()) {
                     player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
                 } else {
@@ -143,10 +143,10 @@ public class PlayState extends GameState {
                 }
             }
         }
-        if (SPInput.isPressed(SPInput.BUTTON_LEFT) || SPInput.isPressed() && SPInput.x < touchNbrs[0] ) {
+        if (SPInput.isPressed(SPInput.BUTTON_LEFT) || SPInput.isPressed() && SPInput.x < touchNbrs[0]) {
             SPInput.down = false;
             if (!player.isDead()) {
-                    lastJumpDirection = -1;
+                lastJumpDirection = -1;
                 if (cl.canJump()) {
                     player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
                 } else {
@@ -155,12 +155,13 @@ public class PlayState extends GameState {
             }
         }
         if (SPInput.isPressed(SPInput.BUTTON_W) ||
-                SPInput.isPressed() && SPInput.x > touchNbrs[0] && SPInput.x < touchNbrs[1]) {
+                SPInput.isPressed() && SPInput.x > touchNbrs[0] && SPInput.x < touchNbrs[1] && SPInput.y > touchNbrs[2]) {
             SPInput.down = false;
             if (!player.isDead() && !player.spectateMode())
                 weapons.shoot();
         }
-        if (SPInput.isPressed(SPInput.BUTTON_E)) {
+        if (SPInput.isPressed(SPInput.BUTTON_E) || SPInput.isPressed() && SPInput.x > touchNbrs[0] && SPInput.x < touchNbrs[1] && SPInput.y < touchNbrs[2]) {
+            SPInput.down = false;
             if (!player.isDead() && !player.spectateMode())
                 weapons.throwGrenade();
         }
@@ -208,14 +209,13 @@ public class PlayState extends GameState {
                         //clear opponents score
                         killedByEntity.remove(pkt.id);
                         //remove all entities belonging to that opponent
-                        for (IntMap.Keys it = opEntities.keys(); it.hasNext;){
+                        for (IntMap.Keys it = opEntities.keys(); it.hasNext; ) {
                             int id = it.next();
-                            if(pkt.id == Tools.getPlayerId(id)){
+                            if (pkt.id == Tools.getPlayerId(id)) {
                                 EnemyEntity e = opEntities.get(id);
-                                if(e instanceof EnemyGrenade){
+                                if (e instanceof EnemyGrenade) {
                                     Pooler.free((EnemyGrenade) e);
-                                }
-                                else if(e instanceof EnemyBullet){
+                                } else if (e instanceof EnemyBullet) {
                                     Pooler.free((EnemyBullet) e);
                                 }
                             }
@@ -261,7 +261,7 @@ public class PlayState extends GameState {
                     break;
                 case B2DVars.NET_DEATH:
                     if (opponents.containsKey(pkt.id)) {
-                        if(pkt.misc3 == 0) {
+                        if (pkt.misc3 == 0) {
                             opponents.get(pkt.id).setInvulnerable(2f);
                             hud.setOpponentDeath(pkt.id, pkt.misc);
                             if (pkt.misc2 == B2DVars.MY_ID) {
@@ -321,7 +321,7 @@ public class PlayState extends GameState {
         if (hud.getPlayerDeathCount() != 0) {
             Vector2 spawnLoc = spawnLocations.random();
             respawnTimer = 0;
-            player.revive(spawnLoc,lastJumpDirection);
+            player.revive(spawnLoc, lastJumpDirection);
             weapons.refresh();
             cl.resetJumps();
             cl.revivePlayer();
@@ -385,7 +385,7 @@ public class PlayState extends GameState {
                 pkt.id = player.getId();
                 pkt.misc = hud.getPlayerDeathCount();
                 pkt.misc2 = Tools.getPlayerId(id);
-                if(powerHandler.isShielded()) pkt.misc3 = 1;
+                if (powerHandler.isShielded()) pkt.misc3 = 1;
                 client.sendTCP(pkt);
                 Pooler.free(pkt); //return it to the pool
                 if (weapons.isMyWeapon(id)) {
