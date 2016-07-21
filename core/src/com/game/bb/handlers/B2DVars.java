@@ -26,23 +26,25 @@ public class B2DVars {
     public static final short BIT_GROUND = 2, BIT_PLAYER = 4, BIT_OPPONENT = 8, BIT_BULLET = 16,
             BIT_GRENADE = 32, BIT_DOME = 64, BIT_ENEMY_ENTITY = 128, BIT_BOUNCE = 256;
 
+    // power ups
     public static final int POWERTYPE_TILTSCREEN = 1, POWERTYPE_AMMO = 2,  POWERTYPE_SHIELD = 3
             , POWERTYPE_GHOST = 4;
     public static final int POWERTYPE_AMOUNT = 4;
 
+    // player
     public static final float PLAYER_HEIGHT = 22f/PPM, PLAYER_WIDTH = 18f/PPM;
 
+    // entity ids
     public static final String ID_FOOT = "foot", ID_PLAYER = "player", ID_OPPONENT = "opponent",
     ID_GROUND = "ground", ID_BULLET = "bullet", ID_GRENADE = "grenade", ID_DOME = "dome",
     ID_POWERUP = "powerup", ID_ENEMY_GRENADE = "enemygrenade", ID_ENEMY_ENTITY = "enemyentity",
     ID_BOUNCE = "bounce";
 
+    //NET ids
     public static final int NET_CONNECT = 1, NET_RESPAWN = 2, NET_DEATH = 3, NET_SHOOT = 4,
             NET_GRENADE = 5, NET_DISCONNECT = 6, NET_DESTROY_BODY = 7, NET_SPAWN_POWER = 8, NET_NEW_ENTITY = 9,
             NET_APPLY_ANTIPOWER = 10, NET_GAME_OVER = 11, NET_REMOVE_ME = 12, NET_SERVER_INFO = 13,
             NET_UPDATE_MY_TIME = 14;
-
-    public static final int TYPE_BULLET = 1, TYPE_GRENADE = 2;
 
     public static final float ENTITY_UPDATE_FREQ = 1/30f, MOVEMENT_UPDATE_FREQ = 1/30f;
 

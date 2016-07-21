@@ -21,7 +21,6 @@ public abstract class GameState {
         sb = game.getBatch();
         cam = game.getCam();
         hudCam = game.getHudCam();
-
     }
 
     public abstract void handleInput();
