@@ -38,6 +38,7 @@ public class JoinServerState extends GameState {
     private float newFallingBody = 0f, refresh = 5f;
     private GameClient client;
     private TextureRegion[] font;
+    private ServerSearcher searcher;
 
 
     public JoinServerState(GameStateManager gsm) {
@@ -58,22 +59,9 @@ public class JoinServerState extends GameState {
             font[i + 6] = new TextureRegion(hudTex, 32 + i * 9, 25, 9, 9);
         }
         fallingBody();
+        searcher = new ServerSearcher();
+        searcher.start();
 
-        //Anonymous Thread to find local servers.
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                serverAddresses.clear();
-                //Used to avoid interference with ApplicationListeners threads.
-                //Is run before each render() call for this class.
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (InetAddress a : client.getLocalServers()) serverAddresses.add(a);
-                    }
-                });
-            }
-        }).start();
     }
 
     public void fallingBody() {
@@ -166,6 +154,7 @@ public class JoinServerState extends GameState {
         }
         availableServers.dispose();
         backbutton.dispose();
+        searcher.stopSearch();
     }
 
     private HashMap<InetAddress, SPButton> getJoinButtons() {
@@ -201,5 +190,31 @@ public class JoinServerState extends GameState {
         public void dispose() {
         }
     }
+
+    private class ServerSearcher extends Thread {
+
+        private boolean active = true;
+
+        public void run(){
+            while(active){
+                final Array<InetAddress> temp = new Array<InetAddress>();
+                //Populate address list with addresses found.
+                for (InetAddress a : client.getLocalServers()){
+                    temp.add(a);
+                }
+                //Used to communicate with render thread without disrupting it.
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        serverAddresses = temp;
+                    }
+                });
+            }
+        }
+        private void stopSearch(){
+            active = false;
+        }
+    }
 }
+
 
