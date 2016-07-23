@@ -44,7 +44,7 @@ public class GameClient extends Listener {
     }
 
     public List<InetAddress> getLocalServers() {
-        return kryoClient.discoverHosts(udpPort, 50);
+        return kryoClient.discoverHosts(udpPort, 5000);
     }
 
     public void connectToServer(InetAddress address) {
