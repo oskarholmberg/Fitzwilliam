@@ -64,7 +64,7 @@ public class SPOpponent extends SPPlayer {
             sb.begin();
             float x = body.getPosition().x * B2DVars.PPM - B2DVars.PLAYER_WIDTH;
             float y = body.getPosition().y * B2DVars.PPM - B2DVars.PLAYER_HEIGHT;
-            if (shielded)
+            if (shielded && !texture.equals(textures[BLANK]))
                 sb.draw(shield.getFrame(), x - 25, y - 30, 50, 60);
             if(invulnerableTimer <= invulnerableTime && invulnerableTimer > 0){
                 if (invulnerableBlink < 5){
