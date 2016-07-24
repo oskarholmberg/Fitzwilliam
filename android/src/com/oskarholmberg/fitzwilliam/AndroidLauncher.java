@@ -6,11 +6,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.oskarholmberg.fitzwilliam.gamestates.GameStateManager;
 
 public class AndroidLauncher extends AndroidApplication {
     private int currentApiVersion;
+    private com.oskarholmberg.fitzwilliam.main.Game game;
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
 	protected void onCreate (Bundle savedInstanceState) {
@@ -49,7 +52,8 @@ public class AndroidLauncher extends AndroidApplication {
                         }
                     });
         }
-		initialize(new com.oskarholmberg.fitzwilliam.main.Game(), config);
+        game = new com.oskarholmberg.fitzwilliam.main.Game();
+		initialize(game, config);
 	}
 
 	@SuppressLint("NewApi")
@@ -68,6 +72,11 @@ public class AndroidLauncher extends AndroidApplication {
 							| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 		}
 	}
+
+    @Override
+    public void onBackPressed(){
+        game.setState(GameStateManager.START_SCREEN);
+    }
 }
 
 

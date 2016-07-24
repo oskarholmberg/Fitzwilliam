@@ -87,8 +87,6 @@ public class GameStateManager {
                 return new HostOfflineState(this);
             case GAME_OVER:
                 hosting = false;
-                if(server != null) server.stop();
-                if(client != null) client.stop();
                 return new GameOverState(this, killedByEntities, victoryOrder);
             case MAP_SELECTION:
                 return new MapSelectState(this);
@@ -98,6 +96,11 @@ public class GameStateManager {
     }
 
     public void setState(int state) {
+        //Make sure server and clients stop when states are changed.
+        if(state != PLAY){
+            if(server != null) server.stop();
+            if(client != null) client.stop();
+        }
         popState();
         pushState(state);
     }

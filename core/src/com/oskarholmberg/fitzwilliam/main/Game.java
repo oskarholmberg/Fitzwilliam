@@ -51,6 +51,10 @@ public class Game extends ApplicationAdapter {
 
     }
 
+    public void setState(int state){
+        gsm.pushState(state);
+    }
+
     public void pause(){}
     public void resume(){}
     public SpriteBatch getBatch(){return batch;}
