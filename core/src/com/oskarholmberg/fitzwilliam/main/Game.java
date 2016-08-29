@@ -48,7 +48,8 @@ public class Game extends ApplicationAdapter {
     }
 
     public void resize(int w, int h){
-
+        cam.update();
+        hudCam.update();
     }
 
     public void setState(int state){

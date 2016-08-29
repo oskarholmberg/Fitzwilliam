@@ -15,7 +15,7 @@ public class PowerupHandler {
     private float ammoAccum = 20f, tiltAccum = 20f, shieldAccum = 20f, tiltDirection = 1f, ghostAccum = 20f;
     private static final float AMMO_DUR = 10f, TILT_DUR = 10f, SHIELD_DUR = 10f, GHOST_DUR = 5f;
     private float rotationAngle = 0f;
-    private boolean shielded = false, ghosted = false;
+    private boolean shielded = false, ghosted = false, tilted = false;
     private IntMap<SPPower> powerups;
     private int xOffset = 25, yOffset = 30;
     private PlayState ps;
@@ -54,6 +54,7 @@ public class PowerupHandler {
                 break;
             case B2DVars.POWERTYPE_TILTSCREEN:
                 tiltAccum = 0f;
+                tilted = true;
                 break;
             case B2DVars.POWERTYPE_SHIELD:
                 shielded = true;
@@ -95,6 +96,34 @@ public class PowerupHandler {
     }
     public boolean isGhosted(){
         return ghosted;
+    }
+    public float getRotationAngle(){ return rotationAngle; }
+
+    public void tiltScreen(float dt){
+        if (tiltAccum < TILT_DUR){
+            tiltAccum += dt;
+            if (rotationAngle > 20f){
+                tiltDirection = -1f;
+            } else if (rotationAngle < -20f){
+                tiltDirection = 1f;
+            }
+            PlayState.playState.cam.rotate(1f * tiltDirection);
+            rotationAngle+=1f*tiltDirection;
+            if (tiltAccum >= TILT_DUR) {
+                PlayState.playState.cam.rotate(-rotationAngle);
+                rotationAngle = 0;
+                float camX = PlayState.playState.player.getPosition().x * B2DVars.PPM;
+                if ((camX + PlayState.playState.cam.viewportWidth / 2) > PlayState.playState.map.getMapWidth()){
+                    PlayState.playState.cam.position.x = PlayState.playState.map.getMapWidth()
+                            - PlayState.playState.cam.viewportWidth / 2;
+                } else if ((camX - PlayState.playState.cam.viewportWidth / 2) < 0){
+                    PlayState.playState.cam.position.x = 0 + PlayState.playState.cam.viewportWidth / 2;
+                } else {
+                    PlayState.playState.cam.position.x = camX;
+                }
+                tilted = false;
+            }
+        }
     }
 
     private void powerTaken(){
@@ -152,28 +181,8 @@ public class PowerupHandler {
         if (ammoAccum < AMMO_DUR){
             ammoAccum += dt;
         }
-        if (tiltAccum < TILT_DUR){
-            tiltAccum += dt;
-            if (rotationAngle > 20f){
-                tiltDirection = -1f;
-            } else if (rotationAngle < -20f){
-                tiltDirection = 1f;
-            }
-            PlayState.playState.cam.rotate(1f * tiltDirection);
-            rotationAngle+=1f*tiltDirection;
-            if (tiltAccum >= TILT_DUR) {
-                PlayState.playState.cam.setToOrtho(false);
-                rotationAngle = 0;
-                float camX = PlayState.playState.player.getPosition().x * B2DVars.PPM;
-                if ((camX + PlayState.playState.cam.viewportWidth / 2) > PlayState.playState.map.getMapWidth()){
-                    PlayState.playState.cam.position.x = PlayState.playState.map.getMapWidth()
-                            - PlayState.playState.cam.viewportWidth / 2;
-                } else if ((camX - PlayState.playState.cam.viewportWidth / 2) < 0){
-                    PlayState.playState.cam.position.x = 0 + PlayState.playState.cam.viewportWidth / 2;
-                } else {
-                    PlayState.playState.cam.position.x = camX;
-                }
-            }
+        if (tilted){
+            tiltScreen(dt);
         }
     }
 

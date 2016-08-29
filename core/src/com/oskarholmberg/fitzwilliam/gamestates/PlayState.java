@@ -544,7 +544,12 @@ public class PlayState extends GameState {
                 }
             }
         }
-        cam.setToOrtho(false);
+        //cam.setToOrtho(false);
+        if (powerHandler.getRotationAngle() != 0f){
+            System.out.println(powerHandler.getRotationAngle());
+            cam.rotate(-powerHandler.getRotationAngle());
+            cam.update();
+        }
         gsm.setVictoryOrder(pkt.miscString);
         gsm.setKilledByEntities(temp);
         gsm.setState(GameStateManager.GAME_OVER);
