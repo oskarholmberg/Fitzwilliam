@@ -33,9 +33,9 @@ public class PowerupSpawner {
                 630 / B2DVars.PPM);
         powerIdAccum++;
         int id = Integer.valueOf(powerId + Integer.toString(powerIdAccum));
-        //int powerType = MathUtils.random(2, B2DVars.POWERTYPE_AMOUNT);
+        int powerType = MathUtils.random(2, B2DVars.POWERTYPE_AMOUNT);
         // below used for debugging powerUps, managed through limiting the range
-        int powerType = MathUtils.random(1, 1);
+        //int powerType = MathUtils.random(1, 1);
         PowerUp powerUp = new PowerUp(world, powerPos.x, powerPos.y, id, powerType);
         powerHandler.addPower(id, powerUp);
         TCPEventPacket pkt = Pooler.tcpEventPacket();

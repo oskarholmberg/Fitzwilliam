@@ -10,7 +10,7 @@ public class PlayerInput {
     public static int x, y;
     public static boolean pdown, down;
 
-    public static final int NUM_KEYS = 5, BUTTON_W = 0, BUTTON_Y = 1, BUTTON_RIGHT = 2, BUTTON_LEFT = 3, BUTTON_E = 4;
+    public static final int NUM_KEYS = 6, BUTTON_W = 0, BUTTON_Y = 1, BUTTON_RIGHT = 2, BUTTON_LEFT = 3, BUTTON_E = 4, BUTTON_K = 5;
 
     static{
         keys = new boolean[NUM_KEYS];

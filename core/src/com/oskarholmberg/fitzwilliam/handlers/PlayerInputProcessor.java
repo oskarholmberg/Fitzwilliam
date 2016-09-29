@@ -34,6 +34,8 @@ public class PlayerInputProcessor extends InputAdapter{
             PlayerInput.setKey(PlayerInput.BUTTON_LEFT, true);
         if (k == Input.Keys.Y)
             PlayerInput.setKey(PlayerInput.BUTTON_Y, true);
+        if (k == Input.Keys.K)
+            PlayerInput.setKey(PlayerInput.BUTTON_K, true);
         return true;
     }
 
@@ -48,6 +50,8 @@ public class PlayerInputProcessor extends InputAdapter{
             PlayerInput.setKey(PlayerInput.BUTTON_LEFT, false);
         if (k == Input.Keys.Y)
             PlayerInput.setKey(PlayerInput.BUTTON_Y, false);
+        if (k == Input.Keys.K)
+            PlayerInput.setKey(PlayerInput.BUTTON_K, false);
         return true;
     }
 

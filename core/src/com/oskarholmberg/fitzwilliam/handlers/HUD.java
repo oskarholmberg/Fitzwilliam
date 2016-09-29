@@ -15,7 +15,7 @@ import java.util.HashMap;
  */
 public class HUD {
     private TextureRegion[] font;
-    private int playerDeaths = B2DVars.AMOUNT_LIVES, playerKills = 0;
+    private int playerLives = B2DVars.AMOUNT_LIVES, playerKills = 0;
     private HashMap<Integer, Integer> opponentDeaths;
     private IntMap<String> idsToColors;
     private Texture bulletTexture, heart, blaster;
@@ -72,7 +72,7 @@ public class HUD {
                 }
             }
         }
-        if (playerDeaths == 0){
+        if (playerLives == 0){
             amountPlayersAlive--;
             if (!victoryOrder.contains(B2DVars.MY_ID, true)){
                 victoryOrder.add(B2DVars.MY_ID);
@@ -107,7 +107,7 @@ public class HUD {
     }
 
     public void addPlayerDeath() {
-        playerDeaths--;
+        playerLives--;
         checkGameOver();
     }
 
@@ -135,7 +135,7 @@ public class HUD {
         float camWidth = PlayState.playState.cam.viewportWidth;
         sb.begin();
         sb.draw(heart, 43, camHeight - 70, 40, 40);
-        String playerDeathString = Integer.toString(playerDeaths);
+        String playerDeathString = Integer.toString(playerLives);
         int j = 0;
         for (int i = 0; i < playerDeathString.length(); i++) {
             sb.draw(font[Integer.valueOf(playerDeathString.substring(i, i + 1))], 100 + i * 50, camHeight - 70, 40, 40);
@@ -165,8 +165,8 @@ public class HUD {
         sb.end();
     }
 
-    public int getPlayerDeathCount() {
-        return playerDeaths;
+    public int getAmountPlayerLives() {
+        return playerLives;
     }
 
     public boolean gameOver() {

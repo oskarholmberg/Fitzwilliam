@@ -164,6 +164,7 @@ public class PlayState extends GameState {
             if (!player.isDead() && !player.spectateMode())
                 weapons.throwGrenade();
         }
+        // debug camera button
         if (PlayerInput.isPressed(PlayerInput.BUTTON_Y)) {
             System.out.println("Debug is clicked! printing the next debug event.");
             System.out.println("CurrentTime: " + TimeUtils.millis() + "\t" + System.currentTimeMillis());
@@ -171,6 +172,13 @@ public class PlayState extends GameState {
             debuggingMode = !debuggingMode;
             System.out.println("CURRENT TIME: " + TimeUtils.millis() + " SystemCurrentTime: " + System.currentTimeMillis());
             System.out.println("HudCam pos: " + hudCam.position.x + " cam pos: " + cam.position.x);
+        }
+        //kill button, mostly for debugging or bugging friends
+        if (PlayerInput.isPressed(PlayerInput.BUTTON_K)) {
+            int livesLeft = hud.getAmountPlayerLives();
+            for (int i = 0; i < livesLeft; i++){
+                hud.addPlayerDeath();
+            }
         }
     }
 
@@ -317,7 +325,7 @@ public class PlayState extends GameState {
     }
 
     private void respawnPlayer() {
-        if (hud.getPlayerDeathCount() != 0) {
+        if (hud.getAmountPlayerLives() != 0) {
             Vector2 spawnLoc = spawnLocations.random();
             respawnTimer = 0;
             player.revive(spawnLoc, lastJumpDirection);
@@ -382,7 +390,7 @@ public class PlayState extends GameState {
                 client.sendTCP(pkt);
                 pkt.action = B2DVars.NET_DEATH;
                 pkt.id = player.getId();
-                pkt.misc = hud.getPlayerDeathCount();
+                pkt.misc = hud.getAmountPlayerLives();
                 pkt.misc2 = Tools.getPlayerId(id);
                 if (powerHandler.isShielded()) pkt.misc3 = 1;
                 client.sendTCP(pkt);
@@ -417,11 +425,13 @@ public class PlayState extends GameState {
         if ((player.getPosition().x * B2DVars.PPM) > (camX + 100f)) {
             if ((camX + cam.viewportWidth / 2) < map.getMapWidth()) {
                 cam.position.x = camX + 2f;
+                b2dCam.position.x = cam.position.x;
             }
             //if the player moves far left
         } else if ((player.getPosition().x * B2DVars.PPM) < (camX - 100f)) {
             if ((camX - cam.viewportWidth / 2) > 0) {
                 cam.position.x = camX - 2f;
+                b2dCam.position.x = cam.position.x;
             }
         }
         cam.update();
