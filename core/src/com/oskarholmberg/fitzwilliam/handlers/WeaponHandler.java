@@ -129,7 +129,7 @@ public class WeaponHandler {
     }
 
     private void bulletsHittingWall() {
-        for (int id : ps.cl.getIdsToRemove()) {
+        for (int id : ps.contactListener.getIdsToRemove()) {
             if (activeBullets.containsKey(id)) {
                 TCPEventPacket pkt = Pooler.tcpEventPacket();
                 pkt.id = id;
@@ -141,7 +141,7 @@ public class WeaponHandler {
                 bullet.dispose();
             }
         }
-        ps.cl.clearIdList();
+        ps.contactListener.clearIdList();
     }
 
     private void checkGrenadeTimer(float dt) {

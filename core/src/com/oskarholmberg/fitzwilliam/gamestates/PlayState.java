@@ -65,7 +65,7 @@ public class PlayState extends GameState {
     public GameClient client;
     public PowerupHandler powerHandler;
     public MapBuilder map;
-    public SPContactListener cl;
+    public SPContactListener contactListener;
     public Player player;
 
     public PlayState(GameStateManager gsm, GameClient client) {
@@ -73,7 +73,7 @@ public class PlayState extends GameState {
 
         playState = this;
         world = new World(new Vector2(0, -7.81f), true);
-        world.setContactListener(cl = new SPContactListener());
+        world.setContactListener(contactListener = new SPContactListener());
         Tools.init();
 
         this.client = client;
@@ -135,7 +135,7 @@ public class PlayState extends GameState {
             PlayerInput.down = false;
             if (!player.isDead()) {
                 lastJumpDirection = 1;
-                if (cl.canJump()) {
+                if (contactListener.canJump()) {
                     player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
                 } else {
                     currentTexture = Player.STAND_RIGHT;
@@ -146,7 +146,7 @@ public class PlayState extends GameState {
             PlayerInput.down = false;
             if (!player.isDead()) {
                 lastJumpDirection = -1;
-                if (cl.canJump()) {
+                if (contactListener.canJump()) {
                     player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
                 } else {
                     currentTexture = Player.STAND_LEFT;
@@ -175,10 +175,7 @@ public class PlayState extends GameState {
         }
         //kill button, mostly for debugging or bugging friends
         if (PlayerInput.isPressed(PlayerInput.BUTTON_K)) {
-            int livesLeft = hud.getAmountPlayerLives();
-            for (int i = 0; i < livesLeft; i++){
-                hud.addPlayerDeath();
-            }
+            playerHit();
         }
     }
 
@@ -218,7 +215,7 @@ public class PlayState extends GameState {
                         //remove all entities belonging to that opponent
                         for (IntMap.Keys it = opEntities.keys(); it.hasNext; ) {
                             int id = it.next();
-                            if (pkt.id == Tools.getPlayerId(id)) {
+                            if (pkt.id == Tools.getKillerId(id)) {
                                 EnemyEntity e = opEntities.get(id);
                                 if (e instanceof EnemyGrenade) {
                                     Pooler.free((EnemyGrenade) e);
@@ -271,7 +268,7 @@ public class PlayState extends GameState {
                         if (pkt.misc3 == 0) {
                             opponents.get(pkt.id).setInvulnerable(2f);
                             hud.setOpponentDeath(pkt.id, pkt.misc);
-                            if (pkt.misc2 == B2DVars.MY_ID) {
+                            if (pkt.id == B2DVars.MY_ID) {
                                 hud.addPlayerKill();
                             }
                         }
@@ -330,8 +327,8 @@ public class PlayState extends GameState {
             respawnTimer = 0;
             player.revive(spawnLoc, lastJumpDirection);
             weapons.refresh();
-            cl.resetJumps();
-            cl.revivePlayer();
+            contactListener.resetJumps();
+            contactListener.revivePlayer();
             float camX = player.getPosition().x * B2DVars.PPM;
             if ((camX + cam.viewportWidth / 2) > map.getMapWidth()) {
                 cam.position.x = map.getMapWidth() - cam.viewportWidth / 2;
@@ -343,8 +340,8 @@ public class PlayState extends GameState {
         } else if (!removeMeMessageSent) {
             player.setSpectateMode();
             player.revive(spawnLocations.random(), lastJumpDirection);
-            cl.resetJumps();
-            cl.revivePlayer();
+            contactListener.resetJumps();
+            contactListener.revivePlayer();
             TCPEventPacket pkt = Pooler.tcpEventPacket();
             pkt.action = B2DVars.NET_REMOVE_ME;
             pkt.id = player.getId();
@@ -378,7 +375,7 @@ public class PlayState extends GameState {
     private void playerHit() {
         if (!player.isInvulnerable()) {
             if (!player.isDead()) {
-                int id = cl.getKillingEntityID();
+                int entityId = contactListener.getKillingEntityID();
                 if (!powerHandler.isShielded()) {
                     player.kill(1);
                     hud.addPlayerDeath();
@@ -386,31 +383,30 @@ public class PlayState extends GameState {
                 }
                 TCPEventPacket pkt = Pooler.tcpEventPacket(); // grab it from the pool
                 pkt.action = B2DVars.NET_DESTROY_BODY;
-                pkt.id = id;
+                pkt.id = entityId;
                 client.sendTCP(pkt);
                 pkt.action = B2DVars.NET_DEATH;
                 pkt.id = player.getId();
                 pkt.misc = hud.getAmountPlayerLives();
-                pkt.misc2 = Tools.getPlayerId(id);
                 if (powerHandler.isShielded()) pkt.misc3 = 1;
                 client.sendTCP(pkt);
                 Pooler.free(pkt); //return it to the pool
-                if (weapons.isMyWeapon(id)) {
-                    weapons.removeGrenade(id);
+                if (weapons.isMyWeapon(entityId)) {
+                    weapons.removeGrenade(entityId);
                     if (!powerHandler.isShielded())
                         killedByEntity.get(B2DVars.MY_ID).add("grenade");
-                } else if (opEntities.containsKey(id)) {
-                    EnemyEntity entity = opEntities.remove(id);
+                } else if (opEntities.containsKey(entityId)) {
+                    EnemyEntity entity = opEntities.remove(entityId);
                     if (entity instanceof EnemyGrenade) {
                         entity.getBody().setTransform(400f, 400f, 0); //Was not moved when freed, so done manually.
                         Pooler.free((EnemyGrenade) entity);
                         if (!powerHandler.isShielded())
-                            killedByEntity.get(Tools.getPlayerId(id)).add("grenade");
+                            killedByEntity.get(Tools.getKillerId(entityId)).add("grenade");
                     } else if (entity instanceof EnemyBullet) {
                         entity.getBody().setTransform(400f, 400f, 0);
                         Pooler.free((EnemyBullet) entity);
                         if (!powerHandler.isShielded())
-                            killedByEntity.get(Tools.getPlayerId(id)).add("bullet");
+                            killedByEntity.get(Tools.getKillerId(entityId)).add("bullet");
                     }
                 }
             }
@@ -425,13 +421,15 @@ public class PlayState extends GameState {
         if ((player.getPosition().x * B2DVars.PPM) > (camX + 100f)) {
             if ((camX + cam.viewportWidth / 2) < map.getMapWidth()) {
                 cam.position.x = camX + 2f;
-                b2dCam.position.x = cam.position.x;
+                b2dCam.position.x = cam.position.x / B2DVars.PPM;
+                b2dCam.update();
             }
             //if the player moves far left
         } else if ((player.getPosition().x * B2DVars.PPM) < (camX - 100f)) {
             if ((camX - cam.viewportWidth / 2) > 0) {
                 cam.position.x = camX - 2f;
-                b2dCam.position.x = cam.position.x;
+                b2dCam.position.x = cam.position.x / B2DVars.PPM;
+                b2dCam.update();
             }
         }
         cam.update();
@@ -467,10 +465,10 @@ public class PlayState extends GameState {
         opponentMovementEvents();
 
         weapons.update(dt);
-        if (cl.isPlayerHit()) {
+        if (contactListener.isPlayerHit()) {
             playerHit();
         }
-        if (cl.bouncePlayer()) {
+        if (contactListener.bouncePlayer()) {
             player.bouncePlayer();
         }
         powerHandler.update(dt);

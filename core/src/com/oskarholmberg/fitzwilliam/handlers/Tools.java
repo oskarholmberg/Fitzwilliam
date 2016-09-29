@@ -10,7 +10,7 @@ public class Tools {
         entityAccum = 0;
     }
 
-    public static int getPlayerId(int entityId){
+    public static int getKillerId(int entityId){
         String idString = Integer.toString(entityId);
         idString = idString.substring(0, 2);
         return Integer.valueOf(idString);

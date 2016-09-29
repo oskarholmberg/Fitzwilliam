@@ -127,8 +127,8 @@ public class PowerupHandler {
     }
 
     private void powerTaken(){
-        if (ps.cl.powerTaken() && ps.cl.getLastPowerTaken() != null){
-            PowerUp powerUp = powerups.remove(ps.cl.getLastPowerTaken().getId());
+        if (ps.contactListener.powerTaken() && ps.contactListener.getLastPowerTaken() != null){
+            PowerUp powerUp = powerups.remove(ps.contactListener.getLastPowerTaken().getId());
             int powerType = powerUp.getPowerType();
             ps.world.destroyBody(powerUp.getBody());
             powerUp.dispose();
