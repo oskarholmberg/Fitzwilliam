@@ -544,12 +544,15 @@ public class PlayState extends GameState {
                 }
             }
         }
-        // reset camera position for score screen
+        // reset camera rotation for score screen
         if (powerHandler.getRotationAngle() != 0f){
-            cam.position.x = cam.viewportWidth/2;
             cam.rotate(-powerHandler.getRotationAngle());
             cam.update();
         }
+        // reset camera position for score screen
+        cam.position.x = cam.viewportWidth/2;
+        cam.update();
+
         gsm.setVictoryOrder(pkt.miscString);
         gsm.setKilledByEntities(temp);
         gsm.setState(GameStateManager.GAME_OVER);
