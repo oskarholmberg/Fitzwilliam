@@ -544,9 +544,9 @@ public class PlayState extends GameState {
                 }
             }
         }
-        //cam.setToOrtho(false);
+        // reset camera position for score screen
         if (powerHandler.getRotationAngle() != 0f){
-            System.out.println(powerHandler.getRotationAngle());
+            cam.position.x = cam.viewportWidth/2;
             cam.rotate(-powerHandler.getRotationAngle());
             cam.update();
         }
