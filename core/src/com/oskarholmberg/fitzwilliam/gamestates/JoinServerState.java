@@ -193,12 +193,15 @@ public class JoinServerState extends GameState {
         private boolean active = true;
 
         public void run(){
+            int timeout = 500;
             while(active){
                 final Array<InetAddress> temp = new Array<InetAddress>();
                 //Populate address list with addresses found.
-                for (InetAddress a : client.getLocalServers()){
+                for (InetAddress a : client.getLocalServers(timeout)){
                     temp.add(a);
                 }
+                if(temp.size == 0) timeout = timeout+500;
+                if(timeout >= 10000) timeout = 500;
                 //Used to communicate with render thread without disrupting it.
                 Gdx.app.postRunnable(new Runnable() {
                     @Override

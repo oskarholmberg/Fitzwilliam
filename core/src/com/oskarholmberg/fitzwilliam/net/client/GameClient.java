@@ -43,13 +43,13 @@ public class GameClient extends Listener {
         Gdx.app.log("NET_CLIENT", "GameClient started at " + TimeUtils.millis());
     }
 
-    public List<InetAddress> getLocalServers() {
-        return kryoClient.discoverHosts(udpPort, 5000);
+    public List<InetAddress> getLocalServers(int timeout) {
+        return kryoClient.discoverHosts(udpPort, timeout);
     }
 
     public void connectToServer(InetAddress address) {
         try {
-            kryoClient.connect(5000, address, tcpPort, udpPort);
+            kryoClient.connect(10000, address, tcpPort, udpPort);
             Gdx.app.log("NET_CLIENT_CONNECT", "Connected to host @");
         } catch (IOException e) {
             Gdx.app.log("NET_CLIENT", "Host went offline.");
