@@ -3,7 +3,7 @@ package com.oskarholmberg.fitzwilliam.handlers;
 /**
  * Created by erik on 08/05/16.
  */
-public class SPInput {
+public class PlayerInput {
 
     public static boolean[] keys;
     public static boolean[] pkeys;

@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Disposable;
 /**
  * Created by erik on 09/05/16.
  */
-public abstract class SPSprite implements Disposable {
+public abstract class Sprite implements Disposable {
     protected World world;
     protected Body body;
     protected float height, width;
@@ -18,7 +18,7 @@ public abstract class SPSprite implements Disposable {
     protected int ID;
     protected float dir;
 
-    public SPSprite(World world, int ID){
+    public Sprite(World world, int ID){
         this.ID=ID;
         this.world=world;
     }

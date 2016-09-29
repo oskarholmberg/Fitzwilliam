@@ -19,7 +19,7 @@ import com.oskarholmberg.fitzwilliam.handlers.B2DVars;
  */
 public class StartScreenState extends GameState {
 
-    private SPButton playButton;
+    private MenuButton playButton;
     private World world;
     private Texture background = Assets.getBackground();
     private Array<FallingBody> itRains;
@@ -33,7 +33,7 @@ public class StartScreenState extends GameState {
         itRains = new Array<FallingBody>();
 
 
-        playButton = new SPButton(new Texture("images/button/playButton.png"),
+        playButton = new MenuButton(new Texture("images/button/playButton.png"),
                 cam.viewportWidth / 2, cam.viewportHeight / 2, 304f, 80f, cam);
         fallingBody();
     }

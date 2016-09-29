@@ -25,11 +25,11 @@ import java.util.HashMap;
  */
 public class JoinServerState extends GameState {
 
-    private HashMap<InetAddress, SPButton> joinButtons;
+    private HashMap<InetAddress, MenuButton> joinButtons;
     private World world;
     private Texture background = Assets.getBackground();
     private Texture availableServers = new Texture("images/font/availableServers.png");
-    private SPButton backbutton;
+    private MenuButton backbutton;
     private Array<FallingBody> itRains;
     private Array<InetAddress> serverAddresses;
     private float newFallingBody = 0f, refresh = 5f;
@@ -43,9 +43,9 @@ public class JoinServerState extends GameState {
         world = new World(new Vector2(0, -9.81f), true);
         client = new GameClient();
         itRains = new Array<FallingBody>();
-        joinButtons = new HashMap<InetAddress, SPButton>();
+        joinButtons = new HashMap<InetAddress, MenuButton>();
         serverAddresses = new Array<InetAddress>();
-        backbutton = new SPButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
+        backbutton = new MenuButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
                 cam.viewportHeight - 100, 40f, 40f, cam);
         font = new TextureRegion[11];
         Texture hudTex = new Texture("images/hud.png");
@@ -128,7 +128,7 @@ public class JoinServerState extends GameState {
         sb.begin();
         int k = 0;
         for (InetAddress address : joinButtons.keySet()) {
-            SPButton button = joinButtons.get(address);
+            MenuButton button = joinButtons.get(address);
             int j = 0;
             String[] ip = button.getInfo().split("\\.");
             for (int e = 0; e < ip.length; e++) {
@@ -154,14 +154,14 @@ public class JoinServerState extends GameState {
         searcher.stopSearch();
     }
 
-    private HashMap<InetAddress, SPButton> getJoinButtons() {
-        HashMap<InetAddress, SPButton> buttons = new HashMap<InetAddress, SPButton>();
+    private HashMap<InetAddress, MenuButton> getJoinButtons() {
+        HashMap<InetAddress, MenuButton> buttons = new HashMap<InetAddress, MenuButton>();
         int i = 0;
         int offset = 0;
         for (InetAddress server : serverAddresses) {
             if (serverAddresses.size > 2) offset = 120;
             else offset = 170;
-            SPButton button = new SPButton(new Texture("images/button/joinButton.png"), cam.viewportWidth - 350, (cam.viewportHeight - offset) - (50 * i), 100, 20, cam);
+            MenuButton button = new MenuButton(new Texture("images/button/joinButton.png"), cam.viewportWidth - 350, (cam.viewportHeight - offset) - (50 * i), 100, 20, cam);
             button.setInfo(server.getHostAddress());
             buttons.put(server, button);
             i++;

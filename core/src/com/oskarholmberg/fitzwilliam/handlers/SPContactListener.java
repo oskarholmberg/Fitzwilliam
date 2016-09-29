@@ -7,8 +7,8 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Array;
 import com.oskarholmberg.fitzwilliam.entities.EnemyEntity;
-import com.oskarholmberg.fitzwilliam.entities.SPPower;
-import com.oskarholmberg.fitzwilliam.entities.SPSprite;
+import com.oskarholmberg.fitzwilliam.entities.PowerUp;
+import com.oskarholmberg.fitzwilliam.entities.Sprite;
 
 /**
  * Created by erik on 08/05/16.
@@ -45,31 +45,31 @@ public class SPContactListener implements ContactListener {
             amntJumps = 0;
             //If the player is hit by an enemy bullet
         } else if (fa.getUserData().equals(B2DVars.ID_PLAYER) && fb.getUserData().equals(B2DVars.ID_BULLET)) {
-            killingEntityID = ((SPSprite) fb.getBody().getUserData()).getId();
+            killingEntityID = ((Sprite) fb.getBody().getUserData()).getId();
             playerHit = true;
             // - || -
         } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && fb.getUserData().equals(B2DVars.ID_PLAYER)) {
-            killingEntityID = ((SPSprite) fa.getBody().getUserData()).getId();
+            killingEntityID = ((Sprite) fa.getBody().getUserData()).getId();
             playerHit = true;
             // If a bullet touches ground
         } else if (fa.getUserData().equals(B2DVars.ID_BULLET) && (fb.getUserData().equals(B2DVars.ID_GROUND)
                 || fb.getUserData().equals(B2DVars.ID_DOME))) {
-            killingEntityID = ((SPSprite) fa.getBody().getUserData()).getId();
-            idsToRemove.add(((SPSprite) fa.getBody().getUserData()).getId());
+            killingEntityID = ((Sprite) fa.getBody().getUserData()).getId();
+            idsToRemove.add(((Sprite) fa.getBody().getUserData()).getId());
             // - || -
         } else if ((fa.getUserData().equals(B2DVars.ID_GROUND)  || fa.getUserData().equals(B2DVars.ID_DOME))
                 && fb.getUserData().equals(B2DVars.ID_BULLET)) {
-            killingEntityID = ((SPSprite) fb.getBody().getUserData()).getId();
-            idsToRemove.add(((SPSprite) fb.getBody().getUserData()).getId());
+            killingEntityID = ((Sprite) fb.getBody().getUserData()).getId();
+            idsToRemove.add(((Sprite) fb.getBody().getUserData()).getId());
             // If a grenade touches player
         } else if ((fa.getUserData().equals(B2DVars.ID_GRENADE) || fa.getUserData().equals(B2DVars.ID_ENEMY_GRENADE))
                 && fb.getUserData().equals(B2DVars.ID_PLAYER)){
-            killingEntityID = ((SPSprite) fa.getBody().getUserData()).getId();
+            killingEntityID = ((Sprite) fa.getBody().getUserData()).getId();
             playerHit = true;
             // - || -
         } else if ((fb.getUserData().equals(B2DVars.ID_GRENADE) || fb.getUserData().equals(B2DVars.ID_ENEMY_GRENADE))
                 && fa.getUserData().equals(B2DVars.ID_PLAYER)){
-            killingEntityID = ((SPSprite) fb.getBody().getUserData()).getId();
+            killingEntityID = ((Sprite) fb.getBody().getUserData()).getId();
             playerHit = true;
             // If a player catches a powerup
         } else if (fa.getUserData().equals(B2DVars.ID_POWERUP) && fb.getUserData().equals(B2DVars.ID_PLAYER)){
@@ -124,8 +124,8 @@ public class SPContactListener implements ContactListener {
         return false;
     }
 
-    public SPPower getLastPowerTaken(){
-        return (SPPower) lastPowerUp.getBody().getUserData();
+    public PowerUp getLastPowerTaken(){
+        return (PowerUp) lastPowerUp.getBody().getUserData();
     }
 
     public boolean powerTaken() {

@@ -7,21 +7,21 @@ import com.badlogic.gdx.utils.Disposable;
 /**
  * Created by oskar on 5/15/16.
  */
-public class SPAnimation implements Disposable{
+public class SpriteAnimation implements Disposable{
     private TextureRegion[] textureRegions;
     private float frequency;
     private float time;
     private int currentFrame;
     private boolean noAnimation = false;
 
-    public SPAnimation(TextureRegion[] textureRegions, float frequency) {
+    public SpriteAnimation(TextureRegion[] textureRegions, float frequency) {
         this.textureRegions = textureRegions;
         this.frequency = frequency;
         time = 0;
         currentFrame = 0;
     }
 
-    public SPAnimation(Texture texture){
+    public SpriteAnimation(Texture texture){
         textureRegions = new TextureRegion[1];
         textureRegions[0] = new TextureRegion(texture);
         noAnimation=true;

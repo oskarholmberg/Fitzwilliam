@@ -5,8 +5,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.oskarholmberg.fitzwilliam.handlers.B2DVars;
-import com.oskarholmberg.fitzwilliam.handlers.SPInput;
-import com.oskarholmberg.fitzwilliam.handlers.SPInputProcessor;
+import com.oskarholmberg.fitzwilliam.handlers.PlayerInput;
+import com.oskarholmberg.fitzwilliam.handlers.PlayerInputProcessor;
 import com.oskarholmberg.fitzwilliam.gamestates.GameStateManager;
 
 public class Game extends ApplicationAdapter {
@@ -28,7 +28,7 @@ public class Game extends ApplicationAdapter {
         hudCam = new OrthographicCamera();
         hudCam.setToOrtho(false, B2DVars.DEFAULT_GAME_WIDTH, B2DVars.DEFAULT_GAME_HEIGHT);
 
-        Gdx.input.setInputProcessor(new SPInputProcessor());
+        Gdx.input.setInputProcessor(new PlayerInputProcessor());
 
         gsm = new GameStateManager(this);
 	}
@@ -40,7 +40,7 @@ public class Game extends ApplicationAdapter {
         Gdx.graphics.setTitle(TITLE + " -- FPS: " + Gdx.graphics.getFramesPerSecond());
         gsm.update(Gdx.graphics.getDeltaTime());
         gsm.render();
-        SPInput.update();
+        PlayerInput.update();
 	}
 
 	public void dispose(){

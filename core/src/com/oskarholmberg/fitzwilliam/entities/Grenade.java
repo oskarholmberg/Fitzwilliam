@@ -7,27 +7,27 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.oskarholmberg.fitzwilliam.handlers.Assets;
 import com.oskarholmberg.fitzwilliam.handlers.B2DVars;
-import com.oskarholmberg.fitzwilliam.handlers.SPAnimation;
+import com.oskarholmberg.fitzwilliam.handlers.SpriteAnimation;
 
 /**
  * Created by erik on 11/05/16.
  */
-public class SPGrenade extends com.oskarholmberg.fitzwilliam.entities.SPSprite {
+public class Grenade extends Sprite {
 
     private int offset = 15;
     private float posYoffset = 5 / B2DVars.PPM, getPosXoffset = B2DVars.PLAYER_WIDTH + (20 / B2DVars.PPM);
-    private SPAnimation animation;
+    private SpriteAnimation animation;
     private boolean opponentGrenade;
     private CircleShape shape;
     private float lifetime = 0f;
 
-    public SPGrenade(World world, float xPos, float yPos, float dir, boolean opponentGrenade, int ID) {
+    public Grenade(World world, float xPos, float yPos, float dir, boolean opponentGrenade, int ID) {
         super(world, ID);
         this.dir = dir;
         this.opponentGrenade=opponentGrenade;
         createGrenadeBody(xPos + dir * getPosXoffset, yPos - posYoffset, dir);
         Assets.getSound("grenade").play();
-        animation = new SPAnimation(Assets.getAnimation(B2DVars.MY_COLOR + "Grenade"), 0.2f);
+        animation = new SpriteAnimation(Assets.getAnimation(B2DVars.MY_COLOR + "Grenade"), 0.2f);
 
     }
 

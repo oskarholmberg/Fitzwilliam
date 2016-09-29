@@ -8,7 +8,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.oskarholmberg.fitzwilliam.gamestates.PlayState;
 import com.oskarholmberg.fitzwilliam.handlers.Assets;
 import com.oskarholmberg.fitzwilliam.handlers.B2DVars;
-import com.oskarholmberg.fitzwilliam.handlers.SPAnimation;
+import com.oskarholmberg.fitzwilliam.handlers.SpriteAnimation;
 
 
 public class EnemyBullet extends EnemyEntity {
@@ -23,7 +23,7 @@ public class EnemyBullet extends EnemyEntity {
         Texture bullet = Assets.getTex(color + "Bullet");
         textureWidth = bullet.getWidth();
         textureHeight = bullet.getHeight();
-        animation = new SPAnimation(bullet);
+        animation = new SpriteAnimation(bullet);
         textureOffset = 0;
     }
 

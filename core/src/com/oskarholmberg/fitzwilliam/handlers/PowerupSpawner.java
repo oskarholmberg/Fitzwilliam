@@ -3,7 +3,7 @@ package com.oskarholmberg.fitzwilliam.handlers;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
-import com.oskarholmberg.fitzwilliam.entities.SPPower;
+import com.oskarholmberg.fitzwilliam.entities.PowerUp;
 import com.oskarholmberg.fitzwilliam.handlers.pools.Pooler;
 import com.oskarholmberg.fitzwilliam.net.client.GameClient;
 import com.oskarholmberg.fitzwilliam.net.packets.TCPEventPacket;
@@ -36,8 +36,8 @@ public class PowerupSpawner {
         //int powerType = MathUtils.random(2, B2DVars.POWERTYPE_AMOUNT);
         // below used for debugging powerUps, managed through limiting the range
         int powerType = MathUtils.random(1, 1);
-        SPPower power = new SPPower(world, powerPos.x, powerPos.y, id, powerType);
-        powerHandler.addPower(id, power);
+        PowerUp powerUp = new PowerUp(world, powerPos.x, powerPos.y, id, powerType);
+        powerHandler.addPower(id, powerUp);
         TCPEventPacket pkt = Pooler.tcpEventPacket();
         pkt.id = id;
         pkt.action = B2DVars.NET_SPAWN_POWER;

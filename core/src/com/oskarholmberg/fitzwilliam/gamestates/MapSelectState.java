@@ -11,23 +11,23 @@ import java.util.HashMap;
 public class MapSelectState extends GameState {
 
     private World world;
-    private SPButton backButton;
+    private MenuButton backButton;
     private Texture background = Assets.getBackground();
-    private HashMap<Integer, SPButton> mapButtons;
+    private HashMap<Integer, MenuButton> mapButtons;
 
     protected MapSelectState(GameStateManager gsm) {
         super(gsm);
         world = new World(new Vector2(0f, -9.81f), true);
         populateMapSelection();
-        backButton = new SPButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
+        backButton = new MenuButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
                 cam.viewportHeight - 100, 40f, 40f, cam);
     }
 
     private void populateMapSelection(){
-        mapButtons = new HashMap<Integer, SPButton>();
+        mapButtons = new HashMap<Integer, MenuButton>();
         int index = 0;
         for (int i = 3; i <= 4; i++){
-            SPButton mapButton = new SPButton(new Texture("maps/mapicons/level" +  i + "icon.png")
+            MenuButton mapButton = new MenuButton(new Texture("maps/mapicons/level" +  i + "icon.png")
                     , 350 + 220*index, cam.viewportHeight - 300, 200, 70, cam);
             mapButton.setInfo(Integer.toString(i));
             mapButtons.put(i, mapButton);

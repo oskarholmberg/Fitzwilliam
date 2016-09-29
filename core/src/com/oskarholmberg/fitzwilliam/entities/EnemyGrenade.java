@@ -6,7 +6,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.oskarholmberg.fitzwilliam.handlers.Assets;
 import com.oskarholmberg.fitzwilliam.handlers.B2DVars;
-import com.oskarholmberg.fitzwilliam.handlers.SPAnimation;
+import com.oskarholmberg.fitzwilliam.handlers.SpriteAnimation;
 import com.oskarholmberg.fitzwilliam.gamestates.PlayState;
 
 
@@ -18,7 +18,7 @@ public class EnemyGrenade extends EnemyEntity{
     }
 
     public void setAnimation(String color){
-        animation = new SPAnimation(Assets.getAnimation(color + "Grenade"), 0.2f);
+        animation = new SpriteAnimation(Assets.getAnimation(color + "Grenade"), 0.2f);
         textureOffset = 15;
     }
 

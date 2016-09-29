@@ -5,7 +5,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pool;
 import com.oskarholmberg.fitzwilliam.handlers.EntityInterpolator;
-import com.oskarholmberg.fitzwilliam.handlers.SPAnimation;
+import com.oskarholmberg.fitzwilliam.handlers.SpriteAnimation;
 import com.oskarholmberg.fitzwilliam.net.packets.EntityPacket;
 
 /**
@@ -15,7 +15,7 @@ public abstract class EnemyEntity implements Disposable, Pool.Poolable{
 
     protected Body body;
     protected int id;
-    protected SPAnimation animation;
+    protected SpriteAnimation animation;
     protected float textureOffset = 0, textureWidth, textureHeight;
     protected EntityInterpolator interpolator;
 
