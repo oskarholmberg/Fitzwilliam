@@ -3,7 +3,7 @@ package com.oskarholmberg.fitzwilliam.handlers;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntMap;
-import com.oskarholmberg.fitzwilliam.entities.SPPower;
+import com.oskarholmberg.fitzwilliam.entities.PowerUp;
 import com.oskarholmberg.fitzwilliam.handlers.pools.Pooler;
 import com.oskarholmberg.fitzwilliam.net.packets.TCPEventPacket;
 import com.oskarholmberg.fitzwilliam.gamestates.PlayState;
@@ -16,14 +16,14 @@ public class PowerupHandler {
     private static final float AMMO_DUR = 10f, TILT_DUR = 10f, SHIELD_DUR = 10f, GHOST_DUR = 5f;
     private float rotationAngle = 0f;
     private boolean shielded = false, ghosted = false, tilted = false;
-    private IntMap<SPPower> powerups;
+    private IntMap<PowerUp> powerups;
     private int xOffset = 25, yOffset = 30;
     private PlayState ps;
-    private SPAnimation shield = new SPAnimation(Assets.getAnimation("shield"), 0.2f);
+    private SpriteAnimation shield = new SpriteAnimation(Assets.getAnimation("shield"), 0.2f);
 
     public PowerupHandler(PlayState ps){
         this.ps=ps;
-        powerups = new IntMap<SPPower>();
+        powerups = new IntMap<PowerUp>();
     }
 
     public boolean unlimitedAmmo(){
@@ -33,8 +33,8 @@ public class PowerupHandler {
         return false;
     }
 
-    public void addPower(int id, SPPower power){
-        powerups.put(id, power);
+    public void addPower(int id, PowerUp powerUp){
+        powerups.put(id, powerUp);
     }
 
     public boolean containsPower(int id){
@@ -42,9 +42,9 @@ public class PowerupHandler {
     }
 
     public void removePower(int id){
-        SPPower power = powerups.remove(id);
-        ps.world.destroyBody(power.getBody());
-        power.dispose();
+        PowerUp powerUp = powerups.remove(id);
+        ps.world.destroyBody(powerUp.getBody());
+        powerUp.dispose();
     }
 
     public void applyPowerup(int powerupType){
@@ -128,14 +128,14 @@ public class PowerupHandler {
 
     private void powerTaken(){
         if (ps.cl.powerTaken() && ps.cl.getLastPowerTaken() != null){
-            SPPower power = powerups.remove(ps.cl.getLastPowerTaken().getId());
-            int powerType = power.getPowerType();
-            ps.world.destroyBody(power.getBody());
-            power.dispose();
+            PowerUp powerUp = powerups.remove(ps.cl.getLastPowerTaken().getId());
+            int powerType = powerUp.getPowerType();
+            ps.world.destroyBody(powerUp.getBody());
+            powerUp.dispose();
 
             TCPEventPacket pkt = Pooler.tcpEventPacket();
             pkt.action = B2DVars.NET_DESTROY_BODY;
-            pkt.id = power.getId();
+            pkt.id = powerUp.getId();
             ps.client.sendTCP(pkt);
             Pooler.free(pkt);
 

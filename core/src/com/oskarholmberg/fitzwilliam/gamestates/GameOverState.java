@@ -12,7 +12,7 @@ import com.oskarholmberg.fitzwilliam.handlers.Assets;
  */
 public class GameOverState extends GameState {
 
-    private SPButton backbutton;
+    private MenuButton backbutton;
     private World world;
     private Texture background = Assets.getBackground();
     private Texture gameOver = new Texture("images/font/gameOver.png");
@@ -29,7 +29,7 @@ public class GameOverState extends GameState {
         this.killedByEntities = killedByEntities;
         this.victoryOrder = victoryOrder.split(":");
         world = new World(new Vector2(0, -9.81f), true);
-        backbutton = new SPButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
+        backbutton = new MenuButton(new Texture("images/button/backButton.png"), cam.viewportWidth - 100,
                 cam.viewportHeight - 100, 40f, 40f, cam);
         placings = new Texture[4];
         placings[0] = new Texture("images/font/golden1.png");

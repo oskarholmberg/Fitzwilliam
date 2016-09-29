@@ -9,13 +9,13 @@ import com.oskarholmberg.fitzwilliam.handlers.Assets;
 import com.oskarholmberg.fitzwilliam.handlers.B2DVars;
 
 
-public class SPBullet extends SPSprite {
+public class Bullet extends Sprite {
 
     private int offset = 0;
     private float posYoffset = 5/ B2DVars.PPM, posXoffset = B2DVars.PLAYER_WIDTH+(20/ B2DVars.PPM);
     private PolygonShape shape;
 
-    public SPBullet(World world, float xPos, float yPos, float dir, boolean harmful, int ID) {
+    public Bullet(World world, float xPos, float yPos, float dir, boolean harmful, int ID) {
         super(world, ID);
         this.dir=dir;
         createBullet(xPos+dir* posXoffset, yPos-posYoffset, dir, harmful);

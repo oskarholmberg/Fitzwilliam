@@ -13,9 +13,9 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.oskarholmberg.fitzwilliam.entities.EnemyBullet;
 import com.oskarholmberg.fitzwilliam.entities.EnemyEntity;
 import com.oskarholmberg.fitzwilliam.entities.EnemyGrenade;
-import com.oskarholmberg.fitzwilliam.entities.SPOpponent;
-import com.oskarholmberg.fitzwilliam.entities.SPPlayer;
-import com.oskarholmberg.fitzwilliam.entities.SPPower;
+import com.oskarholmberg.fitzwilliam.entities.Opponent;
+import com.oskarholmberg.fitzwilliam.entities.Player;
+import com.oskarholmberg.fitzwilliam.entities.PowerUp;
 import com.oskarholmberg.fitzwilliam.handlers.Assets;
 import com.oskarholmberg.fitzwilliam.handlers.B2DVars;
 import com.oskarholmberg.fitzwilliam.handlers.HUD;
@@ -23,7 +23,7 @@ import com.oskarholmberg.fitzwilliam.handlers.MapBuilder;
 import com.oskarholmberg.fitzwilliam.handlers.PowerupHandler;
 import com.oskarholmberg.fitzwilliam.handlers.PowerupSpawner;
 import com.oskarholmberg.fitzwilliam.handlers.SPContactListener;
-import com.oskarholmberg.fitzwilliam.handlers.SPInput;
+import com.oskarholmberg.fitzwilliam.handlers.PlayerInput;
 import com.oskarholmberg.fitzwilliam.handlers.Tools;
 import com.oskarholmberg.fitzwilliam.handlers.WeaponHandler;
 import com.oskarholmberg.fitzwilliam.handlers.pools.Pooler;
@@ -41,7 +41,7 @@ public class PlayState extends GameState {
 
     private Box2DDebugRenderer b2dr;
     private OrthographicCamera b2dCam;
-    private IntMap<SPOpponent> opponents;
+    private IntMap<Opponent> opponents;
     private Array<Vector2> spawnLocations;
     private PowerupSpawner powerupSpawner;
     private WeaponHandler weapons;
@@ -58,7 +58,7 @@ public class PlayState extends GameState {
             removeMeMessageSent = false, debuggingMode = false, gameOverReceived = false,
             mapHasBeenCreated = false;
 
-    public int currentTexture = SPOpponent.STAND_LEFT;
+    public int currentTexture = Opponent.STAND_LEFT;
     public World world;
     public static PlayState playState;
     public float lastJumpDirection = 1;
@@ -66,7 +66,7 @@ public class PlayState extends GameState {
     public PowerupHandler powerHandler;
     public MapBuilder map;
     public SPContactListener cl;
-    public SPPlayer player;
+    public Player player;
 
     public PlayState(GameStateManager gsm, GameClient client) {
         super(gsm);
@@ -85,7 +85,7 @@ public class PlayState extends GameState {
 
         powerHandler = new PowerupHandler(this);
 
-        opponents = new IntMap<SPOpponent>();
+        opponents = new IntMap<Opponent>();
         opponentEntitySequence = new IntMap<Integer>();
 
         killedByEntity = new IntMap<Array<String>>();
@@ -110,7 +110,7 @@ public class PlayState extends GameState {
 
     private void createPlayer() {
         Vector2 spawn = spawnLocations.random();
-        player = new SPPlayer(world, spawn.x, spawn.y, B2DVars.MY_ID, B2DVars.MY_COLOR);
+        player = new Player(world, spawn.x, spawn.y, B2DVars.MY_ID, B2DVars.MY_COLOR);
         TCPEventPacket packet = new TCPEventPacket();
         packet.action = B2DVars.NET_CONNECT;
         packet.pos = spawn;
@@ -130,41 +130,41 @@ public class PlayState extends GameState {
     }
 
     public void handleInput() {
-        if (SPInput.isPressed(SPInput.BUTTON_RIGHT) ||
-                SPInput.isPressed() && SPInput.x > touchNbrs[1]) {
-            SPInput.down = false;
+        if (PlayerInput.isPressed(PlayerInput.BUTTON_RIGHT) ||
+                PlayerInput.isPressed() && PlayerInput.x > touchNbrs[1]) {
+            PlayerInput.down = false;
             if (!player.isDead()) {
                 lastJumpDirection = 1;
                 if (cl.canJump()) {
                     player.jump(B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
                 } else {
-                    currentTexture = SPPlayer.STAND_RIGHT;
+                    currentTexture = Player.STAND_RIGHT;
                 }
             }
         }
-        if (SPInput.isPressed(SPInput.BUTTON_LEFT) || SPInput.isPressed() && SPInput.x < touchNbrs[0]) {
-            SPInput.down = false;
+        if (PlayerInput.isPressed(PlayerInput.BUTTON_LEFT) || PlayerInput.isPressed() && PlayerInput.x < touchNbrs[0]) {
+            PlayerInput.down = false;
             if (!player.isDead()) {
                 lastJumpDirection = -1;
                 if (cl.canJump()) {
                     player.jump(-B2DVars.PH_JUMPX, B2DVars.PH_JUMPY, player.getPosition().x, player.getPosition().y);
                 } else {
-                    currentTexture = SPPlayer.STAND_LEFT;
+                    currentTexture = Player.STAND_LEFT;
                 }
             }
         }
-        if (SPInput.isPressed(SPInput.BUTTON_W) ||
-                SPInput.isPressed() && SPInput.x > touchNbrs[0] && SPInput.x < touchNbrs[1] && SPInput.y > touchNbrs[2]) {
-            SPInput.down = false;
+        if (PlayerInput.isPressed(PlayerInput.BUTTON_W) ||
+                PlayerInput.isPressed() && PlayerInput.x > touchNbrs[0] && PlayerInput.x < touchNbrs[1] && PlayerInput.y > touchNbrs[2]) {
+            PlayerInput.down = false;
             if (!player.isDead() && !player.spectateMode())
                 weapons.shoot();
         }
-        if (SPInput.isPressed(SPInput.BUTTON_E) || SPInput.isPressed() && SPInput.x > touchNbrs[0] && SPInput.x < touchNbrs[1] && SPInput.y < touchNbrs[2]) {
-            SPInput.down = false;
+        if (PlayerInput.isPressed(PlayerInput.BUTTON_E) || PlayerInput.isPressed() && PlayerInput.x > touchNbrs[0] && PlayerInput.x < touchNbrs[1] && PlayerInput.y < touchNbrs[2]) {
+            PlayerInput.down = false;
             if (!player.isDead() && !player.spectateMode())
                 weapons.throwGrenade();
         }
-        if (SPInput.isPressed(SPInput.BUTTON_Y)) {
+        if (PlayerInput.isPressed(PlayerInput.BUTTON_Y)) {
             System.out.println("Debug is clicked! printing the next debug event.");
             System.out.println("CurrentTime: " + TimeUtils.millis() + "\t" + System.currentTimeMillis());
             debugClick = true;
@@ -186,7 +186,7 @@ public class PlayState extends GameState {
                     break;
                 case B2DVars.NET_CONNECT:
                     if (!opponents.containsKey(pkt.id)) {
-                        SPOpponent opponent = new SPOpponent(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.miscString);
+                        Opponent opponent = new Opponent(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.miscString);
                         opponents.put(pkt.id, opponent);
                         hud.setColorToId(pkt.id, pkt.miscString);
                         killedByEntity.put(pkt.id, new Array<String>());
@@ -203,7 +203,7 @@ public class PlayState extends GameState {
                 case B2DVars.NET_DISCONNECT:
                     if (opponents.containsKey(pkt.id)) {
                         //remove opponent
-                        SPOpponent opponent = opponents.remove(pkt.id);
+                        Opponent opponent = opponents.remove(pkt.id);
                         world.destroyBody(opponent.getBody());
                         //clear opponents score
                         killedByEntity.remove(pkt.id);
@@ -270,7 +270,7 @@ public class PlayState extends GameState {
                     }
                     break;
                 case B2DVars.NET_SPAWN_POWER:
-                    powerHandler.addPower(pkt.id, new SPPower(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.misc));
+                    powerHandler.addPower(pkt.id, new PowerUp(world, pkt.pos.x, pkt.pos.y, pkt.id, pkt.misc));
                     break;
                 case B2DVars.NET_APPLY_ANTIPOWER:
                     if (pkt.misc == B2DVars.POWERTYPE_TILTSCREEN) {
@@ -358,7 +358,7 @@ public class PlayState extends GameState {
             if (!powerHandler.isGhosted()) {
                 pkt.tex = currentTexture;
             } else {
-                pkt.tex = SPPlayer.BLANK;
+                pkt.tex = Player.BLANK;
             }
             pkt.id = player.getId();
             pkt.time = TimeUtils.millis();

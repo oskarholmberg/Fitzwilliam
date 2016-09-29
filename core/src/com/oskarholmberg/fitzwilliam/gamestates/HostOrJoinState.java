@@ -19,7 +19,7 @@ import com.oskarholmberg.fitzwilliam.handlers.B2DVars;
  */
 public class HostOrJoinState extends GameState {
 
-    private SPButton hostButton, joinButton;
+    private MenuButton hostButton, joinButton;
     private World world;
     private Texture background = Assets.getBackground();
     private Array<FallingBody> itRains;
@@ -31,8 +31,8 @@ public class HostOrJoinState extends GameState {
 
         world = new World(new Vector2(0, -9.81f), true);
         itRains = new Array<FallingBody>();
-        hostButton = new SPButton(new Texture("images/button/hostGameButton.png"), cam.viewportWidth/2, (cam.viewportHeight/2)+100, 289f, 28f, cam);
-        joinButton = new SPButton(new Texture("images/button/joinGameButton.png"), cam.viewportWidth/2, (cam.viewportHeight/2), 289f, 28f, cam);
+        hostButton = new MenuButton(new Texture("images/button/hostGameButton.png"), cam.viewportWidth/2, (cam.viewportHeight/2)+100, 289f, 28f, cam);
+        joinButton = new MenuButton(new Texture("images/button/joinGameButton.png"), cam.viewportWidth/2, (cam.viewportHeight/2), 289f, 28f, cam);
         fallingBody();
     }
 

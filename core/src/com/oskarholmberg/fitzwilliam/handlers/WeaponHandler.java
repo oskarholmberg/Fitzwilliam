@@ -5,9 +5,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.oskarholmberg.fitzwilliam.entities.SPBullet;
-import com.oskarholmberg.fitzwilliam.entities.SPGrenade;
-import com.oskarholmberg.fitzwilliam.entities.SPSprite;
+import com.oskarholmberg.fitzwilliam.entities.Bullet;
+import com.oskarholmberg.fitzwilliam.entities.Grenade;
+import com.oskarholmberg.fitzwilliam.entities.Sprite;
 import com.oskarholmberg.fitzwilliam.handlers.pools.Pooler;
 import com.oskarholmberg.fitzwilliam.net.packets.EntityCluster;
 import com.oskarholmberg.fitzwilliam.net.packets.EntityPacket;
@@ -22,16 +22,16 @@ public class WeaponHandler {
     private float bulletRefresh = 0f, grenadeRefresh = 0f, sendWeaponEventsTimer = 0f;
     private HUD hud;
     private PlayState ps;
-    private IntMap<SPGrenade> activeGrenades;
-    private IntMap<SPBullet> activeBullets;
+    private IntMap<Grenade> activeGrenades;
+    private IntMap<Bullet> activeBullets;
 
     public WeaponHandler(HUD hud, PlayState playState){
         this.hud=hud;
         this.ps =playState;
         amountBullets = B2DVars.AMOUNT_BULLET;
         amountGrenades = B2DVars.AMOUNT_GRENADE;
-        activeBullets = new IntMap<SPBullet>();
-        activeGrenades = new IntMap<SPGrenade>();
+        activeBullets = new IntMap<Bullet>();
+        activeGrenades = new IntMap<Grenade>();
     }
 
     public void refresh(){
@@ -51,11 +51,11 @@ public class WeaponHandler {
 
     public void removeGrenade(int id){
         if (activeGrenades.containsKey(id)) {
-            SPGrenade grenade = activeGrenades.remove(id);
+            Grenade grenade = activeGrenades.remove(id);
             ps.world.destroyBody(grenade.getBody());
             grenade.dispose();
         } else if (activeBullets.containsKey(id)){
-            SPBullet bullet = activeBullets.remove(id);
+            Bullet bullet = activeBullets.remove(id);
             ps.world.destroyBody(bullet.getBody());
             bullet.dispose();
         }
@@ -67,7 +67,7 @@ public class WeaponHandler {
         } else {
             int id = Tools.newEntityId();
             Vector2 pos = ps.player.getPosition();
-            SPBullet bullet = new SPBullet(ps.world, pos.x, pos.y, ps.lastJumpDirection, false, id);
+            Bullet bullet = new Bullet(ps.world, pos.x, pos.y, ps.lastJumpDirection, false, id);
             activeBullets.put(id, bullet);
             amountBullets--;
             hud.setAmountBulletsLeft(amountBullets);
@@ -87,7 +87,7 @@ public class WeaponHandler {
         if (amountGrenades > 0) {
             int id = Tools.newEntityId();
             Vector2 pos = ps.player.getPosition();
-            SPGrenade spg = new SPGrenade(ps.world, pos.x, pos.y, ps.lastJumpDirection, false, id);
+            Grenade spg = new Grenade(ps.world, pos.x, pos.y, ps.lastJumpDirection, false, id);
             activeGrenades.put(id, spg);
             amountGrenades--;
             hud.setAmountGrenadesLeft(amountGrenades);
@@ -136,7 +136,7 @@ public class WeaponHandler {
                 pkt.action = B2DVars.NET_DESTROY_BODY;
                 ps.client.sendTCP(pkt);
                 Pooler.free(pkt);
-                SPSprite bullet = activeBullets.remove(id);
+                Sprite bullet = activeBullets.remove(id);
                 ps.world.destroyBody(bullet.getBody());
                 bullet.dispose();
             }
@@ -153,7 +153,7 @@ public class WeaponHandler {
                 pkt.action = B2DVars.NET_DESTROY_BODY;
                 ps.client.sendTCP(pkt);
                 Pooler.free(pkt); // return it to the pool
-                SPSprite grenade = activeGrenades.remove(id);
+                Sprite grenade = activeGrenades.remove(id);
                 grenade.dispose();
                 ps.world.destroyBody(grenade.getBody());
             }

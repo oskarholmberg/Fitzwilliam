@@ -7,20 +7,20 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.oskarholmberg.fitzwilliam.handlers.Assets;
 import com.oskarholmberg.fitzwilliam.handlers.B2DVars;
-import com.oskarholmberg.fitzwilliam.handlers.SPAnimation;
+import com.oskarholmberg.fitzwilliam.handlers.SpriteAnimation;
 
 /**
  * Created by oskar on 5/18/16.
  */
-public class SPOpponent extends com.oskarholmberg.fitzwilliam.entities.SPPlayer {
-    private SPAnimation shield;
+public class Opponent extends Player {
+    private SpriteAnimation shield;
     private boolean shielded = false, lost = false;
     private int lastMovementSeq = 0;
     private float invulnerableTimer = 0, invulnerableTime = 0;
 
-    public SPOpponent(World world, float xPos, float yPos, int id, String color) {
+    public Opponent(World world, float xPos, float yPos, int id, String color) {
         super(world, xPos, yPos, id, color);
-        shield = new SPAnimation(Assets.getAnimation("shield"), 0.2f);
+        shield = new SpriteAnimation(Assets.getAnimation("shield"), 0.2f);
     }
 
     public void applyShield(){

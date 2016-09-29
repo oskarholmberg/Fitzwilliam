@@ -15,7 +15,7 @@ import com.oskarholmberg.fitzwilliam.handlers.Assets;
 import com.oskarholmberg.fitzwilliam.handlers.B2DVars;
 import com.oskarholmberg.fitzwilliam.gamestates.PlayState;
 
-public class SPPlayer extends com.oskarholmberg.fitzwilliam.entities.SPSprite {
+public class Player extends Sprite {
 
     protected Sound jetpackSound;
     protected Texture[] textures, ghostTex;
@@ -28,7 +28,7 @@ public class SPPlayer extends com.oskarholmberg.fitzwilliam.entities.SPSprite {
     public static int STAND_RIGHT = 0, STAND_LEFT = 1, JUMP_RIGHT = 2, JUMP_LEFT = 3,
             DEAD_RIGHT = 4, DEAD_LEFT = 5, BLANK=6;
 
-    public SPPlayer(World world, float xPos, float yPos, int id, String color) {
+    public Player(World world, float xPos, float yPos, int id, String color) {
         super(world, id);
         this.color=color;
         createPlayerBody(xPos, yPos);

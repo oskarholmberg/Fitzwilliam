@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.oskarholmberg.fitzwilliam.handlers.Assets;
 import com.oskarholmberg.fitzwilliam.handlers.B2DVars;
-import com.oskarholmberg.fitzwilliam.handlers.SPAnimation;
+import com.oskarholmberg.fitzwilliam.handlers.SpriteAnimation;
 import com.oskarholmberg.fitzwilliam.gamestates.PlayState;
 import com.oskarholmberg.fitzwilliam.net.packets.PlayerMovementPacket;
 
@@ -47,7 +47,7 @@ public class EnemyPlayer extends com.oskarholmberg.fitzwilliam.entities.EnemyEnt
         for (int i = 0; i < textures.length; i++){
             texRegions[i] = new TextureRegion(textures[i]);
         }
-        animation = new SPAnimation(texRegions, 0.2f);
+        animation = new SpriteAnimation(texRegions, 0.2f);
     }
 
     public void moveOpponent(PlayerMovementPacket pkt){

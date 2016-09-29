@@ -5,12 +5,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
-import com.oskarholmberg.fitzwilliam.handlers.SPInput;
+import com.oskarholmberg.fitzwilliam.handlers.PlayerInput;
 
 /**
  * Created by erik on 12/05/16.
  */
-public class SPButton implements Disposable{
+public class MenuButton implements Disposable{
     private Texture texture;
     private float xPos, yPos, texWidth, texHeight;
     private OrthographicCamera cam;
@@ -19,7 +19,7 @@ public class SPButton implements Disposable{
     private Vector3 vector3;
     private boolean clicked;
 
-    public SPButton(Texture texture, float xPos, float yPos, float width, float height, OrthographicCamera cam){
+    public MenuButton(Texture texture, float xPos, float yPos, float width, float height, OrthographicCamera cam){
         this.texture=texture;
         this.xPos=xPos;
         this.yPos=yPos;
@@ -33,9 +33,9 @@ public class SPButton implements Disposable{
     public boolean isClicked(){ return clicked;}
 
     public void update(float dt){
-        vector3.set(SPInput.x, SPInput.y, 0);
+        vector3.set(PlayerInput.x, PlayerInput.y, 0);
         cam.unproject(vector3);
-        if(SPInput.isPressed() &&
+        if(PlayerInput.isPressed() &&
                 vector3.x > xPos - texWidth / 2 && vector3.x < xPos + texWidth / 2 &&
                 vector3.y > yPos - texHeight / 2 && vector3.y < yPos + texHeight / 2) {
             clicked = true;
