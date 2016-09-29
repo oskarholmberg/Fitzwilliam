@@ -170,6 +170,8 @@ public class PlayState extends GameState {
             System.out.println("CurrentTime: " + TimeUtils.millis() + "\t" + System.currentTimeMillis());
             debugClick = true;
             debuggingMode = !debuggingMode;
+            b2dCam.position.x = cam.position.x / B2DVars.PPM;
+            b2dCam.update();
             System.out.println("CURRENT TIME: " + TimeUtils.millis() + " SystemCurrentTime: " + System.currentTimeMillis());
             System.out.println("HudCam pos: " + hudCam.position.x + " cam pos: " + cam.position.x);
         }
@@ -332,10 +334,16 @@ public class PlayState extends GameState {
             float camX = player.getPosition().x * B2DVars.PPM;
             if ((camX + cam.viewportWidth / 2) > map.getMapWidth()) {
                 cam.position.x = map.getMapWidth() - cam.viewportWidth / 2;
+                b2dCam.position.x = cam.position.x / B2DVars.PPM;
+                b2dCam.update();
             } else if ((camX - cam.viewportWidth / 2) < 0) {
                 cam.position.x = 0 + cam.viewportWidth / 2;
+                b2dCam.position.x = cam.position.x / B2DVars.PPM;
+                b2dCam.update();
             } else {
                 cam.position.x = camX;
+                b2dCam.position.x = cam.position.x / B2DVars.PPM;
+                b2dCam.update();
             }
         } else if (!removeMeMessageSent) {
             player.setSpectateMode();
@@ -421,15 +429,19 @@ public class PlayState extends GameState {
         if ((player.getPosition().x * B2DVars.PPM) > (camX + 100f)) {
             if ((camX + cam.viewportWidth / 2) < map.getMapWidth()) {
                 cam.position.x = camX + 2f;
-                b2dCam.position.x = cam.position.x / B2DVars.PPM;
-                b2dCam.update();
+                if (debuggingMode) {
+                    b2dCam.position.x = cam.position.x / B2DVars.PPM;
+                    b2dCam.update();
+                }
             }
             //if the player moves far left
         } else if ((player.getPosition().x * B2DVars.PPM) < (camX - 100f)) {
             if ((camX - cam.viewportWidth / 2) > 0) {
                 cam.position.x = camX - 2f;
-                b2dCam.position.x = cam.position.x / B2DVars.PPM;
-                b2dCam.update();
+                if (debuggingMode) {
+                    b2dCam.position.x = cam.position.x / B2DVars.PPM;
+                    b2dCam.update();
+                }
             }
         }
         cam.update();
