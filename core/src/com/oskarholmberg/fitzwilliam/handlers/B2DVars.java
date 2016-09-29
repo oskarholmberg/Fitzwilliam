@@ -12,7 +12,6 @@ public class B2DVars {
 
     public static final int SCALE = 1;
     public final static int DEFAULT_GAME_WIDTH = 960*SCALE, DEFAULT_GAME_HEIGHT = 640*SCALE;
-    public final static int AMOUNT_BULLET = 3, AMOUNT_GRENADE = 1, AMOUNT_LIVES = 1;
 
     public final static float VOID_X = 200f, VOID_Y = 200f;
 
@@ -33,6 +32,7 @@ public class B2DVars {
 
     // player
     public static final float PLAYER_HEIGHT = 22f/PPM, PLAYER_WIDTH = 18f/PPM;
+    public final static int AMOUNT_BULLET = 3, AMOUNT_GRENADE = 1, AMOUNT_LIVES = 5;
 
     // entity ids
     public static final String ID_FOOT = "foot", ID_PLAYER = "player", ID_OPPONENT = "opponent",
